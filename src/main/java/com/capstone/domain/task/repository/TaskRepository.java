@@ -1,5 +1,5 @@
-package com.capstone.task.repository;
-import com.capstone.task.entity.Task;
+package com.capstone.domain.task.repository;
+import com.capstone.domain.task.entity.Task;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

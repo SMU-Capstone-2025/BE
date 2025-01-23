@@ -1,4 +1,4 @@
-package com.capstone.task.dto;
+package com.capstone.domain.task.dto;
 
 import jakarta.annotation.Nullable;
 import lombok.Data;

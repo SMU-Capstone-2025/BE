@@ -1,4 +1,4 @@
-package com.capstone.task.entity;
+package com.capstone.domain.task.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +14,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Version {
+    private String taskId;
     private String version;
     private String modifiedDateTime;
     private String modifiedBy;
     private String summary;
     private String content;
-    private String state;
 }
 
