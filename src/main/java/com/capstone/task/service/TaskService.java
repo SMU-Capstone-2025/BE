@@ -49,8 +49,18 @@ public class TaskService {
             }
             task.getVersionHistory().add(version);
             putTask(task);
+            return "업데이트가 성공적으로 완료되었습니다.";
         }
-        return "업데이트가 성공적으로 완료되었습니다.";
+        return "업데이트 하고자 하는 작업은 기존에 없던 작업 입니다.";
+    }
+    public String dropTask(String id){
+        Optional<Task> optionalTask = fetchTaskById(id);
+        if(optionalTask.isPresent()){
+            Task task = optionalTask.get();
+            taskRepository.delete(task);
+            return "작업 삭제가 성공적으로 완료되었습니다.";
+        }
+        return "삭제하고자 하는 작업은 기존에 없던 작업입니다.";
     }
     public Optional<Task> fetchTaskById(String id){
         return taskRepository.findById(id);

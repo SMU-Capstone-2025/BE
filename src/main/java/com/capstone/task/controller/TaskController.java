@@ -33,4 +33,9 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateTask(taskDto));
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteTask(@RequestParam String id){
+        return ResponseEntity.ok(taskService.dropTask(id));
+    }
+
 }
