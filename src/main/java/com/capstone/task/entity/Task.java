@@ -18,5 +18,6 @@ public class Task {
     private String id;
     private String title;
     private String currentVersion;
+    private String status;
     private List<Version> versionHistory;
 }
