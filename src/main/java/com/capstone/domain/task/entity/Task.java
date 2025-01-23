@@ -1,11 +1,10 @@
-package com.capstone.task.entity;
+package com.capstone.domain.task.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
-import java.util.Map;
 
 @Document(collection = "task")
 @Getter
