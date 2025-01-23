@@ -38,4 +38,8 @@ public class TaskController {
         return ResponseEntity.ok(taskService.dropTask(id));
     }
 
+    @PutMapping("/status")
+    public ResponseEntity<String> putUpdate(@RequestParam String id, @RequestParam String status){
+        return ResponseEntity.ok(taskService.updateStatus(id, status));
+    }
 }

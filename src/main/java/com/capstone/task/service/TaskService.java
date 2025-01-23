@@ -62,6 +62,16 @@ public class TaskService {
         }
         return "삭제하고자 하는 작업은 기존에 없던 작업입니다.";
     }
+    public String updateStatus(String id, String status){
+        Optional<Task> optionalTask = fetchTaskById(id);
+        if(optionalTask.isPresent()){
+            Task task = optionalTask.get();
+            task.setStatus(status);
+            taskRepository.save(task);
+            return "작업 상태변경이 성공적으로 완료되었습니다.";
+        }
+        return "상태 변경하고자 하는 작업은 기존에 없던 작업입니다.";
+    }
     public Optional<Task> fetchTaskById(String id){
         return taskRepository.findById(id);
     }
