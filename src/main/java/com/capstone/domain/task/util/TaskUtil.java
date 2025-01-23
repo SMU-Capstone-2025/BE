@@ -1,17 +1,18 @@
-package com.capstone.task.util;
+package com.capstone.domain.task.util;
 
-import com.capstone.task.dto.TaskDto;
-import com.capstone.task.entity.Task;
-import com.capstone.task.entity.Version;
+import com.capstone.domain.task.message.Status;
+import com.capstone.global.util.DateUtil;
+import com.capstone.domain.task.dto.TaskDto;
+import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.entity.Version;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class TaskUtil {
     public static Task toEntity(TaskDto taskDto) {
         return Task.builder()
                 .title(taskDto.getTitle())
+                .status(Status.IN_PROGRESS)
                 .currentVersion(taskDto.getVersion())
                 .versionHistory(new ArrayList<>())
                 .build();
@@ -19,8 +20,9 @@ public class TaskUtil {
 
     public static Version createVersion(TaskDto taskDto) {
         return Version.builder()
+                .taskId(taskDto.getId())
                 .version(taskDto.getVersion())
-                .modifiedDateTime(formattedDateTime)
+                .modifiedDateTime(DateUtil.getCurrentFormattedDateTime())
                 .modifiedBy(taskDto.getModifiedBy())
                 .summary(taskDto.getSummary())
                 .content(taskDto.getContent())
