@@ -41,18 +41,23 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateStatus(id, status));
     }
 
-    @PutMapping("/version/new")
-    public ResponseEntity<String> putVersion(@RequestBody TaskDto taskDto){
+    @PostMapping("/version/new")
+    public ResponseEntity<String> postVersion(@RequestBody TaskDto taskDto){
         return ResponseEntity.ok(taskService.addVersion(taskDto));
     }
 
     @GetMapping("/version/list")
-    public ResponseEntity<List<Version>> getVersionRollback(@RequestParam String taskId){
+    public ResponseEntity<List<Version>> getVersionLists(@RequestParam String taskId){
         return ResponseEntity.ok(taskService.listVersions(taskId));
     }
 
     @GetMapping("/version/back")
     public ResponseEntity<Task> getVersionRollback(@RequestParam String taskId, @RequestParam String version){
         return ResponseEntity.ok(taskService.rollbackVersion(taskId, version));
+    }
+
+    @PutMapping("/version/modify")
+    public ResponseEntity<String> versionModify(@RequestBody TaskDto taskDto){
+        return ResponseEntity.ok(taskService.modifyVersion(taskDto));
     }
 }

@@ -7,7 +7,8 @@ import lombok.Data;
 @Data
 public class TaskDto {
     @Nullable // 신규 작성 시에는 없음.
-    private String id;
+    private String id; // taskId
+    @Nullable
     private String title;
     private String modifiedBy;
     private String version;
