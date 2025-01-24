@@ -4,10 +4,10 @@ import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.TaskNotFoundException;
-import com.capstone.domain.task.exception.VersionNotFoundException;
 import com.capstone.domain.task.message.ResponseMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
+import com.capstone.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +22,13 @@ public class TaskService {
         taskRepository.save(TaskUtil.toEntity(taskDto));
         return ResponseMessages.TASK_CREATED;
     }
+
     public Version loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
         String currentVersion = task.getCurrentVersion();
-
-        return task.getVersionHistory().stream()
-                .filter(version -> version.getVersion().equals(currentVersion))
-                .findFirst()
-                .orElseThrow(() -> new VersionNotFoundException(ResponseMessages.VERSION_NOT_FOUND));
+        return taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
     }
+
     public String addVersion(TaskDto taskDto){
         Version version = TaskUtil.createVersion(taskDto);
         Task task = findTaskByIdOrThrow(taskDto.getId());
@@ -39,6 +37,7 @@ public class TaskService {
 
         return ResponseMessages.VERSION_ADDED;
     }
+
     public String dropTask(String id){
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
@@ -62,6 +61,10 @@ public class TaskService {
         task.setCurrentVersion(version);
         taskRepository.save(task);
         return task;
+    }
+
+    public String modifyVersion(TaskDto taskDto) {
+        return taskRepository.modifyVersion(taskDto);
     }
 
     public Task findTaskByIdOrThrow(String id){
