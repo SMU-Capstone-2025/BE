@@ -10,6 +10,15 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  kafka:
+    bootstrap-server: "localhost:9092"
+
+  elasticsearch:
+    uris: http://localhost:9200
+    username: elastic
+    password: keypass
+
+
 server:
   compression:
     enabled: true
