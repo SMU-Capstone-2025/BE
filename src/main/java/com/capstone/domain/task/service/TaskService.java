@@ -7,16 +7,19 @@ import com.capstone.domain.task.exception.TaskNotFoundException;
 import com.capstone.domain.task.message.ResponseMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
+import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final KafkaProducerService kafkaProducerService;
 
     public String saveTask(TaskDto taskDto){
         taskRepository.save(TaskUtil.toEntity(taskDto));
@@ -34,7 +37,7 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(taskDto.getId());
         task.getVersionHistory().add(version);
         taskRepository.save(task);
-
+        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto);
         return ResponseMessages.VERSION_ADDED;
     }
 
