@@ -4,6 +4,7 @@ import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.service.TaskService;
+import com.capstone.global.elastic.entity.LogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -59,5 +60,10 @@ public class TaskController {
     @PutMapping("/version/modify")
     public ResponseEntity<String> versionModify(@RequestBody TaskDto taskDto){
         return ResponseEntity.ok(taskService.modifyVersion(taskDto));
+    }
+
+    @GetMapping("/log")
+    public ResponseEntity<List<LogEntity>> getLogList(@RequestParam String taskId){
+        return ResponseEntity.ok(taskService.findLogsByTaskId(taskId));
     }
 }
