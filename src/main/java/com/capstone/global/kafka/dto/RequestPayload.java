@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class RequestPayload<T> {
     private String taskId;
+    private String email;
     private String method;
     private T data;
 }
