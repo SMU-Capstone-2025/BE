@@ -37,7 +37,6 @@ public class LogListener {
             String taskId = jsonNode.get("taskId").asText();
             String method = jsonNode.get("method").asText();
             String data = jsonNode.get("data").toString(); // data 필드를 문자열로 유지
-            String response = String.format("Processed task: %s with method: %s", taskId, method);
 
             // Elasticsearch에 저장할 엔티티 생성
             LogEntity logEntity = new LogEntity();
@@ -47,9 +46,6 @@ public class LogListener {
             logEntity.setLogMessage(data);
             logEntity.setTimestamp(LocalDateTime.now().toString()); // 엘라스틱서치에서 사용되는 날짜는 DateUtil의 형식과는 다른 ISO8601.
             logRepository.save(logEntity);
-
-            //kafkaTemplate.send("response-topic", response);
-
         } catch (Exception e) {
             System.err.println("메시지 처리 실패: " + e.getMessage());
         }
