@@ -7,6 +7,8 @@ import com.capstone.domain.task.exception.TaskNotFoundException;
 import com.capstone.domain.task.message.ResponseMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
+import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.global.elastic.repository.LogRepository;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final LogRepository logRepository;
     private final KafkaProducerService kafkaProducerService;
 
     public String saveTask(TaskDto taskDto){
@@ -70,6 +73,9 @@ public class TaskService {
         return taskRepository.modifyVersion(taskDto);
     }
 
+    public List<LogEntity> findLogsByTaskId(String taskId){
+        return logRepository.findAllByTaskId(taskId);
+    }
     public Task findTaskByIdOrThrow(String id){
         return taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException(ResponseMessages.TASK_NOT_FOUND));
