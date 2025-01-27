@@ -2,6 +2,7 @@ package com.capstone.global.kafka.listener;
 
 import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.global.elastic.repository.LogRepository;
 import com.capstone.global.kafka.dto.RequestPayload;
 import com.capstone.global.kafka.dto.ResponsePayload;
 import com.capstone.global.kafka.message.LogMessageGenerator;
@@ -25,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LogListener {
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final LogRepository logRepository;
     private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "log-event", groupId = "log-group")
@@ -43,7 +45,8 @@ public class LogListener {
             logEntity.setTaskId(taskId);
             logEntity.setMethod(method);
             logEntity.setLogMessage(data);
-            logEntity.setTimestamp(LocalDateTime.now().toString());
+            logEntity.setTimestamp(LocalDateTime.now().toString()); // 엘라스틱서치에서 사용되는 날짜는 DateUtil의 형식과는 다른 ISO8601.
+            logRepository.save(logEntity);
 
             //kafkaTemplate.send("response-topic", response);
 
