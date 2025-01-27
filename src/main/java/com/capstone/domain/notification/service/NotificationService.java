@@ -21,8 +21,9 @@ public class NotificationService {
     private final ObjectMapper objectMapper;
     private final NotificationWebSocketHandler notificationWebSocketHandler;
 
-    public Notification createNotification(String email, String content){
+    public Notification createNotification(String taskId, String email, String content){
         return Notification.builder()
+                .taskId(taskId)
                 .email(email)
                 .content(content)
                 .expiredDate(LocalDateTime.now().toString())
@@ -56,7 +57,7 @@ public class NotificationService {
     public void processNotification(String message) {
         try {
             LogEntity log = objectMapper.readValue(message, LogEntity.class);
-            Notification notification = createNotification(log.getEmail(), log.getLog());
+            Notification notification = createNotification(log.getTaskId(), log.getEmail(), log.getLog());
             saveNotification(notification);
             notificationWebSocketHandler.broadcastMessage(notification);
         } catch (JsonProcessingException e) {
