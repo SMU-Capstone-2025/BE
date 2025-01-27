@@ -4,18 +4,16 @@ import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.TaskNotFoundException;
-import com.capstone.domain.task.message.ResponseMessages;
+import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.global.elastic.entity.LogEntity;
 import com.capstone.global.elastic.repository.LogRepository;
 import com.capstone.global.kafka.service.KafkaProducerService;
-import com.capstone.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class TaskService {
 
     public String saveTask(TaskDto taskDto){
         taskRepository.save(TaskUtil.toEntity(taskDto));
-        return ResponseMessages.TASK_CREATED;
+        return TaskMessages.TASK_CREATED;
     }
 
     public Version loadVersionContent(String taskId) {
@@ -40,21 +38,21 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(taskDto.getId());
         task.getVersionHistory().add(version);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto);
-        return ResponseMessages.VERSION_ADDED;
+        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto, "pjy1121");
+        return TaskMessages.VERSION_ADDED;
     }
 
     public String dropTask(String id){
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
-        return ResponseMessages.TASK_DROPPED;
+        return TaskMessages.TASK_DROPPED;
     }
 
     public String updateStatus(String id, String status){
         Task task = findTaskByIdOrThrow(id);
         task.setStatus(status);
         taskRepository.save(task);
-        return ResponseMessages.STATUS_UPDATED;
+        return TaskMessages.STATUS_UPDATED;
     }
 
     public List<Version> listVersions(String taskId){
@@ -76,8 +74,9 @@ public class TaskService {
     public List<LogEntity> findLogsByTaskId(String taskId){
         return logRepository.findAllByTaskId(taskId);
     }
+
     public Task findTaskByIdOrThrow(String id){
         return taskRepository.findById(id)
-                .orElseThrow(() -> new TaskNotFoundException(ResponseMessages.TASK_NOT_FOUND));
+                .orElseThrow(() -> new TaskNotFoundException(TaskMessages.TASK_NOT_FOUND));
     }
 }

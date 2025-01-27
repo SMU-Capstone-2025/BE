@@ -40,7 +40,11 @@ dependencies {
 	implementation 'org.elasticsearch.client:elasticsearch-rest-client'
 	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.27'
 
+	// websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.4.2'
 
+	// localdatetime을 직렬화/역직렬화 하기 위함.
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
 
 	implementation 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'

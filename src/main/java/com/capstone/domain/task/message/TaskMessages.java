@@ -1,6 +1,6 @@
 package com.capstone.domain.task.message;
 
-public class ResponseMessages {
+public class TaskMessages {
     public static final String TASK_CREATED = "작업 생성이 성공적으로 완료되었습니다.";
     public static final String TASK_UPDATED = "업데이트가 성공적으로 완료되었습니다.";
     public static final String TASK_DROPPED = "작업 삭제가 성공적으로 완료되었습니다.";

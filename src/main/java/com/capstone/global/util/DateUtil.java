@@ -9,4 +9,10 @@ public class DateUtil {
     public static String getCurrentFormattedDateTime() {
         return LocalDateTime.now().format(FORMATTER);
     }
+
+
+    public static String formatLocalDateTime(String isoDateTime) {
+        LocalDateTime dateTime = LocalDateTime.parse(isoDateTime);
+        return dateTime.format(FORMATTER);
+    }
 }
