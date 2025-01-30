@@ -8,6 +8,7 @@ import com.capstone.global.elastic.entity.LogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,9 +43,10 @@ public class TaskController {
         return ResponseEntity.ok(taskService.updateStatus(id, status));
     }
 
-    @PostMapping("/version/new")
-    public ResponseEntity<String> postVersion(@RequestBody TaskDto taskDto){
-        return ResponseEntity.ok(taskService.addVersion(taskDto));
+    @PostMapping("/version/save")
+    public ResponseEntity<String> postVersion(@RequestBody TaskDto taskDto,
+                                              @RequestParam(value = "fileId", required = false) String fileId){
+        return ResponseEntity.ok(taskService.saveVersion(taskDto, fileId));
     }
 
     @GetMapping("/version/list")
@@ -55,11 +57,6 @@ public class TaskController {
     @GetMapping("/version/back")
     public ResponseEntity<Task> getVersionRollback(@RequestParam String taskId, @RequestParam String version){
         return ResponseEntity.ok(taskService.rollbackVersion(taskId, version));
-    }
-
-    @PutMapping("/version/modify")
-    public ResponseEntity<String> versionModify(@RequestBody TaskDto taskDto){
-        return ResponseEntity.ok(taskService.modifyVersion(taskDto));
     }
 
     @GetMapping("/log")

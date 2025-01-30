@@ -10,20 +10,23 @@ import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.global.elastic.entity.LogEntity;
 import com.capstone.global.elastic.repository.LogRepository;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
     private final LogRepository logRepository;
     private final KafkaProducerService kafkaProducerService;
+    private final TaskUtil taskUtil;
 
     public String saveTask(TaskDto taskDto){
-        taskRepository.save(TaskUtil.toEntity(taskDto));
+        taskRepository.save(taskUtil.toEntity(taskDto));
         return TaskMessages.TASK_CREATED;
     }
 
@@ -33,8 +36,8 @@ public class TaskService {
         return taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
     }
 
-    public String addVersion(TaskDto taskDto){
-        Version version = TaskUtil.createVersion(taskDto);
+    public String saveVersion(TaskDto taskDto, String fileId){
+        Version version = taskUtil.createOrGetVersion(taskDto, fileId);
         Task task = findTaskByIdOrThrow(taskDto.getId());
         task.getVersionHistory().add(version);
         taskRepository.save(task);
@@ -67,9 +70,6 @@ public class TaskService {
         return task;
     }
 
-    public String modifyVersion(TaskDto taskDto) {
-        return taskRepository.modifyVersion(taskDto);
-    }
 
     public List<LogEntity> findLogsByTaskId(String taskId){
         return logRepository.findAllByTaskId(taskId);
