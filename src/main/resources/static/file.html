@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Upload & Management</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 20px;
+        max-width: 600px;
+    }
+    input, button {
+        margin: 10px 0;
+        padding: 10px;
+    }
+    #fileList {
+        margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>File Upload & Management</h2>
+
+<!-- 파일 업로드 -->
+<input type="file" id="fileInput">
+<button onclick="uploadFile()">Upload</button>
+
+<!-- 파일 다운로드 -->
+<input type="text" id="downloadFileId" placeholder="Enter File ID">
+<button onclick="downloadFile()">Download</button>
+
+<!-- 파일 삭제 -->
+<input type="text" id="deleteFileId" placeholder="Enter File ID">
+<button onclick="deleteFile()">Delete</button>
+
+<h3>Uploaded Files</h3>
+<ul id="fileList"></ul>
+
+<script>
+  const serverUrl = "http://localhost:8080/file"; // 서버 URL
+
+  // 📌 파일 업로드
+  async function uploadFile() {
+      const fileInput = document.getElementById("fileInput");
+      if (!fileInput.files.length) {
+          alert("파일을 선택하세요.");
+          return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+
+      try {
+          const response = await fetch(`${serverUrl}/upload`, {
+              method: "POST",
+              body: formData
+          });
+
+          const fileId = await response.text();
+          alert("File Uploaded! ID: " + fileId);
+          updateFileList(fileId);
+      } catch (error) {
+          console.error("Upload Error:", error);
+          alert("파일 업로드 실패!");
+      }
+  }
+
+  // 📌 파일 다운로드
+  function downloadFile() {
+      const fileId = document.getElementById("downloadFileId").value;
+      if (!fileId) {
+          alert("파일 ID를 입력하세요.");
+          return;
+      }
+
+      window.location.href = `${serverUrl}/download?fileId=${fileId}`;
+  }
+
+  // 📌 파일 삭제
+  async function deleteFile() {
+      const fileId = document.getElementById("deleteFileId").value;
+      if (!fileId) {
+          alert("파일 ID를 입력하세요.");
+          return;
+      }
+
+      try {
+          const response = await fetch(`${serverUrl}/delete?fileId=${fileId}`, {
+              method: "DELETE"
+          });
+
+          if (response.ok) {
+              alert("파일이 삭제되었습니다.");
+              removeFileFromList(fileId);
+          } else {
+              alert("파일 삭제 실패!");
+          }
+      } catch (error) {
+          console.error("Delete Error:", error);
+          alert("파일 삭제 실패!");
+      }
+  }
+
+  // 📌 파일 목록에 추가
+  function updateFileList(fileId) {
+      const fileList = document.getElementById("fileList");
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `File ID: ${fileId} <button onclick="downloadFile('${fileId}')">Download</button> <button onclick="deleteFile('${fileId}')">Delete</button>`;
+      fileList.appendChild(listItem);
+  }
+
+  // 📌 파일 목록에서 제거
+  function removeFileFromList(fileId) {
+      const fileList = document.getElementById("fileList");
+      [...fileList.children].forEach(li => {
+          if (li.textContent.includes(fileId)) {
+              li.remove();
+          }
+      });
+  }
+</script>
+
+</body>
+</html>
