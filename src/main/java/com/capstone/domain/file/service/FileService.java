@@ -1,13 +1,12 @@
 package com.capstone.domain.file.service;
 
-import com.capstone.domain.file.FileMessages;
-import com.capstone.domain.file.FileTypes;
+import com.capstone.domain.file.common.FileMessages;
+import com.capstone.domain.file.common.FileTypes;
 import com.capstone.domain.file.exception.InvalidFileException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
@@ -19,10 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
