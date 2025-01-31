@@ -25,7 +25,14 @@ services:
       - zookeeper
     networks:
       - kafka_network
-
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    networks:
+      - app_network
+    command: [ "mongodb", "--bind_ip", "0.0.0.0" ]
 networks:
   kafka_network:
     driver: bridge
