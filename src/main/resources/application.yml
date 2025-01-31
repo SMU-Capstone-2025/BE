@@ -4,17 +4,17 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   data:
     mongodb:
-      uri: mongodb://localhost:27017/
+      uri: mongodb://34.59.80.150:27017/
       database: capstone
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
   kafka:
-    bootstrap-server: "localhost:9092"
+    bootstrap-server: "34.59.80.150:9092"
 
   elasticsearch:
-    uris: http://localhost:9200
+    uris: http://34.59.80.150:9200
     username: elastic
     password: keypass
 
