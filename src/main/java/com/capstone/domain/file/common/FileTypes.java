@@ -1,6 +1,4 @@
-package com.capstone.domain.file;
-
-import org.springframework.web.multipart.MultipartFile;
+package com.capstone.domain.file.common;
 
 import java.util.List;
 
