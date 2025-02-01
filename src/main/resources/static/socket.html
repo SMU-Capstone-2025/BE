@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Notification Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        #messages {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        #messages p {
+            margin: 5px 0;
+        }
+
+        #inputContainer {
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .status {
+            margin-top: 10px;
+            color: green;
+        }
+
+        .status.error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+<h1>WebSocket Notification Demo</h1>
+<div id="messages">
+    <p><strong>Messages:</strong></p>
+</div>
+
+<div id="inputContainer">
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button id="sendButton">Send</button>
+</div>
+
+<p class="status" id="status">Connecting to WebSocket...</p>
+
+<script>
+    const wsUrl = "ws://localhost:8081/ws/notifications"; // WebSocket 서버 URL
+    let socket;
+
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const statusDiv = document.getElementById('status');
+
+    // Initialize WebSocket connection
+    function connectWebSocket() {
+        socket = new WebSocket(wsUrl);
+
+        // Connection opened
+        socket.onopen = () => {
+            statusDiv.textContent = 'Connected to WebSocket server.';
+            statusDiv.classList.remove('error');
+        };
+
+        // Message received
+        socket.onmessage = (event) => {
+            const message = event.data;
+            displayMessage(`Received: ${message}`);
+        };
+
+        // Connection closed
+        socket.onclose = () => {
+            statusDiv.textContent = 'Disconnected. Reconnecting...';
+            statusDiv.classList.add('error');
+            setTimeout(connectWebSocket, 3000); // Retry connection after 3 seconds
+        };
+
+        // Error handling
+        socket.onerror = (error) => {
+            statusDiv.textContent = `WebSocket error: ${error.message}`;
+            statusDiv.classList.add('error');
+        };
+    }
+
+    // Display a message in the messages div
+    function displayMessage(message) {
+        const p = document.createElement('p');
+        p.textContent = message;
+        messagesDiv.appendChild(p);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+    }
+
+    // Send a message to the WebSocket server
+    sendButton.addEventListener('click', () => {
+        const message = messageInput.value;
+        if (message && socket.readyState === WebSocket.OPEN) {
+            socket.send(message);
+            displayMessage(`Sent: ${message}`);
+            messageInput.value = '';
+        } else {
+            alert('Cannot send message. WebSocket is not connected.');
+        }
+    });
+
+    // Connect to the WebSocket server
+    connectWebSocket();
+</script>
+</body>
+</html>

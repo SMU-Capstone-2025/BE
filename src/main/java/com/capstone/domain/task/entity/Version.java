@@ -1,10 +1,8 @@
 package com.capstone.domain.task.entity;
 
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,5 +16,6 @@ public class Version {
     private String modifiedBy;
     private String summary;
     private String content;
+    private List<String> attachmentList; // 사진, 표 등 첨부 파일 리스트.
 }
 
