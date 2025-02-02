@@ -19,8 +19,21 @@ spring:
     password: keypass
 
 
+jwt:
+  issuer: am030818@naver.com
+  secret: "jfsgkhdsjkweoiruwqejkrfbhnsadkjlfghbwerqewrsdfgdsfagbdf"
+  access-expiration: 3600
+  refresh-expiration: 8640
+
 server:
+  max-http-header-size: 16KB
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1024 # 1KB ??? ??? ?? ??
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
