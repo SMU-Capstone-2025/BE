@@ -77,7 +77,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         //addRefreshEntity(email, refresh, REFRESH_TOKEN_EXPIRE_TIME);
 
         response.addCookie(cookieUtil.createCookie("refresh", refresh));
-        response.addCookie(cookieUtil.createCsrfCookie(request, response));
         response.setStatus(HttpStatus.OK.value());
     }
 
