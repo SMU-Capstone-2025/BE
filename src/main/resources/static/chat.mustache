@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <style>
+        #messages {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+            height: 200px;
+            overflow-y: scroll;
+        }
+        #room-list {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+    </style>
+    <title>Real-Time Chat</title>
+</head>
+<body>
+<h2>Real-Time Chat</h2>
+
+<!-- Enter Username -->
+<div>
+    <h3>Enter Your Name</h3>
+    <input type="text" id="username" placeholder="Enter your name">
+</div>
+
+<!-- Create Chat Room -->
+<div>
+    <h3>Create Chat Room</h3>
+    <input type="text" id="newRoomName" placeholder="Enter room name">
+    <button id="createRoomButton">Create Room</button>
+</div>
+
+<!-- Chat Room List -->
+<div id="room-list">
+    <h3>Chat Room List</h3>
+    <div id="rooms"></div>
+</div>
+
+<!-- Join Chat Room -->
+<div id="controls">
+    <h3>Join Chat Room</h3>
+    <label for="room-id">Room ID:</label>
+    <input type="text" id="room-id" placeholder="Enter room ID">
+    <button onclick="joinRoom()">Join Room</button>
+</div>
+
+<!-- Chat Controls -->
+<div id="controls">
+    <h3>Chat</h3>
+    <label for="messageInput">Message:</label>
+    <input type="text" id="messageInput" placeholder="Enter your message">
+    <button id="sendButton" disabled>Send</button>
+</div>
+
+<!-- Message Display -->
+<div id="messages"></div>
+
+<script>
+    let stompClient = null;
+    let chatRoomId = null;
+    let username = null;
+
+    // Initialize WebSocket
+    function initializeWebSocket() {
+        const port = window.location.port || "8081"; // 현재 접속된 포트 확인, 기본값 8081
+        const socket = new SockJS(`http://${window.location.hostname}:${port}/chat-websocket`);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('WebSocket connected: ' + frame);
+        });
+    }
+
+    // Display Message
+    function displayMessage(sender, message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = `${sender}: ${message}`;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    // Fetch Chat Rooms
+    async function fetchChatRooms() {
+        try {
+            const response = await fetch('/chat/rooms');
+            const rooms = await response.json();
+            const roomList = document.getElementById('rooms');
+            roomList.innerHTML = '';
+
+            rooms.forEach(room => {
+                const roomDiv = document.createElement('div');
+                roomDiv.textContent = `Room Name: ${room.name}, ID: ${room.roomId}`;
+                roomDiv.style.cursor = 'pointer';
+                roomDiv.onclick = () => joinRoom(room.roomId);
+                roomList.appendChild(roomDiv);
+            });
+        } catch (error) {
+            console.error('Failed to fetch chat rooms:', error);
+        }
+    }
+
+    // Create Chat Room
+    async function createRoom() {
+        const roomName = document.getElementById('newRoomName').value;
+        if (!roomName) {
+            alert('Please enter a room name!');
+            return;
+        }
+        try {
+            const response = await fetch(`/chat/room?name=${encodeURIComponent(roomName)}`, {
+                method: 'POST'
+            });
+            const room = await response.json();
+            alert(`New chat room created! ID: ${room.roomId}`);
+            fetchChatRooms();
+        } catch (error) {
+            console.error('Failed to create chat room:', error);
+        }
+    }
+
+    // Join Chat Room
+    function joinRoom(roomId) {
+        username = document.getElementById('username').value;
+        chatRoomId = document.getElementById('room-id').value || roomId;
+
+        if (!username) {
+            alert('Please enter your name before joining a room!');
+            return;
+        }
+
+        if (!chatRoomId) {
+            alert('Please enter a room ID!');
+            return;
+        }
+
+        if (!stompClient) {
+            alert('WebSocket connection is required!');
+            return;
+        }
+
+        stompClient.subscribe(`/topic/chat/${chatRoomId}`, function (message) {
+            const msg = JSON.parse(message.body);
+            displayMessage(msg.sender, msg.content);
+        });
+
+        stompClient.send(`/app/${chatRoomId}/chat.addUser`, {}, JSON.stringify({
+            sender: username,
+            content: `${username} has joined the chat.`,
+            type: 'JOIN',
+            roomId: chatRoomId
+        }));
+
+        alert(`Joined chat room: ${chatRoomId} as ${username}`);
+        document.getElementById('sendButton').disabled = false;
+    }
+
+    // Send Message
+    function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const messageContent = messageInput.value;
+
+        if (!messageContent.trim() || !chatRoomId || !username) return;
+
+        stompClient.send(`/app/${chatRoomId}/chat.sendMessage`, {}, JSON.stringify({
+            sender: username,
+            content: messageContent,
+            type: 'CHAT',
+            roomId: chatRoomId
+        }));
+
+        messageInput.value = '';
+    }
+
+    // Initialize on page load
+    window.onload = function () {
+        initializeWebSocket();
+        fetchChatRooms();
+
+        document.getElementById('createRoomButton').addEventListener('click', createRoom);
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+    };
+</script>
+</body>
+</html>
