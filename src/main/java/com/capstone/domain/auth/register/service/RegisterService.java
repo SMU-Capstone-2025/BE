@@ -21,4 +21,8 @@ public class RegisterService {
         userRepository.save(createUser(registerRequest));
         return "회원가입 성공";
     }
+
+    public boolean checkEmail(String email){
+        return userRepository.findUserByEmail(email) == null;
+    }
 }
