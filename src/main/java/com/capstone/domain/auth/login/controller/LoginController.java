@@ -1,25 +1,25 @@
 package com.capstone.domain.auth.login.controller;
 
-import com.capstone.domain.auth.login.dto.LoginRequest;
-import com.capstone.global.jwt.CookieUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(value = "http://localhost:63342")
 public class LoginController {
-    private final CookieUtil cookieUtil;
+
+    // 로그인 전 해당 경로로 요청을 보내 토큰 획득
+    @GetMapping("/csrf-token")
+    public String getCsrfToken(HttpServletRequest request) {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+        return csrfToken != null ? csrfToken.getToken() : "CSRF token not found";
+    }
 
     @PostMapping("/login")
-    private ResponseEntity<String> doLogin(){
+    public ResponseEntity<String> doLogin(){
         return ResponseEntity.ok().build();
     }
 }
