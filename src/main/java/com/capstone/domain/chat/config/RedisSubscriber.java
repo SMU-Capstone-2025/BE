@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
@@ -15,16 +16,18 @@ import java.nio.charset.StandardCharsets;
 public class RedisSubscriber implements MessageListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
+    private final RedisTemplate redisTemplate;
 
-    public RedisSubscriber(SimpMessagingTemplate messagingTemplate, ObjectMapper objectMapper) {
+    public RedisSubscriber(SimpMessagingTemplate messagingTemplate, ObjectMapper objectMapper, RedisTemplate redisTemplate) {
         this.messagingTemplate = messagingTemplate;
         this.objectMapper = objectMapper;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            String jsonMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            String jsonMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
             ChatRequest.ChatMessageDTO chatMessage = objectMapper.readValue(jsonMessage, ChatRequest.ChatMessageDTO.class);
 
             log.info("Redis 메시지 수신 채팅방: {} | 내용: {}", chatMessage.getRoomId(), chatMessage.getContent());
