@@ -10,6 +10,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Random;
 
@@ -18,7 +19,7 @@ import java.util.Random;
 public class MailService {
 
     private final JavaMailSender javaMailSender;
-    private final String ePw = createKey();
+    private String ePw;
 
     @Value("${spring.mail.username}")
     private String id;
@@ -26,7 +27,7 @@ public class MailService {
     public MimeMessage createMessage(String to) throws MessagingException, UnsupportedEncodingException {
 
         MimeMessage message = javaMailSender.createMimeMessage();
-
+        ePw = createKey();
         message.addRecipients(MimeMessage.RecipientType.TO, to); // to 보내는 대상
         message.setSubject("[Doctalk] 회원가입 인증 코드"); //메일 제목
 
@@ -47,9 +48,9 @@ public class MailService {
         return message;
     }
 
-    public static String createKey() {
+    public String createKey() {
         StringBuilder key = new StringBuilder();
-        Random rnd = new Random();
+        SecureRandom rnd = new SecureRandom();
 
         for (int i = 0; i < 6; i++) { // 인증코드 6자리
             key.append((rnd.nextInt(10)));
