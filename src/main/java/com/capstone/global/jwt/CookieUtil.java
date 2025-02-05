@@ -1,16 +1,16 @@
 package com.capstone.global.jwt;
 
+import com.capstone.domain.auth.exception.InvalidTokenException;
+import com.capstone.domain.auth.token.message.TokenMessages;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 
 @Component
 public class CookieUtil {
@@ -24,6 +24,16 @@ public class CookieUtil {
         cookie.setSecure(true);  // HTTPS 요청에만 secure 설정
         cookie.setAttribute("SameSite", "Strict");
         return cookie;
+    }
+
+    public ResponseCookie createResponseCookie(String refreshToken){
+        return ResponseCookie.from("refresh", refreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict") // CSRF 방어
+                .path("/")      // 모든 경로에서 유효
+                .maxAge(COOKIE_EXPIRE_TIME) // 7일 유지
+                .build();
     }
 
     public Cookie createCsrfCookie(HttpServletRequest request, HttpServletResponse response){
@@ -50,10 +60,18 @@ public class CookieUtil {
                         }));
     }
 
-    public static String getCookieValue(HttpServletRequest request, String name) {
-        return Arrays.stream(Optional.ofNullable(request.getCookies()).orElse(new Cookie[0]))
-                .filter(c -> c.getName().equals(name))
+    public static Optional<String> getRefreshTokenFromRequest(HttpServletRequest request) {
+        if (request.getCookies() == null) {
+            return Optional.empty();
+        }
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> "refresh".equals(cookie.getName()))
                 .map(Cookie::getValue)
-                .findAny().orElse(null);
+                .findFirst();
+    }
+
+    public static String findTokenOrThrow(HttpServletRequest request){
+        return getRefreshTokenFromRequest(request)
+                .orElseThrow(() -> new InvalidTokenException(TokenMessages.REFRESH_NOT_FOUND));
     }
 }
