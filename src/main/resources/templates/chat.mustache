@@ -70,7 +70,7 @@
     let chatRoomId = null;
     let username = null;
 
-    // Initialize WebSocket
+    // WebSocket 초기화
     function initializeWebSocket() {
         const port = window.location.port || "8081"; // 현재 접속된 포트 확인, 기본값 8081
         const socket = new SockJS(`http://${window.location.hostname}:${port}/chat-websocket`);
@@ -81,7 +81,7 @@
         });
     }
 
-    // Display Message
+    // 메시지 표시 함수
     function displayMessage(sender, message) {
         const messagesDiv = document.getElementById('messages');
         const messageElement = document.createElement('div');
@@ -90,7 +90,7 @@
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // Fetch Chat Rooms
+    // 채팅방 목록 가져오기
     async function fetchChatRooms() {
         try {
             const response = await fetch('/chat/rooms');
@@ -110,7 +110,7 @@
         }
     }
 
-    // Create Chat Room
+    // 채팅방 생성
     async function createRoom() {
         const roomName = document.getElementById('newRoomName').value;
         if (!roomName) {
@@ -118,9 +118,7 @@
             return;
         }
         try {
-            const response = await fetch(`/chat/room?name=${encodeURIComponent(roomName)}`, {
-                method: 'POST'
-            });
+            const response = await fetch(`/chat/room?name=${encodeURIComponent(roomName)}`, { method: 'POST' });
             const room = await response.json();
             alert(`New chat room created! ID: ${room.roomId}`);
             fetchChatRooms();
@@ -129,8 +127,21 @@
         }
     }
 
-    // Join Chat Room
-    function joinRoom(roomId) {
+    // ✅ API를 사용하여 이전 채팅 메시지 불러오기
+    async function fetchChatHistory(roomId) {
+        try {
+            const response = await fetch(`/chat/room/${roomId}/history`);
+            const messages = await response.json();
+            messages.forEach(msg => {
+                displayMessage(msg.sender, msg.content);
+            });
+        } catch (error) {
+            console.error('Failed to fetch chat history:', error);
+        }
+    }
+
+    // ✅ 채팅방 입장 (API로 히스토리 불러오고 WebSocket 연결)
+    async function joinRoom(roomId) {
         username = document.getElementById('username').value;
         chatRoomId = document.getElementById('room-id').value || roomId;
 
@@ -149,11 +160,28 @@
             return;
         }
 
-        stompClient.subscribe(`/topic/chat/${chatRoomId}`, function (message) {
+        // ✅ 기존 구독을 해제하여 중복 구독 방지
+        if (stompClient && stompClient.subscriptions && stompClient.subscriptions[chatRoomId]) {
+            stompClient.unsubscribe(stompClient.subscriptions[chatRoomId]);
+        }
+
+        // ✅ 메시지 영역 초기화
+        document.getElementById('messages').innerHTML = '';
+
+        // ✅ 이전 메시지 불러오기 (API 호출)
+        await fetchChatHistory(chatRoomId);
+
+        // ✅ WebSocket 구독 설정 (중복 구독 방지)
+        const subscription = stompClient.subscribe(`/topic/chat/${chatRoomId}`, function (message) {
             const msg = JSON.parse(message.body);
             displayMessage(msg.sender, msg.content);
         });
 
+        // ✅ 현재 채팅방의 구독 ID 저장 (중복 방지)
+        stompClient.subscriptions = stompClient.subscriptions || {};
+        stompClient.subscriptions[chatRoomId] = subscription.id;
+
+        // ✅ 사용자 입장 메시지 전송 (WebSocket)
         stompClient.send(`/app/${chatRoomId}/chat.addUser`, {}, JSON.stringify({
             sender: username,
             content: `${username} has joined the chat.`,
@@ -165,7 +193,7 @@
         document.getElementById('sendButton').disabled = false;
     }
 
-    // Send Message
+    // 메시지 전송
     function sendMessage() {
         const messageInput = document.getElementById('messageInput');
         const messageContent = messageInput.value;
@@ -182,7 +210,7 @@
         messageInput.value = '';
     }
 
-    // Initialize on page load
+    // 페이지 로드 시 WebSocket 초기화 및 채팅방 목록 로드
     window.onload = function () {
         initializeWebSocket();
         fetchChatRooms();
