@@ -62,26 +62,16 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         log.info("Authentication successful...");
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        String id = userDetails.getUsername();
         String email = userDetails.getUsername();
 
         try {
-            String access = jwtUtil.createAccess(id, email);
-            response.addHeader("access", access);
+            response.addHeader("access", jwtUtil.createAccess(email));
         } catch (Exception e) {
             log.error("Error generating JWT: ", e);
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        String refresh = jwtUtil.createRefresh(id, email);
-
-        //addRefreshEntity(email, refresh, REFRESH_TOKEN_EXPIRE_TIME);
-
-        response.addCookie(cookieUtil.createCookie("refresh", refresh));
+        response.addCookie(cookieUtil.createCookie("refresh", jwtUtil.createRefresh(email)));
         response.setStatus(HttpStatus.OK.value());
     }
 
-//    private void addRefreshEntity(String email, String refresh, Long expiredMs) {
-//        RefreshEntity refreshEntity = new RefreshEntity(email, refresh, new Date(System.currentTimeMillis() + expiredMs).toString());
-//        refreshRepository.save(refreshEntity);
-//    }
 }
