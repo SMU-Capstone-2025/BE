@@ -8,12 +8,14 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RequiredArgsConstructor
 @Controller
 public class ChatController {
 
     private final ChatService chatService;
+
 
     @MessageMapping("/{chatRoomId}/chat.sendMessage")
     public ChatRequest.ChatMessageDTO sendMessage(@Payload ChatRequest.ChatMessageDTO chatMessage, @DestinationVariable String chatRoomId)
@@ -29,7 +31,8 @@ public class ChatController {
     }
     @MessageMapping("/{chatRoomId}/chat.removeUser")
     public ChatRequest.ChatMessageDTO removeUser(@Payload ChatRequest.ChatMessageDTO chatMessage,SimpMessageHeaderAccessor headerAccessor,@DestinationVariable String chatRoomId) {
-        //구현 예정
+        chatService.exitMessage(chatMessage,headerAccessor,chatRoomId);
         return chatMessage;
     }
+
 }
