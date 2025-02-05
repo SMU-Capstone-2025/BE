@@ -1,12 +1,14 @@
 package com.capstone.domain.chat.dto;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 public class ChatRequest {
 
-    @Getter
-    @Setter
+    @Data
+    @NoArgsConstructor
     public static class ChatMessageDTO {
         public enum MessageType{
             CHAT,JOIN,LEAVE
