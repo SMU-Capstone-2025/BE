@@ -30,12 +30,16 @@ public class MailService {
         message.addRecipients(MimeMessage.RecipientType.TO, to); // to 보내는 대상
         message.setSubject("[Doctalk] 회원가입 인증 코드"); //메일 제목
 
-        String msg="";
-        msg += "<h1 style=\"font-size: 30px; padding-right: 30px; padding-left: 30px;\">이메일 주소 확인</h1>";
-        msg += "<p style=\"font-size: 17px; padding-right: 30px; padding-left: 30px;\">아래 확인 코드를 회원가입 화면에서 입력해주세요.</p>";
-        msg += "<div style=\"padding-right: 30px; padding-left: 30px; margin: 32px 0 40px;\"><table style=\"border-collapse: collapse; border: 0; background-color: #F4F4F4; height: 70px; table-layout: fixed; word-wrap: break-word; border-radius: 6px;\"><tbody><tr><td style=\"text-align: center; vertical-align: middle; font-size: 30px;\">";
-        msg += ePw;
-        msg += "</td></tr></tbody></table></div>";
+        String msg = "<div style=\"width: 100%; font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;\">"
+                + "<div style=\"max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; text-align: center;\">"
+                + "<h1 style=\"color: #333; font-size: 24px;\">이메일 주소 확인</h1>"
+                + "<p style=\"font-size: 16px; color: #555;\">아래 인증 코드를 회원가입 화면에서 입력해주세요.</p>"
+                + "<div style=\"margin: 20px 0; padding: 15px; background-color: #F4F4F4; border-radius: 10px; display: inline-block;\">"
+                + "<span style=\"font-size: 32px; font-weight: bold; color: #333; letter-spacing: 4px;\">" + ePw + "</span>"
+                + "</div>"
+                + "<p style=\"font-size: 14px; color: #888;\">이 코드는 10분 동안 유효합니다.</p>"
+                + "</div>"
+                + "</div>";
 
         message.setText(msg, "utf-8", "html"); //내용, charset타입, subtype
         message.setFrom(new InternetAddress(id,"Doctalk")); //보내는 사람의 메일 주소, 보내는 사람 이름
