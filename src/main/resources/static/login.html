@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
+</head>
+<body>
+<h2>Login</h2>
+<form id="loginForm">
+  <label for="username">Username:</label>
+  <input type="text" id="username" required>
+  <br><br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" required>
+  <br><br>
+  <button type="submit">Login</button>
+</form>
+
+<script>
+  let csrfToken = ""; // CSRF 토큰을 저장할 변수
+
+  // ✅ CSRF 토큰을 먼저 가져오기
+  async function fetchCsrfToken() {
+      const response = await fetch("http://localhost:8080/csrf-token", {
+          method: "GET",
+          credentials: "include" // ✅ 쿠키 포함
+      });
+
+      console.log(response)
+      if (response.ok) {
+          const data = await response.json();
+          csrfToken = data.csrfToken; // ✅ CSRF 토큰 저장
+          console.log("CSRF Token received:", csrfToken);
+      } else {
+          console.error("Failed to fetch CSRF Token");
+      }
+  }
+
+  // ✅ 로그인 요청
+  document.getElementById("loginForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (!csrfToken) {
+          console.error("CSRF Token is missing!");
+          return;
+      }
+
+      const response = await fetch("http://localhost:8080/login", {
+          method: "POST",
+          credentials: "include", // ✅ 쿠키 포함
+          headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-TOKEN": csrfToken // ✅ CSRF 토큰 추가
+          },
+          body: JSON.stringify({ email, password })
+      });
+
+      if (response.ok) {
+          const data = await response.json();
+          console.log("Login successful. Access Token:", data.accessToken);
+
+          // ✅ Access Token 저장 (LocalStorage)
+          localStorage.setItem("accessToken", data.accessToken);
+      } else {
+          console.error("Login failed");
+      }
+  });
+
+  // ✅ 로그인 페이지 로드 시 CSRF 토큰을 미리 가져오기
+  fetchCsrfToken();
+</script>
+</body>
+</html>
