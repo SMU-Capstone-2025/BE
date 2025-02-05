@@ -54,4 +54,14 @@ public class RedisConfig {
         return template;
     }
 
+    //redisㄴ에 일시적 메세지 저장을 위한 Template
+    @Bean
+    public RedisTemplate<String, ChatRequest.ChatMessageDTO> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, ChatRequest.ChatMessageDTO> redisTemplateMessage = new RedisTemplate<>();
+        redisTemplateMessage.setConnectionFactory(connectionFactory);
+        redisTemplateMessage.setKeySerializer(new StringRedisSerializer());
+        redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatRequest.ChatMessageDTO.class));
+
+        return redisTemplateMessage;
+    }
 }
