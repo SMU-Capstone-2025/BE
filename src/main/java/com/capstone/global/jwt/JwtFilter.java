@@ -24,13 +24,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
-        String accessToken = request.getHeader("access");
+        String accessToken = request.getHeader("Authorization");
         // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
+
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
@@ -40,14 +40,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        CustomUserDetails customUserDetails = new CustomUserDetails(new User(jwtUtil.getEmail(accessToken)));
 
-        String email = jwtUtil.getEmail(accessToken);
-
-        User user = new User(email);
-        System.out.println(user.getEmail());
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-
-        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null);
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
