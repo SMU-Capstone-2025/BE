@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -58,7 +59,7 @@ public class MailService {
         return key.toString();
     }
 
-    public String sendSimpleMessage(String email)throws Exception {
+    public String sendSimpleMessage(String email) throws Exception {
         MimeMessage message = createMessage(email);
         try{
             javaMailSender.send(message); // 메일 발송
@@ -67,5 +68,16 @@ public class MailService {
             throw new IllegalArgumentException();
         }
         return ePw; // 메일로 보냈던 인증 코드를 클라이언트로 리턴
+    }
+
+    public void sendMultipleMessages(List<String> emails){
+        emails.forEach(email -> {
+                    try{
+                        sendSimpleMessage(email);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
     }
 }
