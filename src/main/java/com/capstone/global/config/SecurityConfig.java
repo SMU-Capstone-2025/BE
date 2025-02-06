@@ -55,7 +55,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*")
+                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/register")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ); // csrf 공격 방지
 
@@ -68,7 +68,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token").permitAll()
+                                "/v3/api-docs/**","/csrf-token", "/project/register").permitAll()
+                        //.requestMatchers("/project/register").hasRole("MANAGER")
                         .anyRequest().authenticated()
                 );
                 /*.oauth2Login(configure ->
