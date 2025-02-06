@@ -24,3 +24,9 @@ server:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1024 # 1KB ??? ??? ?? ??
+
+
+openai:
+  api:
+    url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+    key: ${OPENAI_API_KEY}
