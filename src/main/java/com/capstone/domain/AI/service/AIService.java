@@ -29,7 +29,6 @@ public class AIService
     @Value("${openai.api.key}")
     private String apiKey;
 
-    //TODO !!!!!!일단 사용자마다 5번씩만 사용 가능하다고 가정 무료버전은 1분에 15번 무료니까 15번 이상하면 박기진 카드에서 돈이 나갑니다 조심~!!!!!!!!!
     private static final int AI_LIMIT =5;
 
     private final JwtUtil jwtUtil;
