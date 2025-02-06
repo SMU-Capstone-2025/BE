@@ -9,22 +9,22 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/ai/text")
 @CrossOrigin("*")
 public class AIController
 {
     private final AIService aiService;
 
-    @PostMapping("/text/correct")
+    @PostMapping("/correct")
     public ResponseEntity<Map<String, Object>>ModifyGrammar (@RequestBody String data)
     {
         String response= aiService.correctGrammar(data);
         return ResponseEntity.ok(Map.of("correctedText", response));
     }
-    @PostMapping("/text/correct")
+    @PostMapping("/summarize")
     public ResponseEntity<Map<String, Object>>ModifyDocument (@RequestBody String data)
     {
         String response= aiService.sumUpDocument(data);
-        return ResponseEntity.ok(Map.of("correctedText", response));
+        return ResponseEntity.ok(Map.of("summaryText", response));
     }
 }
