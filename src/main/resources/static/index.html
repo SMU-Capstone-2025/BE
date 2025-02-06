@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task API Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            margin: 20px 0;
+        }
+
+        .form-container form {
+            margin-bottom: 20px;
+        }
+
+        .form-container input, .form-container button {
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        #currentVersion {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100%;
+            background-color: #f9f9f9;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            transition: right 0.3s ease;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer h2 {
+            margin-top: 0;
+        }
+
+        .drawer .version-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .drawer .version-item:last-child {
+            border-bottom: none;
+        }
+
+        .rollback-button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .rollback-button:hover {
+            background-color: #0056b3;
+        }
+
+        .toggle-drawer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            z-index: 1100;
+        }
+    </style>
+</head>
+<body>
+<h1>Task API Demo</h1>
+
+<div class="form-container">
+    <h2>Create Task</h2>
+    <form id="createTaskForm">
+        <input type="text" id="title" placeholder="Title" required>
+        <input type="text" id="version" placeholder="Version" required>
+        <input type="text" id="modifiedBy" placeholder="Modified By" required>
+        <input type="text" id="summary" placeholder="Summary">
+        <input type="text" id="content" placeholder="Content">
+        <button type="submit">Create Task</button>
+    </form>
+
+    <h2>Get Current Version</h2>
+    <form id="getTaskForm">
+        <input type="text" id="taskIdToGet" placeholder="Task ID" required>
+        <button type="submit">Get Current Version</button>
+    </form>
+
+    <h2>Delete Task</h2>
+    <form id="deleteTaskForm">
+        <input type="text" id="taskIdToDelete" placeholder="Task ID" required>
+        <button type="submit">Delete Task</button>
+    </form>
+
+    <h2>Update Task Status</h2>
+    <form id="updateStatusForm">
+        <input type="text" id="taskIdToUpdate" placeholder="Task ID" required>
+        <input type="text" id="newStatus" placeholder="New Status" required>
+        <button type="submit">Update Status</button>
+    </form>
+
+    <h2>Add Version</h2>
+    <form id="addVersionForm">
+        <input type="text" id="taskIdForVersion" placeholder="Task ID" required>
+        <input type="text" id="versionForAdd" placeholder="Version" required>
+        <input type="text" id="modifiedByForVersion" placeholder="Modified By" required>
+        <input type="text" id="summaryForVersion" placeholder="Summary">
+        <input type="text" id="contentForVersion" placeholder="Content">
+        <button type="submit">Add Version</button>
+    </form>
+
+    <h2>Show All Versions</h2>
+    <form id="showVersionsForm">
+        <input type="text" id="taskIdToShow" placeholder="Task ID" required>
+        <button type="submit">Show Versions</button>
+    </form>
+</div>
+
+<div id="currentVersion">
+    <h3>Current Version</h3>
+    <p>Loading current version...</p>
+</div>
+
+<div class="drawer" id="versionDrawer">
+    <h2>Task Versions</h2>
+    <div id="versionList"></div>
+</div>
+
+<script>
+    const baseUrl = 'http://localhost:8080/task';
+
+    // Create Task
+    document.getElementById('createTaskForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskDto = {
+            title: document.getElementById('title').value,
+            version: document.getElementById('version').value,
+            modifiedBy: document.getElementById('modifiedBy').value,
+            summary: document.getElementById('summary').value,
+            content: document.getElementById('content').value
+        };
+
+        try {
+            const response = await fetch(`${baseUrl}/post`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskDto)
+            });
+            alert(await response.text());
+        } catch (error) {
+            alert('Error creating task: ' + error.message);
+        }
+    });
+
+    // Get Current Version
+    document.getElementById('getTaskForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskId = document.getElementById('taskIdToGet').value;
+
+        try {
+            const response = await fetch(`${baseUrl}/get?taskId=${taskId}`);
+            if (!response.ok) throw new Error('Failed to fetch the current version');
+            const version = await response.json();
+            displayCurrentVersion(version);
+        } catch (error) {
+            alert('Error fetching current version: ' + error.message);
+        }
+    });
+
+    function displayCurrentVersion(version) {
+        const currentVersionDiv = document.getElementById('currentVersion');
+        currentVersionDiv.innerHTML = `
+            <h3>Current Version</h3>
+            <p><strong>Version:</strong> ${version.version}</p>
+            <p><strong>Modified Date:</strong> ${version.modifiedDateTime}</p>
+            <p><strong>Modified By:</strong> ${version.modifiedBy}</p>
+            <p><strong>Summary:</strong> ${version.summary}</p>
+            <p><strong>Content:</strong> ${version.content}</p>
+        `;
+    }
+
+    // Delete Task
+    document.getElementById('deleteTaskForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskId = document.getElementById('taskIdToDelete').value;
+
+        try {
+            const response = await fetch(`${baseUrl}/delete?id=${taskId}`, { method: 'DELETE' });
+            alert(await response.text());
+        } catch (error) {
+            alert('Error deleting task: ' + error.message);
+        }
+    });
+
+    // Update Task Status
+    document.getElementById('updateStatusForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskId = document.getElementById('taskIdToUpdate').value;
+        const status = document.getElementById('newStatus').value;
+
+        try {
+            const response = await fetch(`${baseUrl}/status?id=${taskId}&status=${status}`, { method: 'PUT' });
+            alert(await response.text());
+        } catch (error) {
+            alert('Error updating status: ' + error.message);
+        }
+    });
+
+    // Add Version
+    document.getElementById('addVersionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskDto = {
+            id: document.getElementById('taskIdForVersion').value,
+            version: document.getElementById('versionForAdd').value,
+            modifiedBy: document.getElementById('modifiedByForVersion').value,
+            summary: document.getElementById('summaryForVersion').value,
+            content: document.getElementById('contentForVersion').value
+        };
+
+        try {
+            const response = await fetch(`${baseUrl}/version/new`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(taskDto)
+            });
+            alert(await response.text());
+        } catch (error) {
+            alert('Error adding version: ' + error.message);
+        }
+    });
+
+    // Show All Versions
+    document.getElementById('showVersionsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const taskId = document.getElementById('taskIdToShow').value;
+
+        try {
+            const response = await fetch(`${baseUrl}/version/list?taskId=${taskId}`);
+            if (!response.ok) throw new Error('Failed to fetch versions');
+
+            const versions = await response.json();
+            const versionListDiv = document.getElementById('versionList');
+            versionListDiv.innerHTML = '';
+
+            versions.forEach(version => {
+                const versionItem = document.createElement('div');
+                versionItem.className = 'version-item';
+                versionItem.innerHTML = `
+                    <h4>Version: ${version.version}</h4>
+                    <p><strong>Modified Date:</strong> ${version.modifiedDateTime}</p>
+                    <p><strong>Modified By:</strong> ${version.modifiedBy}</p>
+                    <p><strong>Summary:</strong> ${version.summary}</p>
+                    <p><strong>Content:</strong> ${version.content}</p>
+                `;
+                versionListDiv.appendChild(versionItem);
+            });
+        } catch (error) {
+            alert('Error fetching versions: ' + error.message);
+        }
+    });
+</script>
+</body>
+</html>
