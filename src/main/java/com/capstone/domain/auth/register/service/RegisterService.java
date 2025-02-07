@@ -1,14 +1,12 @@
 package com.capstone.domain.auth.register.service;
 
-import com.capstone.domain.auth.entity.User;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
-import com.capstone.domain.auth.repository.UserRepository;
+import com.capstone.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import static com.capstone.domain.auth.entity.User.createUser;
+import static com.capstone.domain.user.entity.User.createUser;
 
 @Service
 @RequiredArgsConstructor
