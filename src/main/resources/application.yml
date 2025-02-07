@@ -6,6 +6,9 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/
       database: capstone
+    redis:
+      host: localhost
+      port: 6379
   servlet:
     multipart:
       max-file-size: 50MB
@@ -51,3 +54,9 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
+
+
+openai:
+  api:
+    url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+    key: ${OPENAI_API_KEY}
