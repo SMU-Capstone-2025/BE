@@ -1,5 +1,6 @@
 package com.capstone.domain.project.dto;
 
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectDto {
+    @Nullable
+    private String projectId;
     @NotBlank
     private String projectName;
     @NotBlank
