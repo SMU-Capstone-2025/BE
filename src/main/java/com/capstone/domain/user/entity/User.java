@@ -1,11 +1,9 @@
-package com.capstone.domain.auth.entity;
+package com.capstone.domain.user.entity;
 
-import com.capstone.domain.auth.login.dto.LoginRequest;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
