@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
+
 @Document(collection = "user")
 
 @Builder
@@ -20,6 +22,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private List<String> projectIds;
 
     public static User createUser(RegisterRequest registerRequest){
         return User.builder()
