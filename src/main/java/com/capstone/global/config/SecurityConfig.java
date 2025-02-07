@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -38,6 +39,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
     private final CookieUtil cookieUtil;
 
     @Bean
@@ -55,7 +57,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/register")
+                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ); // csrf 공격 방지
 
@@ -69,7 +71,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
                                 "/v3/api-docs/**","/csrf-token", "/project/register").permitAll()
-                        //.requestMatchers("/project/register").hasRole("MANAGER")
+                        .requestMatchers("/project/update", "/project/auth").hasRole("ROLE_MANAGER")
                         .anyRequest().authenticated()
                 );
                 /*.oauth2Login(configure ->
@@ -84,7 +86,7 @@ public class SecurityConfig {
                         new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil),
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
