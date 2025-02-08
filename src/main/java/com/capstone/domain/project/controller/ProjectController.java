@@ -2,8 +2,10 @@ package com.capstone.domain.project.controller;
 
 import com.capstone.domain.project.dto.AuthorityRequest;
 import com.capstone.domain.project.dto.ProjectDto;
+import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,4 +37,10 @@ public class ProjectController {
     public void inviteProject(@RequestBody AuthorityRequest authorityRequest){
         projectService.processInvite(authorityRequest);
     }
+
+    @GetMapping("/load")
+    public ResponseEntity<Project> loadProject(@RequestHeader("Authorization") String accessToken, @RequestParam String projectId){
+        return ResponseEntity.ok().body(projectService.getProjectContent(projectId, accessToken));
+    }
+
 }
