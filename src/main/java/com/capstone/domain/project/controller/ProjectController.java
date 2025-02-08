@@ -29,4 +29,10 @@ public class ProjectController {
     public void updateAuthority(@RequestBody AuthorityRequest authorityRequest){
         projectService.processAuth(authorityRequest);
     }
+
+    @PreAuthorize("ROLE_MANAGER")
+    @PutMapping("/invite")
+    public void inviteProject(@RequestBody AuthorityRequest authorityRequest){
+        projectService.processInvite(authorityRequest);
+    }
 }
