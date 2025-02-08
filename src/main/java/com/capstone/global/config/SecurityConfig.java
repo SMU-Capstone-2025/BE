@@ -57,7 +57,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*")
+                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/ws/*")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ); // csrf 공격 방지
 
@@ -70,8 +70,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/register").permitAll()
-                        .requestMatchers("/project/update", "/project/auth").hasRole("ROLE_MANAGER")
+                                "/v3/api-docs/**","/csrf-token", "/project/register", "/ws/*").permitAll()
+                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
                         .anyRequest().authenticated()
                 );
                 /*.oauth2Login(configure ->
@@ -98,7 +98,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("http://localhost:63342"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true); // 쿠키 허용
