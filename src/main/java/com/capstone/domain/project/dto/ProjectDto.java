@@ -1,10 +1,11 @@
 package com.capstone.domain.project.dto;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 
 import java.util.List;
 
@@ -14,9 +15,11 @@ import java.util.List;
 public class ProjectDto {
     @Nullable
     private String projectId;
-    @NotBlank
+    @NotNull
+    @Size(min = 1)
     private String projectName;
-    @NotBlank
+    @NotNull
+    @Size(min = 1)
     private String description;
     private List<String> invitedEmails;
 }
