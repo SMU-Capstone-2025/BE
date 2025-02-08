@@ -1,5 +1,8 @@
 package com.capstone.global.mail.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -21,6 +24,7 @@ public class MailService {
 
     private final JavaMailSender javaMailSender;
     private String ePw;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String id;
@@ -79,5 +83,15 @@ public class MailService {
                     }
                 }
         );
+    }
+
+    public void processSendMessages(String message) {
+        try {
+            Map<String, List<String>> map = objectMapper.readValue(message, new TypeReference<Map<String, List<String>>>() {});
+            List<String> emails = map.get("data");  // "data" 키의 값을 가져옴
+            sendMultipleMessages(emails);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
