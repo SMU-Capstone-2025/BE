@@ -42,4 +42,41 @@ public class KafkaProducerService {
             e.printStackTrace();
         }
     }
+
+    public void sendProjectEvent(String topic, String action, String projectId, List<String> emails) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            RequestPayload<List<String>> payload = new RequestPayload<>(
+                    projectId,
+                    null,
+                    action,
+                    emails
+                    );
+
+            String message = objectMapper.writeValueAsString(payload);
+            kafkaTemplate.send(topic, message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMailEvent(String topic, List<String> emails) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            RequestPayload<List<String>> payload = new RequestPayload<>(
+                    null,
+                    null,
+                    null,
+                    emails
+                    );
+
+            String message = objectMapper.writeValueAsString(payload);
+            kafkaTemplate.send(topic, message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
