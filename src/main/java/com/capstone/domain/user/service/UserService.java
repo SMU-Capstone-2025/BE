@@ -33,10 +33,10 @@ public class UserService {
             Query query = new Query(Criteria.where("email").is(email));
             Update update = new Update().set("projectIds", updatedProjectIds);
 
-            bulkOps.updateOne(query, update); // 여러 개의 업데이트를 하나의 배치로 추가
+            bulkOps.updateOne(query, update);
         }
 
-        bulkOps.execute(); // ✅ 한 번에 업데이트 실행
+        bulkOps.execute();
     }
 
     public List<String> participateProject(List<String> oldProjectIds, String projectId) {
