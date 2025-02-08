@@ -1,6 +1,7 @@
 package com.capstone.domain.project.service;
 
 import com.capstone.domain.notification.service.NotificationService;
+import com.capstone.domain.project.exception.ProjectInvalidAccessException;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.domain.project.dto.AuthorityRequest;
 import com.capstone.domain.project.dto.ProjectDto;
@@ -9,6 +10,7 @@ import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.message.ProjectMessages;
 import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.service.UserService;
+import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final KafkaProducerService kafkaProducerService;
-    private final MailService mailService;
+    private final JwtUtil jwtUtil;
 
     public Project createProject(ProjectDto projectDto) {
         return Project.builder()
@@ -64,6 +66,9 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    public Project getProjectContent(String projectId, String accssToken){
+        return checkUserInProject(projectId, accssToken);
+    }
     public void sendInvitation(AuthorityRequest authorityRequest){
         userService.participateProcess(authorityRequest.getAuthorityKeysAsList(), authorityRequest.getProjectId());
         kafkaProducerService.sendProjectEvent("update-event", "REGISTER", authorityRequest.getProjectId(), authorityRequest.getAuthorityKeysAsList());
@@ -105,4 +110,11 @@ public class ProjectService {
                 .orElseThrow(() -> new ProjectNotFoundException(ProjectMessages.PROJECT_NOT_FOUND));
     }
 
+    public Project checkUserInProject(String projectId, String accessToken){
+        Project project = findProjectByProjectIdOrThrow(projectId);
+        if (!project.getAuthorities().containsKey(jwtUtil.getEmail(accessToken))){
+            throw new ProjectInvalidAccessException(ProjectMessages.PROJECT_NOT_ACCESS);
+        }
+        return project;
+    }
 }
