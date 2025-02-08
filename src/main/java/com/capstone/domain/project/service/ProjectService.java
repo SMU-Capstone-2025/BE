@@ -31,19 +31,15 @@ public class ProjectService {
     private final KafkaProducerService kafkaProducerService;
     private final JwtUtil jwtUtil;
 
-    public Project createProject(ProjectDto projectDto) {
-        return Project.builder()
-                .projectName(projectDto.getProjectName())
-                .description(projectDto.getDescription())
-                .authorities(createDefaultAuthorities(projectDto.getInvitedEmails()))
-                .projectIds(new ArrayList<>())
-                .documentIds(new ArrayList<>())
-                .build();
+    @Transactional
+    public Project saveProject(ProjectDto projectDto){
+        return projectRepository.save(Project.createProject(projectDto, createDefaultAuthorities(projectDto.getInvitedEmails())));
     }
+
 
     @Transactional
     public void updateProject(ProjectDto projectDto){
-        Project project = findProjectByProjectIdOrThrow(projectDto.getProjectName());
+        Project project = findProjectByProjectIdOrThrow(projectDto.getProjectId());
         project.setProjectName(projectDto.getProjectName());
         project.setDescription(projectDto.getDescription());
         projectRepository.save(project);
@@ -66,8 +62,8 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
-    public Project getProjectContent(String projectId, String accssToken){
-        return checkUserInProject(projectId, accssToken);
+    public Project getProjectContent(String projectId, String accessToken){
+        return checkUserInProject(projectId, accessToken);
     }
     public void sendInvitation(AuthorityRequest authorityRequest){
         userService.participateProcess(authorityRequest.getAuthorityKeysAsList(), authorityRequest.getProjectId());
@@ -82,7 +78,7 @@ public class ProjectService {
     }
 
     public void processRegister(ProjectDto projectDto){
-        String projectId = projectRepository.save(createProject(projectDto)).getId();
+        String projectId = saveProject(projectDto).getId();
         userService.participateProcess(projectDto.getInvitedEmails(), projectId);
         kafkaProducerService.sendProjectEvent("update-event", "REGISTER", projectId, projectDto.getInvitedEmails());
         kafkaProducerService.sendMailEvent("mail-event", projectDto.getInvitedEmails());
