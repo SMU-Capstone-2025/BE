@@ -22,7 +22,7 @@ public class ChatService {
     private final RedisTemplate<String, ChatRequest.ChatMessageDTO> redisTemplate;
     private final ObjectMapper objectMapper;
 
-    public void processMessage(ChatRequest.ChatMessageDTO message, String chatRoomId)
+    public ChatRequest.ChatMessageDTO processMessage(ChatRequest.ChatMessageDTO message, String chatRoomId,SimpMessageHeaderAccessor headerAccessor)
     {
         if (chatRoomId == null || chatRoomId.isEmpty()) {
             throw new ChatNotFoundException("채팅방을 찾을 수 없습니다.");
@@ -33,7 +33,12 @@ public class ChatService {
         String userMessage = message.getContent();
         System.out.println("Processing message: " + userMessage + " Room ID: " + chatRoomId);
 
+        String name = (String) headerAccessor.getSessionAttributes().get("username");
+
+        message.setSender(name);
+        message.setType(ChatRequest.ChatMessageDTO.MessageType.CHAT);
         redisTemplate.convertAndSend("chatRoom:" + chatRoomId, message);
+        return message;
     }
 
     public void enterMessage(ChatRequest.ChatMessageDTO message, SimpMessageHeaderAccessor headerAccessor, String chatRoomId)
@@ -41,7 +46,9 @@ public class ChatService {
         if (chatRoomId == null || chatRoomId.isEmpty()) {
             throw new ChatNotFoundException("채팅방을 찾을 수 없습니다.");
         }
-        headerAccessor.getSessionAttributes().put("username", message.getSender());
+        String name=headerAccessor.getSessionAttributes().get("username").toString();
+
+        message.setSender(name);
 
         message.setType(ChatRequest.ChatMessageDTO.MessageType.JOIN);
         message.setContent(message.getSender()+"님이 입장하였습니다.");
@@ -54,8 +61,9 @@ public class ChatService {
             throw new ChatNotFoundException("채팅방을 찾을 수 없습니다.");
         }
 
-        headerAccessor.getSessionAttributes().put("username", message.getSender());
+        String name=headerAccessor.getSessionAttributes().put("username", message.getSender()).toString();
 
+        message.setSender(name);
         message.setType(ChatRequest.ChatMessageDTO.MessageType.LEAVE);
         message.setContent(message.getSender()+"님이 퇴장하였습니다.");
         redisTemplate.convertAndSend("chatRoom:" +chatRoomId, message);

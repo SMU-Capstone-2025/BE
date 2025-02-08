@@ -18,9 +18,9 @@ public class ChatController {
 
 
     @MessageMapping("/{chatRoomId}/chat.sendMessage")
-    public ChatRequest.ChatMessageDTO sendMessage(@Payload ChatRequest.ChatMessageDTO chatMessage, @DestinationVariable String chatRoomId)
+    public ChatRequest.ChatMessageDTO sendMessage(@Payload ChatRequest.ChatMessageDTO chatMessage, @DestinationVariable String chatRoomId,SimpMessageHeaderAccessor headerAccessor)
     {
-        chatService.processMessage(chatMessage,chatRoomId);
+        chatService.processMessage(chatMessage,chatRoomId,headerAccessor);
         return chatMessage;
     }
 
