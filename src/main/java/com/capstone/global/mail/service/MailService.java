@@ -88,7 +88,7 @@ public class MailService {
     public void processSendMessages(String message) {
         try {
             Map<String, List<String>> map = objectMapper.readValue(message, new TypeReference<Map<String, List<String>>>() {});
-            List<String> emails = map.get("data");  // "data" 키의 값을 가져옴
+            List<String> emails = map.get("data");
             sendMultipleMessages(emails);
         } catch (Exception e) {
             e.printStackTrace();
