@@ -6,6 +6,9 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/
       database: capstone
+    redis:
+      host: localhost
+      port: 6379
   servlet:
     multipart:
       max-file-size: 50MB
@@ -17,10 +20,44 @@ spring:
     uris: http://localhost:9200
     username: elastic
     password: keypass
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: project.doctalk@gmail.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: false
+      debug: true
 
+
+jwt:
+  issuer: project.doctalk@gmail.com
+  secret: "jfsgkhdsjkweoiruwqejkrfbhnsadkjlfghbwerqewrsdfgdsfag12312bdf"
+  access-expiration: 3600
+  refresh-expiration: 8640
 
 server:
+  max-http-header-size: 16KB
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 1024 # 1KB ??? ??? ?? ??
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+
+
+openai:
+  api:
+    url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+    key: ${OPENAI_API_KEY}
+
