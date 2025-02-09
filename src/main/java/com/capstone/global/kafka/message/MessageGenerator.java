@@ -1,24 +1,39 @@
 package com.capstone.global.kafka.message;
 
-import com.capstone.domain.task.dto.TaskDto;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Iterator;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
-public class LogMessageGenerator {
+public class MessageGenerator {
 
-    // 메시지 템플릿
     public static final String TASK_CREATED = "작업이 생성되었습니다. 제목: {title}, 생성자: {createdBy}, ID: {id}";
-    public static final String VERSION_ADDED = "버전이 추가되었습니다. 버전: {version}, 작업 ID: {taskId}, 수정자: {modifiedBy}";
-    public static final String STATUS_UPDATED = "작업 상태가 업데이트되었습니다. 작업 ID: {taskId}, 상태: {status}";
+
+    public static final String PROJECT_UPDATED =
+            "프로젝트에 변동사항이 있습니다! <br>"
+                + "- 프로젝트 이름: {projectName}<br>"
+                + "- 프로젝트 설명: {description}";
+    public static final String PROJECT_CREATED =
+            "새 프로젝트가 생성되었습니다! 버튼을 눌러 참여하세요!<br>"
+                    + "- 프로젝트 이름: {projectName}<br>";
+
+    public static final String PROJECT_INVITED =
+            "프로젝트에 초대되었습니다! 버튼을 눌러 참여하세요!<br>"
+                    + "- 프로젝트 이름: {projectName}<br>";
+
+    public static final String AUTH_UPDATED = "프로젝트 내 권한이 변경되었습니다.<br>"
+            + "- 프로젝트명: {projectName} <br>"
+            + "- 대상: {names} <br>"
+            + "- 권한: {authorities}";
+
+
+
+
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    /**
-     * DTO 데이터를 기반으로 메시지를 생성하는 메서드
-     */
     public static <T> String generateFromDto(String template, T dto) {
         try {
             // DTO를 JSON 문자열로 변환
@@ -34,8 +49,13 @@ public class LogMessageGenerator {
                 JsonNode valueNode = jsonNode.get(key);
 
                 String value;
-                if (valueNode.isArray() || valueNode.isObject()) {
-                    // 배열 또는 객체는 문자열로 변환
+                if (valueNode.isArray()) {
+                    // 배열을 쉼표로 구분된 문자열로 변환
+                    value = StreamSupport.stream(valueNode.spliterator(), false)
+                            .map(JsonNode::asText)
+                            .collect(Collectors.joining(", "));
+                } else if (valueNode.isObject()) {
+                    // 객체는 JSON 문자열 유지
                     value = objectMapper.writeValueAsString(valueNode);
                 } else {
                     // 단순 값은 텍스트로 변환
