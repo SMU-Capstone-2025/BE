@@ -17,10 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +30,7 @@ public class ProjectService {
 
     @Transactional
     public Project saveProject(ProjectDto projectDto){
-        return projectRepository.save(Project.createProject(projectDto, createDefaultAuthorities(projectDto.getInvitedEmails())));
+        return projectRepository.save(Project.createProject(projectDto, createDefaultAuthorities(Objects.requireNonNull(projectDto.getInvitedEmails()))));
     }
 
 
@@ -42,7 +39,6 @@ public class ProjectService {
         Project project = findProjectByProjectIdOrThrow(projectDto.getProjectId());
         project.setProjectName(projectDto.getProjectName());
         project.setDescription(projectDto.getDescription());
-        projectRepository.save(project);
     }
 
 
@@ -65,9 +61,11 @@ public class ProjectService {
     public Project getProjectContent(String projectId, String accessToken){
         return checkUserInProject(projectId, accessToken);
     }
+
     public void sendInvitation(AuthorityRequest authorityRequest){
+        Project project = findProjectByProjectIdOrThrow(authorityRequest.getProjectId());
         userService.participateProcess(authorityRequest.getAuthorityKeysAsList(), authorityRequest.getProjectId());
-        kafkaProducerService.sendProjectEvent("update-event", "REGISTER", authorityRequest.getProjectId(), authorityRequest.getAuthorityKeysAsList());
+        kafkaProducerService.sendProjectEvent("update-event", "INVITE", project.getProjectName(), authorityRequest.getAuthorities());
         kafkaProducerService.sendMailEvent("mail-event", authorityRequest.getAuthorityKeysAsList());
     }
 
@@ -78,22 +76,23 @@ public class ProjectService {
     }
 
     public void processRegister(ProjectDto projectDto){
-        String projectId = saveProject(projectDto).getId();
-        userService.participateProcess(projectDto.getInvitedEmails(), projectId);
-        kafkaProducerService.sendProjectEvent("update-event", "REGISTER", projectId, projectDto.getInvitedEmails());
+        Project project = saveProject(projectDto);
+        userService.participateProcess(Objects.requireNonNull(projectDto.getInvitedEmails()), project.getId());
+        kafkaProducerService.sendProjectEvent("update-event", "REGISTER", project.getProjectName(), findProjectByProjectIdOrThrow(project.getId()).getAuthorities());
         kafkaProducerService.sendMailEvent("mail-event", projectDto.getInvitedEmails());
     }
 
     public void processAuth(AuthorityRequest authorityRequest){
+        Project project = findProjectByProjectIdOrThrow(authorityRequest.getProjectId());
         updateAuthority(authorityRequest);
-        kafkaProducerService.sendProjectEvent("update-event", "AUTH", authorityRequest.getProjectId(), authorityRequest.getAuthorityKeysAsList());
+        kafkaProducerService.sendProjectEvent("update-event", "AUTH", project.getProjectName(), project.getAuthorities());
         kafkaProducerService.sendMailEvent("mail-event", authorityRequest.getAuthorityKeysAsList());
     }
 
     public void processUpdate(ProjectDto projectDto){
         updateProject(projectDto);
-        kafkaProducerService.sendProjectEvent("update-event", "UPDATE", projectDto.getProjectId(), projectDto.getInvitedEmails());
-        kafkaProducerService.sendMailEvent("mail-event", projectDto.getInvitedEmails());
+        kafkaProducerService.sendProjectEvent("update-event", "UPDATE", projectDto.getProjectName(), findProjectByProjectIdOrThrow(projectDto.getProjectId()).getAuthorities());
+        kafkaProducerService.sendMailEvent("mail-event", projectRepository.getAuthorityKeysByProjectId(projectDto.getProjectId()));
     }
 
     public void processInvite(AuthorityRequest authorityRequest){
