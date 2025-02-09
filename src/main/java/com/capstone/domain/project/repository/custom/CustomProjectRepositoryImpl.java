@@ -23,10 +23,8 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository{
 
     @Override
     public List<String> getAuthorityKeysByProjectId(String projectId) {
-        System.out.println(projectId);
         Query query = new Query(Criteria.where("_id").is(projectId));
-        query.fields().include("authorities"); // ✅ authorities 필드만 가져오기
-
+        query.fields().include("authorities");
         Project project = mongoTemplate.findOne(query, Project.class);
 
         if (project == null || project.getAuthorities() == null) {
