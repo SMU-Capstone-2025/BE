@@ -39,12 +39,12 @@ public class UserService {
         bulkOps.execute();
     }
 
-    public List<String> participateProject(List<String> oldProjectIds, String projectId) {
-        if (oldProjectIds == null) {
-            oldProjectIds = new ArrayList<>();
+    public List<String> participateProject(List<String> projectIds, String projectId) {
+        if (projectIds == null) {
+            projectIds = new ArrayList<>();
         }
-        oldProjectIds.add(projectId);
-        return oldProjectIds;
+        projectIds.add(projectId);
+        return projectIds;
     }
 
 
