@@ -2,6 +2,7 @@ package com.capstone.domain.chat.interceptor;
 
 import com.capstone.global.jwt.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,7 +18,7 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public WebSocketSecurityInterceptor(JwtUtil jwtUtil, SimpMessagingTemplate messagingTemplate) {
+    public WebSocketSecurityInterceptor(JwtUtil jwtUtil, @Lazy SimpMessagingTemplate messagingTemplate) {
         this.jwtUtil = jwtUtil;
         this.messagingTemplate = messagingTemplate;
     }

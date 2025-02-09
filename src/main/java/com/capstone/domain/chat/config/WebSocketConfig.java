@@ -1,6 +1,7 @@
 package com.capstone.domain.chat.config;
 
 
+//import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
 import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
