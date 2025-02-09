@@ -28,13 +28,11 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = request.getHeader("Authorization");
 
-        // ✅ 토큰이 없으면 다음 필터로 넘김
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ 토큰 만료 확인
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
