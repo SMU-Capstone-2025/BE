@@ -21,5 +21,6 @@ public class ProjectDto {
     @NotNull
     @Size(min = 1)
     private String description;
+    @Nullable
     private List<String> invitedEmails;
 }
