@@ -1,11 +1,12 @@
-package com.capstone.domain.auth.entity;
+package com.capstone.domain.user.entity;
 
-import com.capstone.domain.auth.login.dto.LoginRequest;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "user")
 
@@ -20,12 +21,14 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private List<String> projectIds;
 
     public static User createUser(RegisterRequest registerRequest){
         return User.builder()
                 .name(registerRequest.getName())
                 .email(registerRequest.getEmail())
                 .password(registerRequest.getPassword())
+                .projectIds(new ArrayList<>())
                 .build();
     }
 

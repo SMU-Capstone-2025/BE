@@ -1,6 +1,6 @@
-package com.capstone.domain.auth.repository.custom;
+package com.capstone.domain.user.repository.custom;
 
-import com.capstone.domain.auth.entity.User;
+import com.capstone.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

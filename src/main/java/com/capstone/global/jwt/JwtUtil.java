@@ -35,6 +35,13 @@ public class JwtUtil {
                 .get("email", String.class);
     }
 
+    public String getRole(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload()
+                .get("role", String.class);
+    }
+
+
+
     public Boolean isExpired(String token) {
         try {
             Claims claims = extractClaims(token);
@@ -51,9 +58,11 @@ public class JwtUtil {
     }
 
     public String createAccess(String email) {
+        System.out.println(email);
         return Jwts.builder()
                 .claim("category", "access")
                 .claim("email", email)
+                .claim("role", "ROLE_MANAGER")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRE_TIME))
                 .signWith(secretKey)
