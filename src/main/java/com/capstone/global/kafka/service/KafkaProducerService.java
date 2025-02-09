@@ -43,17 +43,16 @@ public class KafkaProducerService {
         }
     }
 
-    public void sendProjectEvent(String topic, String action, String projectId, List<String> emails) {
+    public void sendProjectEvent(String topic, String action, String projectName, Map<String, String> authorities) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            RequestPayload<List<String>> payload = new RequestPayload<>(
-                    projectId,
+            RequestPayload<Map<String, String>> payload = new RequestPayload<>(
+                    projectName,
                     null,
                     action,
-                    emails
+                    authorities
                     );
-
             String message = objectMapper.writeValueAsString(payload);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
@@ -64,14 +63,12 @@ public class KafkaProducerService {
     public void sendMailEvent(String topic, List<String> emails) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-
             RequestPayload<List<String>> payload = new RequestPayload<>(
                     null,
                     null,
                     null,
-                    emails
+                    (emails != null) ? emails : new ArrayList<>()
                     );
-
             String message = objectMapper.writeValueAsString(payload);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
