@@ -28,9 +28,14 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         String token = accessor.getFirstNativeHeader("Authorization");
-        log.info("token{}", token);
 
-        if (token != null) {
+        log.info("token{}", token);
+        if (StompCommand.CONNECT == accessor.getCommand()) {
+
+        }
+        if (token != null && token.startsWith("Bearer "))
+        {
+            token = token.substring(7);
             try {
                 if (jwtUtil.isExpired(token)) {
                     log.warn("JWT 토큰이 만료 되었습니다 - 재인증 요청 보내야합니다.");
@@ -45,12 +50,14 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
 
                 String name = jwtUtil.getEmail(token);
                 accessor.getSessionAttributes().put("username",name);
+                accessor.addNativeHeader("username", name);
                 log.info(name);
             } catch (Exception e) {
                 log.error("JWT 검증 실패: {}", e.getMessage());
                 throw new IllegalArgumentException("유효하지 않은 JWT 토큰입니다.");
             }
-        } else {
+        }
+        else {
             log.error("JWT 토큰이 없음");
             throw new IllegalArgumentException("JWT 토큰이 필요합니다.");
         }
