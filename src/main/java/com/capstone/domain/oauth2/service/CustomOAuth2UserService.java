@@ -34,7 +34,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         try {
             return processOAuth2User(oAuth2UserRequest, oAuth2User);
         } catch (Exception ex) {
-            // Throwing an instance of AuthenticationException will trigger the OAuth2AuthenticationFailureHandler
             throw new InternalAuthenticationServiceException(ex.getMessage(), ex.getCause());
         }
     }
@@ -50,7 +49,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 accessToken,
                 oAuth2User.getAttributes());
 
-        // OAuth2UserInfo field value validation
+        log.info("userInfo: {}", oAuth2UserInfo.getEmail());
+
         if (!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
