@@ -2,6 +2,7 @@ package com.capstone.domain.chat.config;
 
 
 //import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
+//import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
 import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -30,8 +31,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry)
     {
-        registry.addEndpoint("/chat-websocket").withSockJS();
-        registry.addEndpoint("/chat-websocket");
+        registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*").withSockJS();
+        registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*");
     }
 
 
