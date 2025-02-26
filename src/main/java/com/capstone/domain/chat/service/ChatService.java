@@ -28,13 +28,13 @@ public class ChatService {
         if (chatRoomId == null || chatRoomId.isEmpty()) {
             throw new ChatNotFoundException("채팅방을 찾을 수 없습니다.");
         }
-        // 채팅 50개만 Redis에  저장 -> 채팅방 나갔다 들어와도 저장 되어있음
-        saveChatMessage(chatRoomId, message);
 
         String userMessage = message.getContent();
         System.out.println("Processing message: " + userMessage + " Room ID: " + chatRoomId);
 
         String name = (String) headerAccessor.getSessionAttributes().get("username");
+        // 채팅 50개만 Redis에  저장 -> 채팅방 나갔다 들어와도 저장 되어있음
+        saveChatMessage(chatRoomId, message,name);
 
         message.setSender(name);
 
@@ -71,9 +71,10 @@ public class ChatService {
         redisTemplate.convertAndSend("chatRoom:" +chatRoomId, message);
     }
 
-    public void saveChatMessage(String roomId, ChatRequest.ChatMessageDTO message)
+    public void saveChatMessage(String roomId, ChatRequest.ChatMessageDTO message,String username)
     {
         String key = "chat:room:" + roomId;
+        message.setSender(username);
         redisTemplate.opsForList().rightPush(key, message);
         redisTemplate.opsForList().trim(key, 0, 49);
         redisTemplate.expire(key, Duration.ofHours(1));
