@@ -20,6 +20,8 @@ public class User {
     private String id;
     private String name;
     private String email;
+    // 기본 회원가입 시 null.
+    private String social;
     private String password;
     private List<String> projectIds;
 
