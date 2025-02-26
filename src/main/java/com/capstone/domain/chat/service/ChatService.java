@@ -50,7 +50,6 @@ public class ChatService {
 
         //인터셉터에서 이미 이름 헤더에 저장
         String name=headerAccessor.getSessionAttributes().get("username").toString();
-
         message.setSender(name);
 
         message.setContent(message.getSender()+"님이 입장하였습니다.");
