@@ -58,6 +58,7 @@
 <script>
     let stompClient = null;
     let chatRoomId = null;
+    let username = null;
 
     document.addEventListener("DOMContentLoaded", function () {
         console.log("✅ [DOMContentLoaded] 페이지 로드 완료");
@@ -165,13 +166,14 @@
     }
 
     async function joinRoom(roomId) {
+        username = "q";
         chatRoomId = roomId;
         if (!chatRoomId) {
             alert('채팅방 ID를 입력해주세요!');
             return;
         }
 
-        console.log("🔹 [채팅방 입장] 입장 시도 채팅방 ID:", chatRoomId);
+        console.log("🔹 [채팅방 입장] 채팅방 ID:", chatRoomId);
 
         if (!stompClient || !stompClient.connected) {
             alert("WebSocket이 아직 연결되지 않았습니다.");
@@ -184,31 +186,43 @@
             return;
         }
 
-        document.getElementById('messages').innerHTML = ''; // 채팅 메시지 초기화
+        if (stompClient && stompClient.subscriptions && stompClient.subscriptions[chatRoomId]) {
+            stompClient.unsubscribe(stompClient.subscriptions[chatRoomId]);
+        }
+
+        // ✅ 메시지 영역 초기화
+        document.getElementById('messages').innerHTML = '';
+
         await fetchChatHistory(chatRoomId);
 
+        // ✅ SUBSCRIBE 요청 시 Authorization 헤더 포함
         const subscription = stompClient.subscribe(
                 `/topic/chat/${chatRoomId}`,
                 function (message) {
                     const msg = JSON.parse(message.body);
                     displayMessage(msg.sender, msg.content);
                 },
-                { "Authorization": `Bearer ${token}` } // ✅ 구독 요청 시 헤더 포함
+                { "Authorization": `Bearer ${token}` }  // ✅ Authorization 헤더 추가
         );
 
         stompClient.subscriptions = stompClient.subscriptions || {};
         stompClient.subscriptions[chatRoomId] = subscription.id;
 
-        stompClient.send(`/app/${chatRoomId}/chat.addUser`, { "Authorization": `Bearer ${token}` }, JSON.stringify({
-            sender: username,
-            content: `${username} 님이 입장하셨습니다.`,
-            type: 'JOIN',
-            roomId: chatRoomId
-        }));
+        stompClient.send(
+                `/app/${chatRoomId}/chat.addUser`,
+                { "Authorization": `Bearer ${token}` },  // ✅ Authorization 헤더 추가
+                JSON.stringify({
+                    sender: username,
+                    content: `${username} 님이 입장하셨습니다.`,
+                    type: 'JOIN',
+                    roomId: chatRoomId
+                })
+        );
 
         alert(`채팅방 ${chatRoomId}에 입장하였습니다.`);
         document.getElementById('sendButton').disabled = false;
     }
+
 
 
 
@@ -249,24 +263,45 @@
     // ✅ 메시지 전송
     function sendMessage() {
         const messageInput = document.getElementById('messageInput');
-        const messageContent = messageInput.value;
-        if (!messageContent.trim() || !chatRoomId) return;
+        const messageContent = messageInput.value.trim();
+
+        if (!messageContent || !chatRoomId) {
+            console.warn("❌ 메시지 내용이 없거나, 채팅방이 선택되지 않음.");
+            return;
+        }
+
+        if (!stompClient || !stompClient.connected) {
+            console.warn("❌ WebSocket이 연결되지 않음.");
+            alert("WebSocket이 아직 연결되지 않았습니다.");
+            return;
+        }
 
         const token = getAuthToken();
         if (!token) {
+            console.warn("❌ 토큰이 없음.");
             alert("토큰을 입력한 후 다시 시도해주세요!");
             return;
         }
 
-        stompClient.send(
-                `/app/${chatRoomId}/chat.sendMessage`,
-                { "Authorization": `Bearer ${token}` }, // ✅ 메시지 전송 시 헤더 포함
-                JSON.stringify({
-                    content: messageContent,
-                    type: 'CHAT',
-                    roomId: chatRoomId
-                })
-        );
+        username = "q";
+
+        console.log(`🔹 메시지 전송 시도: 채팅방 ${chatRoomId}, 보낸 사람: ${username}, 내용: ${messageContent}`);
+
+        try {
+            stompClient.send(
+                    `/app/${chatRoomId}/chat.sendMessage`,
+                    { "Authorization": `Bearer ${token}` },
+                    JSON.stringify({
+                        sender: username,
+                        content: messageContent,
+                        type: 'CHAT',
+                        roomId: chatRoomId
+                    })
+            );
+            console.log("✅ 메시지 전송 완료");
+        } catch (error) {
+            console.error("❌ 메시지 전송 실패:", error);
+        }
 
         messageInput.value = '';
     }
@@ -283,22 +318,31 @@
             return;
         }
 
-        const socket = new SockJS(`http://${window.location.hostname}:8080/chat-websocket`);
+        const port = window.location.port || "8081"; // 현재 접속된 포트 확인, 기본값 8081
+        const socket = new SockJS(`http://${window.location.hostname}:${port}/chat-websocket`);
         stompClient = Stomp.over(socket);
 
         // ✅ STOMP connect 시 Authorization 헤더 포함
         stompClient.connect(
-                { "Authorization": `Bearer ${token}` }, // 🔹 헤더에 토큰 추가
+                { "Authorization": `Bearer ${token}` },  // ✅ Authorization 헤더 포함
                 function (frame) {
-                    console.log("✅ WebSocket connected 성공: " + frame);
-                    fetchChatRooms();
+                    console.log("✅ WebSocket 연결 성공:", frame);
+
+                    fetchChatRooms();  // ✅ 채팅방 목록 갱신
                 },
                 function (error) {
-                    console.error("❌ WebSocket 연결 실패! 오류:", error);
-                    alert("WebSocket 연결에 실패했습니다. 서버가 실행 중인지 확인하세요.");
+                    console.error("❌ WebSocket 연결 실패:", error);
                 }
         );
+
     }
+    window.onload = function () {
+        initializeWebSocket();
+        fetchChatRooms();
+
+        document.getElementById('createRoomButton').addEventListener('click', createRoom);
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+    };
 
 
 </script>
