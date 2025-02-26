@@ -4,6 +4,7 @@ import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository
 import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
 import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
+import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.CookieUtil;
 import com.capstone.global.jwt.JwtFilter;
 import com.capstone.global.jwt.JwtUtil;
@@ -44,6 +45,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
     private final CookieUtil cookieUtil;
 
     @Bean
@@ -94,7 +96,7 @@ public class SecurityConfig {
 
         http
                 .addFilterAt(
-                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil),
+                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
