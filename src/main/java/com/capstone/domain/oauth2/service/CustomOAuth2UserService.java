@@ -62,6 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             User user = User.builder()
                     .email(oAuth2UserInfo.getEmail())
                     .name(oAuth2UserInfo.getName())
+                    .social(registrationId)
                     .build();
             userRepository.save(user);
         }
