@@ -24,45 +24,47 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
     }
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel) {
+    public Message<?> preSend(Message<?> message, MessageChannel channel)
+    {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
+        StompCommand command = accessor.getCommand();
         String token = accessor.getFirstNativeHeader("Authorization");
-
         log.info("token{}", token);
-        if (StompCommand.CONNECT == accessor.getCommand()) {
 
-        }
-        if (token != null && token.startsWith("Bearer "))
+        if (token == null || !token.startsWith("Bearer "))
         {
-            token = token.substring(7);
-            try {
-                if (jwtUtil.isExpired(token)) {
-                    log.warn("JWT 토큰이 만료 되었습니다 - 재인증 요청 보내야합니다.");
-                    messagingTemplate.convertAndSendToUser(
-                            accessor.getSessionId(),
-                            "/queue/errors",
-                            "TOKEN_EXPIRED"
-                    );
-                    //이후에 프론트에서 웹소켓 재연결
-                    throw new IllegalArgumentException("JWT 토큰이 만료되었습니다.");
-                }
-
-                String name = jwtUtil.getEmail(token);
-                accessor.getSessionAttributes().put("username",name);
-                accessor.addNativeHeader("username", name);
-                log.info(name);
-            } catch (Exception e) {
-                log.error("JWT 검증 실패: {}", e.getMessage());
-                throw new IllegalArgumentException("유효하지 않은 JWT 토큰입니다.");
-            }
-        }
-        else {
             log.error("JWT 토큰이 없음");
             throw new IllegalArgumentException("JWT 토큰이 필요합니다.");
         }
 
+        token = token.substring(7);
+
+        if (jwtUtil.isExpired(token))
+        {
+            log.warn("JWT 토큰이 만료됨 - 재인증 요청 필요");
+            sendErrorMessage(accessor, "TOKEN_EXPIRED");
+            throw new IllegalArgumentException("JWT 토큰이 만료되었습니다.");
+        }
+
+        //소켓 첫 연결시에만 username 저장
+        if (command == StompCommand.CONNECT)
+        {
+            String username = jwtUtil.getEmail(token);
+            accessor.getSessionAttributes().put("username", username);
+            accessor.addNativeHeader("username", username);
+            log.info("사용자: {}", username);
+
+        }
+
         return message;
+    }
+    //프론트 단에서 토큰 만료시 재발급 경로로 가서 재발급
+    private void sendErrorMessage(StompHeaderAccessor accessor, String errorType)
+    {
+        String sessionId = accessor.getSessionId();
+        if (sessionId != null) {
+            messagingTemplate.convertAndSend("/queue/errors/" + sessionId, errorType);
+        }
     }
 }
 
