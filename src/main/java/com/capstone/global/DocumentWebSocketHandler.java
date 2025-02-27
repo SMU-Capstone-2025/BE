@@ -12,7 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
-public class DocumentWebSocketHandler implements WebSocketHandler {
+public class
+DocumentWebSocketHandler implements WebSocketHandler {
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
