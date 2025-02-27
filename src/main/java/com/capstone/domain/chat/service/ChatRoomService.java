@@ -2,18 +2,19 @@ package com.capstone.domain.chat.service;
 
 import com.capstone.domain.chat.dto.ChatRoom;
 import com.capstone.domain.chat.repository.ChatRoomRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ChatRoomService
 {
     private final ChatRoomRepository chatRoomRepository;
 
-    public ChatRoomService(ChatRoomRepository chatRoomRepository) {
-        this.chatRoomRepository = chatRoomRepository;
-    }
+    
     public List<ChatRoom> getRooms()
     {
         return chatRoomRepository.findAllRooms();
