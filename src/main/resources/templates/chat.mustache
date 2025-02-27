@@ -44,7 +44,11 @@
     <h3>Chat Room List</h3>
     <div id="rooms"></div>
 </div>
-
+<div>
+    <h3>Join Chat Room</h3>
+    <input type="text" id="roomIdInput" placeholder="Enter room ID">
+    <button id="joinRoomByIdButton">Join Room</button>
+</div>
 <!-- ✅ 채팅 메시지 입력 -->
 <div id="controls">
     <h3>Chat</h3>
@@ -78,6 +82,14 @@
             console.log("🔹 [확인 버튼 클릭] 입력한 토큰:", token);
             document.getElementById('displayToken').textContent = "🔑 입력한 토큰: " + token;
             initializeWebSocket();
+        });
+        document.getElementById("joinRoomByIdButton").addEventListener("click", function () {
+            const roomId = document.getElementById('roomIdInput').value;
+            if (roomId) {
+                joinRoom(roomId);
+            } else {
+                alert("채팅방 ID를 입력해주세요!");
+            }
         });
     });
 
