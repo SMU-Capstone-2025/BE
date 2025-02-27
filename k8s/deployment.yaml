@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: doctalk-container
-          image: us-central1-docker.pkg.dev/semiotic-sylph-450506-u5/docker/blaybus:latest
+          image: us-central1-docker.pkg.dev/semiotic-sylph-450506-u5/docker/doctalk:latest
           ports:
             - containerPort: 8080
