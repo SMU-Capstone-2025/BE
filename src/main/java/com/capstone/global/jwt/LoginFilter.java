@@ -1,6 +1,9 @@
 package com.capstone.global.jwt;
 
+import com.capstone.domain.auth.exception.SocialLoginException;
 import com.capstone.domain.auth.login.dto.LoginRequest;
+import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -30,10 +33,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
+    private final UserRepository userRepository;
 
-    public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CookieUtil cookieUtil){
+    public LoginFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CookieUtil cookieUtil, UserRepository userRepository){
         this.jwtUtil = jwtUtil;
         this.cookieUtil = cookieUtil;
+        this.userRepository = userRepository;
         super.setAuthenticationManager(authenticationManager);
     }
 
@@ -45,6 +50,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         try {
             String messageBody = StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8);
             LoginRequest loginRequest = new ObjectMapper().readValue(messageBody, LoginRequest.class);
+
+            User user = userRepository.findUserByEmail(loginRequest.getEmail());
+
+            if (user.getSocial() != null){
+                throw new SocialLoginException(user.getSocial() + "계정으로 가입된 회원입니다.");
+            }
 
             UsernamePasswordAuthenticationToken authToken =
                     new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword(), null);
