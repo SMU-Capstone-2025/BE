@@ -1,19 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: doctalk
+  name: doctalk-deployment
+  labels:
+    app: doctalk
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: web
+      app: doctalk
   template:
     metadata:
       labels:
-        app: web
+        app: doctalk
     spec:
       containers:
-        - name: web
-          image: gcr.io/semiotic-sylph-450506-u5/web-app:latest
+        - name: doctalk-container
+          image: us-central1-docker.pkg.dev/semiotic-sylph-450506-u5/docker/blaybus:latest
           ports:
-            - containerPort: 80
+            - containerPort: 8080
