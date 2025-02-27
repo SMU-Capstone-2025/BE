@@ -36,13 +36,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Revoke and Re-authenticate
-        run: |
-          gcloud auth revoke --all
-          gcloud auth list
-          gcloud auth activate-service-account --key-file=${{ secrets.GCP_SA_KEY }}
-          gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
