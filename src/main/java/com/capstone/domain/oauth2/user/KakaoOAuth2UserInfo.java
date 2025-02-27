@@ -1,7 +1,10 @@
 package com.capstone.domain.oauth2.user;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
+@Slf4j
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
 
     private final Map<String, Object> attributes;
@@ -9,10 +12,7 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     private final String id;
     private final String email = "glitt5384@naver.com"; // 하드 코딩한 이유: 카카오 개발자 사이트에서 이메일 권한 요청을 아직 하지 않음.
     private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final String nickName;
-    private final String profileImageUrl;
+    private final String profileUrl;
 
     public KakaoOAuth2UserInfo(String accessToken, Map<String, Object> attributes) {
         this.accessToken = accessToken;
@@ -20,17 +20,10 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
         this.attributes = kakaoProfile;
-
         this.id = ((Long) attributes.get("id")).toString();
-        this.name = null;
-        this.firstName = null;
-        this.lastName = null;
-        this.nickName = (String) attributes.get("nickname");
-        ;
-        this.profileImageUrl = (String) attributes.get("profile_image_url");
-
-        this.attributes.put("id", id);
-        this.attributes.put("email", this.email);
+        //this.email = (String) this.attributes.get("account_email");
+        this.name = (String) this.attributes.get("nickname");
+        this.profileUrl = (String) this.attributes.get("profile_image_url");
     }
 
     @Override
@@ -59,27 +52,9 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name;}
 
     @Override
-    public String getFirstName() {
-        return firstName;
-    }
+    public String getProfileImage() { return profileUrl;}
 
-    @Override
-    public String getLastName() {
-        return lastName;
-    }
-
-    @Override
-    public String getNickname() {
-        return nickName;
-    }
-
-    @Override
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
 }

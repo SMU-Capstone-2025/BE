@@ -9,10 +9,7 @@ public class NaverOAuth2UserInfo implements OAuth2UserInfo {
     private final String id;
     private final String email;
     private final String name;
-    private final String firstName;
-    private final String lastName;
-    private final String nickName;
-    private final String profileImageUrl;
+    private final String profileUrl;
 
     public NaverOAuth2UserInfo(String accessToken, Map<String, Object> attributes) {
         this.accessToken = accessToken;
@@ -21,11 +18,7 @@ public class NaverOAuth2UserInfo implements OAuth2UserInfo {
         this.id = (String) this.attributes.get("id");
         this.email = (String) this.attributes.get("email");
         this.name = (String) this.attributes.get("name");
-        this.firstName = null;
-        this.lastName = null;
-        this.nickName = (String) attributes.get("nickname");
-        ;
-        this.profileImageUrl = (String) attributes.get("profile_image");
+        this.profileUrl = (String) this.attributes.get("profile_image");
     }
 
     @Override
@@ -59,22 +52,6 @@ public class NaverOAuth2UserInfo implements OAuth2UserInfo {
     }
 
     @Override
-    public String getFirstName() {
-        return firstName;
-    }
+    public String getProfileImage() {return profileUrl;}
 
-    @Override
-    public String getLastName() {
-        return lastName;
-    }
-
-    @Override
-    public String getNickname() {
-        return nickName;
-    }
-
-    @Override
-    public String getProfileImageUrl() {
-        return profileImageUrl;
-    }
 }
