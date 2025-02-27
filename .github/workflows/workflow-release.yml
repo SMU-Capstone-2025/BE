@@ -79,107 +79,39 @@ jobs:
       IMAGE_NAME: doctalk
       IMAGE_TAG: ${{ github.sha }}
 
-    name: CI / CD
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-    on:
-      push:
-        branches: [ deploy ]
+      - name: Google Cloud SDK 설정
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-    jobs:
-      CI:
-        runs-on: ubuntu-latest
+      - name: GCP 프로젝트 설정
+        run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
 
-        env:
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          IMAGE_NAME: blaybus
-          IMAGE_TAG: ${{ github.sha }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          KAKAOPAY_KEY: ${{ secrets.KAKAOPAY_KEY }}
+      - name: GCP 프로젝트 확인
+        run: gcloud config list
 
-        steps:
-          - name: Checkout
-            uses: actions/checkout@v3
+      - name: GKE 인증 플러그인 설치
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apt-transport-https ca-certificates curl
+          sudo mkdir -p /usr/share/keyrings
+          curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+          echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
+          sudo apt-get update
+          sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
 
-          - name: Set up JDK
-            uses: actions/setup-java@v3
-            with:
-              java-version: 21
-              distribution: 'adopt'
+      - name: GKE 클러스터 인증
+        run: gcloud container clusters get-credentials cluster-1 --region us-central1
 
-          - name: Google Cloud SDK 설정
-            uses: "google-github-actions/auth@v2"
-            with:
-              credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - name: Kubernetes Deployment 적용
+        run: kubectl apply -f deployment.yaml
 
-          - name: Docker를 위한 gcloud 인증 설정
-            run: gcloud auth configure-docker --quiet
+      - name: 기존 Deployment의 이미지 업데이트
+        run: kubectl set image deployment/blaybus-deployment blaybus-container=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}er.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
 
-          - name: Grant execute permission for gradlew
-            run: chmod +x gradlew
-
-          - name: Run Unit Tests
-            run: ./gradlew test --info
-
-          - name: Setup Gradle
-            uses: gradle/actions/setup-gradle@v3
-
-          - name: Build with Gradle (Test 제외)
-            run: ./gradlew build --exclude-task test
-
-          - name: Verify JAR file
-            run: ls -la build/libs/
-
-          - name: Docker 인증 구성
-            run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-
-          - name: Docker 이미지 빌드 및 푸시
-            run: |
-              docker build --build-arg SPRING_PROFILE=prod -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
-              docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-
-      CD:
-        runs-on: ubuntu-latest
-        needs: CI
-
-        env:
-          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          IMAGE_NAME: blaybus
-          IMAGE_TAG: ${{ github.sha }}
-
-        steps:
-          - name: Checkout Repository
-            uses: actions/checkout@v3
-
-          - name: Google Cloud SDK 설정
-            uses: google-github-actions/auth@v2
-            with:
-              credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-          - name: GCP 프로젝트 설정
-            run: gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
-
-          - name: GCP 프로젝트 확인
-            run: gcloud config list
-
-          - name: GKE 인증 플러그인 설치
-            run: |
-              sudo apt-get update
-              sudo apt-get install -y apt-transport-https ca-certificates curl
-              sudo mkdir -p /usr/share/keyrings
-              curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-              echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
-              sudo apt-get update
-              sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
-
-          - name: GKE 클러스터 인증
-            run: gcloud container clusters get-credentials cluster-1 --region us-central1
-
-          - name: Kubernetes Deployment 적용
-            run: kubectl apply -f deployment.yaml
-
-          - name: 기존 Deployment의 이미지 업데이트
-            run: kubectl set image deployment/blaybus-deployment blaybus-container=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}er.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
-
-          - name: Load Balancer 추가
-            run: kubectl apply -f loadbalancer.yaml
+      - name: Load Balancer 추가
+        run: kubectl apply -f loadbalancer.yaml
