@@ -109,7 +109,8 @@ jobs:
 
       - name: Kubernetes Deployment 적용
         run: |
-            kubectl apply -f k8s/deployment.yaml
-            kubectl apply -f k8s/loadbalancer.yaml
+            kubectl apply -f ./k8s/deployment.yaml
+            kubectl apply -f ./k8s/loadbalancer.yaml
+
       - name: 기존 Deployment의 이미지 업데이트
         run: kubectl set image deployment/blaybus-deployment blaybus-container=us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}er.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
