@@ -42,6 +42,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration()
                 .getRegistrationId();
+
         String accessToken = userRequest.getAccessToken().getTokenValue();
 
 
@@ -49,7 +50,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 accessToken,
                 oAuth2User.getAttributes());
 
+        log.info("userInfoAtt: {}", oAuth2UserInfo.getAttributes());
         log.info("userInfo: {}", oAuth2UserInfo.getEmail());
+        log.info("userProfile: {}", oAuth2UserInfo.getProfileImage());
 
         if (!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
@@ -63,6 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .email(oAuth2UserInfo.getEmail())
                     .name(oAuth2UserInfo.getName())
                     .social(registrationId)
+                    .profileImage(oAuth2UserInfo.getProfileImage())
                     .build();
             userRepository.save(user);
         }
