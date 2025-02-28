@@ -137,10 +137,12 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           helm upgrade --install kafka bitnami/kafka \
-            --set global.storageClass=standard \
-            --set persistence.enabled=true \
-            --set persistence.size=10Gi \
-            --set zookeeper.enabled=true
+          --set global.storageClass=standard \
+          --set persistence.enabled=true \
+          --set persistence.size=10Gi \
+          --set zookeeper.enabled=true \
+          --set replicaCount=3 \
+          --set controller.replicaCount=0
       
 
       - name: Kubernetes Deployment 적용
