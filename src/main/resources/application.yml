@@ -11,10 +11,10 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
   kafka:
-    bootstrap-server: "34.59.80.150:9092"
+    bootstrap-server: "34.45.66.13:9092"
 
   elasticsearch:
-    uris: http://34.59.80.150:9200
+    uris: http://34.45.66.13:9200
     username: elastic
     password: keypass
 
