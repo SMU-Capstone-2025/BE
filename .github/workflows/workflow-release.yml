@@ -107,6 +107,41 @@ jobs:
       - name: GKE 클러스터 인증
         run: gcloud container clusters get-credentials cluster-1 --region us-central1
 
+      - name: Install Helm (Kubernetes 패키지 매니저)
+        run: |
+            curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Deploy Redis using Helm
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+          helm upgrade --install redis bitnami/redis \
+            --set global.storageClass=standard \
+            --set persistence.enabled=true \
+            --set persistence.size=5Gi
+          
+      - name: Deploy Elasticsearch using Helm
+        run: |
+          helm repo add elastic https://helm.elastic.co
+          helm repo update
+          helm upgrade --install elasticsearch elastic/elasticsearch \
+            --set global.storageClass=standard \
+            --set persistence.enabled=true \
+            --set persistence.size=10Gi \
+            --set replicas=1 \
+            --set discovery.type=single-node
+          
+      - name: Deploy Kafka using Helm
+        run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+          helm upgrade --install kafka bitnami/kafka \
+            --set global.storageClass=standard \
+            --set persistence.enabled=true \
+            --set persistence.size=10Gi \
+            --set zookeeper.enabled=true
+      
+
       - name: Kubernetes Deployment 적용
         run: |
             kubectl apply -f ./k8s/deployment.yaml
