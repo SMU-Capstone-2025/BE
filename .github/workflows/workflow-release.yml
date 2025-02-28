@@ -130,6 +130,7 @@ jobs:
             --set persistence.size=10Gi \
             --set replicas=1 \
             --set discovery.type=single-node
+            --set sysctlInitContainer.enabled=false
           
       - name: Deploy Kafka using Helm
         run: |
