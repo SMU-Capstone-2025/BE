@@ -125,7 +125,10 @@ jobs:
           helm repo add elastic https://helm.elastic.co
           helm repo update
           helm upgrade --install elasticsearch elastic/elasticsearch \
-            --set global.storageClass=standard \
+            --set resources.requests.cpu="500m" \
+            --set resources.requests.memory="1Gi" \
+            --set resources.limits.cpu="1000m" \
+            --set resources.limits.memory="2Gi" \
             --set persistence.enabled=true \
             --set persistence.size=10Gi \
             --set replicas=1 \
