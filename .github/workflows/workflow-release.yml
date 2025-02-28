@@ -140,9 +140,9 @@ jobs:
           --set global.storageClass=standard \
           --set persistence.enabled=true \
           --set persistence.size=10Gi \
-          --set zookeeper.enabled=true \
-          --set replicaCount=3 \
-          --set controller.replicaCount=0
+          --set zookeeper.enabled=false \
+          --set controller.replicaCount=1 \
+          --set replicaCount=3
       
 
       - name: Kubernetes Deployment 적용
