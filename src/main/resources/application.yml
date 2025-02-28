@@ -4,7 +4,7 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   data:
     mongodb:
-      uri: mongodb://34.59.80.150:27017/
+      uri: mongodb+srv://admin:<db_password>@cluster0.edjo3.mongodb.net/
       database: capstone
   servlet:
     multipart:
