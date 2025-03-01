@@ -34,7 +34,8 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
         if (token == null || !token.startsWith("Bearer "))
         {
             log.error("JWT 토큰이 없음");
-            throw new IllegalArgumentException("JWT 토큰이 필요합니다.");
+            sendErrorMessage(accessor, "TOKEN_MISSING");
+            return message;
         }
 
         token = token.substring(7);
@@ -43,7 +44,7 @@ public class WebSocketSecurityInterceptor implements ChannelInterceptor {
         {
             log.warn("JWT 토큰이 만료됨 - 재인증 요청 필요");
             sendErrorMessage(accessor, "TOKEN_EXPIRED");
-            throw new IllegalArgumentException("JWT 토큰이 만료되었습니다.");
+            return message;
         }
 
         //소켓 첫 연결시에만 username 저장
