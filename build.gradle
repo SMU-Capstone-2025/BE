@@ -69,6 +69,9 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
+    //chat 테스트용
+    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+
 }
 
 tasks.named('test') {
