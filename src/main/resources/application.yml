@@ -21,8 +21,8 @@ spring:
 
   elasticsearch:
     uris: https://91bc8a8fa35a48edb0b305689240ae61.us-central1.gcp.cloud.es.io:443
-    username: elastic
-    password: kamillcream1
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
 
 
 server:
