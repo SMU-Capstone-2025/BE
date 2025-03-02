@@ -7,7 +7,7 @@ spring:
       uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
     redis:
-      host: 34.67.93.147
+      host: redis-master.default.svc.cluster.local
       port: 6379
 
   servlet:
@@ -15,7 +15,7 @@ spring:
       max-file-size: 50MB
       max-request-size: 50MB
   kafka:
-    bootstrap-server: "34.67.93.147:9092"
+    bootstrap-server: kafka.default.svc.cluster.local:9092
 
   elasticsearch:
     uris: https://91bc8a8fa35a48edb0b305689240ae61.us-central1.gcp.cloud.es.io:443
