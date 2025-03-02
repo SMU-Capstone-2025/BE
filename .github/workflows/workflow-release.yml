@@ -120,20 +120,6 @@ jobs:
             --set persistence.enabled=true \
             --set persistence.size=5Gi
           
-      - name: Deploy Elasticsearch using Helm
-        run: |
-          helm repo add elastic https://helm.elastic.co
-          helm repo update
-          helm upgrade --install elasticsearch elastic/elasticsearch \
-            --set resources.requests.cpu="500m" \
-            --set resources.requests.memory="512Mi" \
-            --set resources.limits.cpu="1000m" \
-            --set resources.limits.memory="1Gi" \
-            --set persistence.enabled=true \
-            --set persistence.size=5Gi \
-            --set replicas=1 \
-            --set discovery.type=single-node \
-            --set sysctlInitContainer.enabled=false
           
       - name: Deploy Kafka using Helm
         run: |
@@ -150,9 +136,7 @@ jobs:
 
       - name: Kubernetes Deployment 적용
         run: |
-            kubectl delete -f ./k8s/deployment.yaml
             kubectl apply -f ./k8s/deployment.yaml
-            kubectl delete -f ./k8s/loadbalancer.yaml
             kubectl apply -f ./k8s/loadbalancer.yaml
 
       - name: 기존 Deployment의 이미지 업데이트
