@@ -116,6 +116,8 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           helm upgrade --install redis bitnami/redis \
+            --set service.type=ClusterIP \
+            --set service.clusterIP="34.118.230.242" \
             --set global.storageClass=standard \
             --set persistence.enabled=true \
             --set persistence.size=5Gi
