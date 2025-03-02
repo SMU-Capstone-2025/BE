@@ -28,5 +28,15 @@ spec:
                 secretKeyRef:
                   name: elasticsearch-secret
                   key: ELASTIC_PASSWORD
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_USERNAME
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: REDIS_PASSWORD
           ports:
             - containerPort: 8080
