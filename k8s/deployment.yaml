@@ -17,5 +17,16 @@ spec:
       containers:
         - name: doctalk-container
           image: us-central1-docker.pkg.dev/semiotic-sylph-450506-u5/docker/doctalk:latest
+          env:
+            - name: ELASTIC_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTIC_USERNAME
+            - name: ELASTIC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: elasticsearch-secret
+                  key: ELASTIC_PASSWORD
           ports:
             - containerPort: 8080
