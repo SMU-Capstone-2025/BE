@@ -7,8 +7,9 @@ spring:
       uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
     redis:
-      host: redis-18096.c1.us-central1-2.gce.redns.redis-cloud.com:18096
-      port: 6379
+      host: "redis-18096.c1.us-central1-2.gce.redislabs.com"
+      port: 18096
+      ssl: true
 
   servlet:
     multipart:
