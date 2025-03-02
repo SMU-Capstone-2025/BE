@@ -6,6 +6,10 @@ spring:
     mongodb:
       uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
+    redis:
+      host: 34.67.93.147
+      port: 6379
+
   servlet:
     multipart:
       max-file-size: 50MB
