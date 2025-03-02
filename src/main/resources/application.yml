@@ -9,7 +9,8 @@ spring:
     redis:
       host: "redis-18096.c1.us-central1-2.gce.redislabs.com"
       port: 18096
-      ssl: true
+      ssl:
+        enabled: true
 
   servlet:
     multipart:
@@ -20,8 +21,8 @@ spring:
 
   elasticsearch:
     uris: https://91bc8a8fa35a48edb0b305689240ae61.us-central1.gcp.cloud.es.io:443
-    username: ${ELASTIC_USERNAME}
-    password: ${ELASTIC_PASSWORD}
+    username: elastic
+    password: kamillcream1
 
 
 server:
