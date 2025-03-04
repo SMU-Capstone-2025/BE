@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: doctalk-deployment
+  name: task-service
   labels:
-    app: doctalk
+    app: task-service
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: doctalk
+      app: task-service
   template:
     metadata:
       labels:
-        app: doctalk
+        app: task-service
     spec:
       containers:
-        - name: doctalk-container
+        - name: task-service
           image: us-central1-docker.pkg.dev/semiotic-sylph-450506-u5/docker/doctalk:latest
           env:
             - name: ELASTIC_USERNAME
@@ -29,4 +29,4 @@ spec:
                   name: elasticsearch-secret
                   key: ELASTIC_PASSWORD
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
