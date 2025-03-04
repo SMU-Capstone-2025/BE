@@ -64,7 +64,7 @@ jobs:
           ./gradlew :task-service:build --exclude-task test
 
       - name: Verify JAR file
-        run: ls -la build/libs/
+        run: ls -la task-service/build/libs/
 
       - name: Docker 인증 구성
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
