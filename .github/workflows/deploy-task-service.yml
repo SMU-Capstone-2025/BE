@@ -71,7 +71,7 @@ jobs:
 
       - name: Build Task Service Docker Image
         run: |
-          docker build --build-arg SPRING_PROFILE=prod -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/task-service:${{ env.IMAGE_TAG }} ./task-service
+          docker build --build-arg SPRING_PROFILE=prod -f task-service/Dockerfile -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/task-service:${{ env.IMAGE_TAG }} .
           docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/task-service:${{ env.IMAGE_TAG }}
   CD:
     runs-on: ubuntu-latest
