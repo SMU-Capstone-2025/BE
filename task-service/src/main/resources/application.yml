@@ -18,7 +18,6 @@ spring:
     username: ${ELASTIC_USERNAME}
     password: ${ELASTIC_PASSWORD}
 
-
 server:
   port: 8081
   compression:
