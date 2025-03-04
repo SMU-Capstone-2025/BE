@@ -59,7 +59,9 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle (Test 제외)
-        run: ./gradlew :task-service:build --exclude-task test
+        run: |
+          cd task-service
+          ./gradlew :task-service:build --exclude-task test
 
       - name: Verify JAR file
         run: ls -la build/libs/
