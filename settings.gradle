@@ -1,1 +1,7 @@
 rootProject.name = 'capstone'
+include 'task-service'
+include 'notification-service'
+include 'file-service'
+include 'log-service'
+include 'api-gateway'
+include 'common-lib'

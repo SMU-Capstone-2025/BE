@@ -1,0 +1,27 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
+      database: capstone
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  kafka:
+    bootstrap-server: "34.67.93.147:9092"
+
+  elasticsearch:
+    uris: https://91bc8a8fa35a48edb0b305689240ae61.us-central1.gcp.cloud.es.io:443
+    username: ${ELASTIC_USERNAME}
+    password: ${ELASTIC_PASSWORD}
+
+
+server:
+  port: 8082
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 1024 # 1KB ??? ??? ?? ??
