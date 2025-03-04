@@ -13,6 +13,7 @@ spring:
   kafka:
     bootstrap-server: "34.67.93.147:9092"
 
+
   elasticsearch:
     uris: https://91bc8a8fa35a48edb0b305689240ae61.us-central1.gcp.cloud.es.io:443
     username: ${ELASTIC_USERNAME}
