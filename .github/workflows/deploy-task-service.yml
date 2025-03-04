@@ -63,9 +63,6 @@ jobs:
           cd task-service
           ./gradlew clean bootJar --exclude-task test
 
-      - name: List Task Service Build Directory
-        run: ls -R task-service/build/
-
       - name: Verify JAR file
         run: ls -la task-service/build/libs/
 
