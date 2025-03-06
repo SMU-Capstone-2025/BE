@@ -83,4 +83,6 @@ jobs:
             --name ${IMAGE_NAME} \
             --network compose_default \
             -p 8080:8080 \
+            -v /etc/letsencrypt/live/blaybus-glowup.com/keystore.p12:/etc/letsencrypt/live/blaybus-glowup.com/keystore.p12 \
+            -p 8443:8443 \
             us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/document-service:${IMAGE_TAG}
