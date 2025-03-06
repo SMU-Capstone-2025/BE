@@ -52,7 +52,7 @@ jobs:
 
       - name: Build Task Service Docker Image
         run: |
-            docker build --build-arg SPRING_PROFILE=prod -f document-service/Dockerfile -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/document-service:${{ env.IMAGE_TAG }} document-service/
+            docker build --build-arg SPRING_PROFILE=prod -f document-service/Dockerfile -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/document-service:${{ env.IMAGE_TAG }} document-service/
             docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/document-service:${{ env.IMAGE_TAG }}
   CD:
     runs-on: ubuntu-latest
