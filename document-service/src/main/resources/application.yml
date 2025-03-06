@@ -1,8 +1,13 @@
 spring:
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  r2dbc:  # ✅ R2DBC 설정 삭제
+    url: ""
+    username: ""
+    password: ""
 
+  datasource:  # ✅ JPA/Hibernate 사용 시 필요했던 설정 삭제
+    url: ""
+    username: ""
+    password: ""
   servlet:
     multipart:
       max-file-size: 50MB

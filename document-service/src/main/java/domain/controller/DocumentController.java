@@ -1,4 +1,4 @@
-package controller;
+package domain.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
