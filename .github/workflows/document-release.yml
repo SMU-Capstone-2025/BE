@@ -11,7 +11,7 @@ jobs:
 
     env:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      IMAGE_NAME: doctalk
+      IMAGE_NAME: document-service
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
@@ -39,26 +39,28 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle (Test 제외)
-        run: ./gradlew :document-service build --exclude-task test
+        run: |
+            cd document-service
+            ./gradlew clean bootJar --exclude-task test
 
       - name: Verify JAR file
-        run: ls -la build/libs/
+        run: ls -la document-service/build/libs/
+
 
       - name: Docker 인증 구성
         run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
-      - name: Docker 이미지 빌드 및 푸시
+      - name: Build Task Service Docker Image
         run: |
-          docker build --build-arg SPRING_PROFILE=prod -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
-          docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-
+            docker build --build-arg SPRING_PROFILE=prod -f document-service/Dockerfile -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/document-service:${{ env.IMAGE_TAG }} document-service/
+            docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/document-service:${{ env.IMAGE_TAG }}
   CD:
     runs-on: ubuntu-latest
     needs: CI
 
     env:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      IMAGE_NAME: doctalk
+      IMAGE_NAME: document
       IMAGE_TAG: ${{ github.sha }}
 
     steps:
