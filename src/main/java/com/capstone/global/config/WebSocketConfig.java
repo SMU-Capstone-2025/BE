@@ -1,47 +1,35 @@
 package com.capstone.global.config;
 
-import com.capstone.domain.notification.handler.NotificationWebSocketHandler;
-import com.capstone.global.DocumentWebSocketHandler;
-import org.apache.catalina.connector.Connector;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.context.annotation.Bean;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
-    @Autowired
-    private final NotificationWebSocketHandler notificationWebSocketHandler;
-    @Autowired
-    private final DocumentWebSocketHandler documentWebSocketHandler;
+@EnableWebSocketMessageBroker
+@RequiredArgsConstructor
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    public WebSocketConfig(NotificationWebSocketHandler notificationWebSocketHandler, DocumentWebSocketHandler documentWebSocketHandler){
-        this.notificationWebSocketHandler = notificationWebSocketHandler;
-        this.documentWebSocketHandler = documentWebSocketHandler;
-    }
+
+
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(notificationWebSocketHandler, "/ws/notifications")
-                .addHandler(documentWebSocketHandler, "/ws/task")
-                .setAllowedOrigins("*"); // 클라이언트 도메인 허용
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/document")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+        registry.addEndpoint("/document")
+                .setAllowedOriginPatterns("*");
     }
 
-    @Bean
-    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> customWebServerFactory() {
-        return factory -> {
-            factory.addAdditionalTomcatConnectors(createWebSocketConnector());
-        };
-    }
 
-    private Connector createWebSocketConnector() {
-        Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
-        connector.setPort(8081); // WebSocket 포트
-        return connector;
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+
+        //sub으로 시작되는 요청을 구독한 모든 사용자들에게 메시지를 broadcast한다.
+        registry.enableSimpleBroker("/sub");
+
+        // pub로 시작되는 메시지는 message-handling methods로 라우팅된다.
+        registry.setApplicationDestinationPrefixes("/pub");
     }
 
 }
