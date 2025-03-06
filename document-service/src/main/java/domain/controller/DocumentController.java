@@ -25,6 +25,6 @@ public class DocumentController {
         LOGGER.info("메시지 수신 - 채널: {}, 내용: {}", documentId, message);
 
         // 해당 채널을 구독 중인 모든 클라이언트에게 메시지 전송
-        messagingTemplate.convertAndSend("/sub/chat/" + documentId, params);
+        messagingTemplate.convertAndSend("/sub/chat/" + documentId, message);
     }
 }
