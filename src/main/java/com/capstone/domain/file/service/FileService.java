@@ -1,7 +1,7 @@
 package com.capstone.domain.file.service;
 
-import com.capstone.domain.file.FileMessages;
-import com.capstone.domain.file.FileTypes;
+import com.capstone.domain.file.common.FileMessages;
+import com.capstone.domain.file.common.FileTypes;
 import com.capstone.domain.file.exception.InvalidFileException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
