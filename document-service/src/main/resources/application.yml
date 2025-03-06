@@ -1,13 +1,4 @@
 spring:
-  r2dbc:  # ✅ R2DBC 설정 삭제
-    url: ""
-    username: ""
-    password: ""
-
-  datasource:  # ✅ JPA/Hibernate 사용 시 필요했던 설정 삭제
-    url: ""
-    username: ""
-    password: ""
   servlet:
     multipart:
       max-file-size: 50MB
@@ -16,7 +7,13 @@ spring:
 
 server:
   address: 0.0.0.0
-  port: 8080
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: /etc/letsencrypt/live/blaybus-glowup.com/keystore.p12
+    key-store-password: blaybus
+    key-store-type: PKCS12
+    key-alias: blaybus
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
