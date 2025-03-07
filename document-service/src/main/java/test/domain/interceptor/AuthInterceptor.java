@@ -2,6 +2,7 @@ package test.domain.interceptor;
 
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageDeliveryException;
@@ -13,12 +14,14 @@ import test.global.jwt.JwtUtil;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuthInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private static final String BEARER_PREFIX = "Bearer ";
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        log.info("preSend: {}", message.getPayload());
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
         // 헤더 토큰 얻기
