@@ -64,13 +64,7 @@ public class SecurityConfig {
         http.formLogin((auth) -> auth.disable());
         http.httpBasic((auth) -> auth.disable());
         http
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized request\"}");
-                        })
-                )
+
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
                                 "/v3/api-docs/**","/csrf-token", "/project/register", "/ws/*").permitAll()
@@ -80,7 +74,8 @@ public class SecurityConfig {
 
         );
 
-        http .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
