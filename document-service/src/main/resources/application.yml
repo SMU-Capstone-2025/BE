@@ -1,8 +1,10 @@
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   data:
-      mongodb:
-        uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
-        database: capstone
+    mongodb:
+      uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
+      database: capstone
   servlet:
     multipart:
       max-file-size: 50MB
