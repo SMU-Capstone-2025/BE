@@ -1,6 +1,5 @@
 package com.capstone.global.config;
 
-import com.capstone.global.DocumentUpdateListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -20,10 +19,7 @@ public class RedisConfig {
         return container;
     }
 
-    @Bean
-    public MessageListenerAdapter listenerAdapter(DocumentUpdateListener listener) {
-        return new MessageListenerAdapter(listener, "onMessage");
-    }
+
 
     @Bean
     public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
