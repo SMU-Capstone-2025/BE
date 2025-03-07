@@ -1,7 +1,7 @@
 package domain.repository;
 
+import domain.entity.User;
 import domain.repository.custom.CustomUserRepository;
-import org.apache.catalina.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

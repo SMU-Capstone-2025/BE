@@ -1,5 +1,6 @@
 package domain.entity;
 
+import domain.register.dto.RegisterRequest;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -18,13 +19,15 @@ public class User {
     private String id;
     private String name;
     private String email;
-    private String profileImage;
-    // 기본 회원가입 시 null.
-    private String social;
     private String password;
-    private List<String> projectIds;
 
-
+    public static User createUser(RegisterRequest registerRequest){
+        return User.builder()
+                .email(registerRequest.getEmail())
+                .password(registerRequest.getPassword())
+                .name(registerRequest.getName())
+                .build();
+    }
 
     public User(String email){
         this.email = email;
