@@ -3,6 +3,8 @@ name: CI / CD
 on:
   push:
     branches: [feature-4-병합-충돌-방지]
+    paths:
+      - "document-service/**"
 
 jobs:
   CI:
