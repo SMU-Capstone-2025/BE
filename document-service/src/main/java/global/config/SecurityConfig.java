@@ -61,13 +61,7 @@ public class SecurityConfig {
         http.formLogin((auth) -> auth.disable());
         http.httpBasic((auth) -> auth.disable());
         http
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized request\"}");
-                        })
-                )
+
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
                                 "/v3/api-docs/**","/csrf-token", "/project/register", "/ws/*").permitAll()
