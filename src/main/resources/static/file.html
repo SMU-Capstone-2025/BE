@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>File Upload & Management</title>
+  <title>실시간 문서 동기화 및 파일 관리</title>
   <style>
     body {
         font-family: Arial, sans-serif;
@@ -11,38 +11,68 @@
         padding: 20px;
         max-width: 600px;
     }
+    #editor {
+        width: 100%;
+        height: 200px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        font-size: 16px;
+        overflow-y: auto;
+    }
     input, button {
         margin: 10px 0;
         padding: 10px;
     }
-    #fileList {
-        margin-top: 20px;
+    #status {
+        margin-top: 10px;
+        color: green;
+    }
+    .file-button {
+        display: inline-block;
+        margin: 5px;
+        padding: 5px 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
     }
   </style>
 </head>
 <body>
 
-<h2>File Upload & Management</h2>
+<h2>실시간 문서 동기화 및 파일 관리</h2>
+
+<!-- 실시간 문서 편집 -->
+<div contenteditable="true" id="editor" placeholder="여기에 내용을 입력하세요..."></div>
+<p id="status">연결 상태: <span>연결 안 됨</span></p>
 
 <!-- 파일 업로드 -->
+<h3>파일 업로드 및 관리</h3>
 <input type="file" id="fileInput">
 <button onclick="uploadFile()">Upload</button>
 
-<!-- 파일 다운로드 -->
-<input type="text" id="downloadFileId" placeholder="Enter File ID">
-<button onclick="downloadFile()">Download</button>
-
-<!-- 파일 삭제 -->
-<input type="text" id="deleteFileId" placeholder="Enter File ID">
-<button onclick="deleteFile()">Delete</button>
-
-<h3>Uploaded Files</h3>
-<ul id="fileList"></ul>
-
 <script>
+  const socket = new WebSocket("ws://localhost:8080/ws/task");
   const serverUrl = "http://localhost:8080/file"; // 서버 URL
+  const editor = document.getElementById("editor");
 
-  // 📌 파일 업로드
+  socket.onopen = function () {
+      document.getElementById("status").innerHTML = "연결 상태: <span style='color:blue;'>연결됨</span>";
+  };
+
+  socket.onmessage = function (event) {
+      editor.innerHTML = event.data;
+  };
+
+  socket.onclose = function () {
+      document.getElementById("status").innerHTML = "연결 상태: <span style='color:red;'>연결 종료</span>";
+  };
+
+  editor.addEventListener("input", function () {
+      socket.send(editor.innerHTML);
+  });
+
   async function uploadFile() {
       const fileInput = document.getElementById("fileInput");
       if (!fileInput.files.length) {
@@ -61,65 +91,21 @@
 
           const fileId = await response.text();
           alert("File Uploaded! ID: " + fileId);
-          updateFileList(fileId);
+          insertFileButton(fileId, fileInput.files[0].name);
       } catch (error) {
           console.error("Upload Error:", error);
           alert("파일 업로드 실패!");
       }
   }
 
-  // 📌 파일 다운로드
-  function downloadFile() {
-      const fileId = document.getElementById("downloadFileId").value;
-      if (!fileId) {
-          alert("파일 ID를 입력하세요.");
-          return;
-      }
-
-      window.location.href = `${serverUrl}/download?fileId=${fileId}`;
-  }
-
-  // 📌 파일 삭제
-  async function deleteFile() {
-      const fileId = document.getElementById("deleteFileId").value;
-      if (!fileId) {
-          alert("파일 ID를 입력하세요.");
-          return;
-      }
-
-      try {
-          const response = await fetch(`${serverUrl}/delete?fileId=${fileId}`, {
-              method: "DELETE"
-          });
-
-          if (response.ok) {
-              alert("파일이 삭제되었습니다.");
-              removeFileFromList(fileId);
-          } else {
-              alert("파일 삭제 실패!");
-          }
-      } catch (error) {
-          console.error("Delete Error:", error);
-          alert("파일 삭제 실패!");
-      }
-  }
-
-  // 📌 파일 목록에 추가
-  function updateFileList(fileId) {
-      const fileList = document.getElementById("fileList");
-      const listItem = document.createElement("li");
-      listItem.innerHTML = `File ID: ${fileId} <button onclick="downloadFile('${fileId}')">Download</button> <button onclick="deleteFile('${fileId}')">Delete</button>`;
-      fileList.appendChild(listItem);
-  }
-
-  // 📌 파일 목록에서 제거
-  function removeFileFromList(fileId) {
-      const fileList = document.getElementById("fileList");
-      [...fileList.children].forEach(li => {
-          if (li.textContent.includes(fileId)) {
-              li.remove();
-          }
-      });
+  function insertFileButton(fileId, fileName) {
+      const fileButton = document.createElement("a");
+      fileButton.href = `${serverUrl}/download?fileId=${fileId}`;
+      fileButton.className = "file-button";
+      fileButton.textContent = fileName;
+      fileButton.target = "_blank";
+      editor.appendChild(fileButton);
+      socket.send(editor.innerHTML);
   }
 </script>
 
