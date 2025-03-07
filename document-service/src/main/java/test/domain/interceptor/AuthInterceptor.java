@@ -11,6 +11,8 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
 import test.global.jwt.JwtUtil;
 
+import java.util.List;
+
 
 @Component
 @RequiredArgsConstructor
@@ -21,27 +23,35 @@ public class AuthInterceptor implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        log.info("preSend: {}", message.getPayload());
+        log.info("[AuthInterceptor] WebSocket CONNECT 메시지 수신: {}", message.getPayload());
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
 
-        // 헤더 토큰 얻기
-        String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader("Authorization"));
-        // 토큰 자르기 fixme 토큰 자르는 로직 validate 로 리팩토링
+        // 1. `Authorization` 헤더 가져오기 (List 형태)
+        List<String> authHeaders = headerAccessor.getNativeHeader("Authorization");
+        String authorizationHeader = (authHeaders != null && !authHeaders.isEmpty()) ? authHeaders.get(0) : null;
 
-        if(authorizationHeader == null || authorizationHeader.equals("null")){
-            throw new MessageDeliveryException("메세지 예외");
+        // 2. 헤더가 없거나 잘못된 경우 예외 발생
+        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
+            log.error("[AuthInterceptor] Authorization 헤더가 누락되었거나 잘못된 형식입니다.");
+            throw new MessageDeliveryException("토큰이 없거나 유효하지 않습니다.");
         }
 
+        // 3. Bearer 토큰 추출
         String token = authorizationHeader.substring(BEARER_PREFIX.length());
 
-        if (jwtUtil.isExpired(token)){
-            throw new JwtException(token);
+        // 4. JWT 유효성 검사
+        if (jwtUtil.isExpired(token)) {
+            log.error("[AuthInterceptor] 토큰이 만료되었습니다: {}", token);
+            throw new JwtException("토큰이 만료되었습니다.");
         }
 
+        // 5. 토큰에서 이메일 추출
         String email = jwtUtil.getEmail(token);
+        log.info("[AuthInterceptor] 사용자 이메일 인증 완료: {}", email);
+
+        // 6. 세션 속성에 사용자 이메일 저장
         headerAccessor.getSessionAttributes().put("email", email);
 
         return message;
-
     }
 }
