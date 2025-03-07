@@ -37,6 +37,9 @@ public class AuthInterceptor implements ChannelInterceptor {
             throw new JwtException(token);
         }
 
+        String email = jwtUtil.getEmail(token);
+        headerAccessor.getSessionAttributes().put("email", email);
+
         return message;
 
     }
