@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/document")
-                .setAllowedOrigins("*") // 모든 오리진 허용 (Spring Boot 2.4 이상)
+                .setAllowedOrigins("https://front.blaybus-glowup.com") // 모든 오리진 허용 (Spring Boot 2.4 이상)
                 .withSockJS();
     }
 
