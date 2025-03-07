@@ -25,13 +25,13 @@ public class DocumentController {
         String documentId = (String) params.get("documentId");
         String message = (String) params.get("message");
 
-        String username = (String) sessionAttributes.get("username");
+        String email = (String) sessionAttributes.get("email");
 
-        LOGGER.info("메시지 수신 - 사용자: {}, 채널: {}, 내용: {}", username, documentId, message);
+        LOGGER.info("메시지 수신 - 사용자: {}, 채널: {}, 내용: {}", email, documentId, message);
 
         // 사용자 정보를 포함한 메시지 객체 생성
         Map<String, Object> messagePayload = new HashMap<>();
-        messagePayload.put("username", username);
+        messagePayload.put("email", email);
         messagePayload.put("message", message);
 
         // 해당 채널을 구독 중인 모든 클라이언트에게 메시지 전송
