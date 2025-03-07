@@ -20,13 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/document")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("*") // 모든 오리진 허용 (Spring Boot 2.4 이상)
                 .withSockJS();
-        registry.addEndpoint("/document/info")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
-        registry.addEndpoint("/document")
-                .setAllowedOriginPatterns("*");
     }
 
 
