@@ -1,6 +1,5 @@
 package com.capstone.global.jwt;
 
-import com.capstone.domain.auth.exception.SocialLoginException;
 import com.capstone.domain.auth.login.dto.LoginRequest;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
@@ -54,7 +53,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             User user = userRepository.findUserByEmail(loginRequest.getEmail());
 
             if (user.getSocial() != null){
-                throw new SocialLoginException(user.getSocial() + "계정으로 가입된 회원입니다.");
+                throw new RuntimeException(user.getSocial() + "계정으로 가입된 회원입니다.");
             }
 
             UsernamePasswordAuthenticationToken authToken =

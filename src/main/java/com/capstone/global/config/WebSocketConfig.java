@@ -17,8 +17,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class WebSocketConfig implements WebSocketConfigurer {
     @Autowired
     private final NotificationWebSocketHandler notificationWebSocketHandler;
-]
-    public WebSocketConfig(NotificationWebSocketHandler notificationWebSocketHandler, DocumentWebSocketHandler documentWebSocketHandler){
+
+    public WebSocketConfig(NotificationWebSocketHandler notificationWebSocketHandler){
         this.notificationWebSocketHandler = notificationWebSocketHandler;
     }
     @Override
