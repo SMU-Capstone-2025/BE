@@ -1,7 +1,9 @@
 package com.capstone.global.config;
 
+import com.capstone.domain.document.interceptor.AuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
@@ -10,7 +12,7 @@ import org.springframework.web.socket.config.annotation.*;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-
+    private final AuthInterceptor authInterceptor;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -32,4 +34,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/pub");
     }
 
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        // connect / disconnect 인터셉터
+        registration.interceptors(authInterceptor);
+    }
 }
