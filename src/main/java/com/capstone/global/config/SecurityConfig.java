@@ -83,7 +83,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/register", "/ws/*").permitAll()
+                                "/v3/api-docs/**","/csrf-token", "/project/register", "/document", "/document/**").permitAll()
                         .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
                         .anyRequest().authenticated()
                 )
@@ -111,7 +111,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://front.blaybus-glowup.com/"));
+        configuration.setAllowedOrigins(List.of("http://localhost:63342"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true); // 쿠키 허용
