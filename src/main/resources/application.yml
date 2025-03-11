@@ -2,6 +2,8 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cache:
+    type: redis
   data:
     mongodb:
       uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
@@ -9,7 +11,7 @@ spring:
     redis:
       host: redis-18096.c1.us-central1-2.gce.redns.redis-cloud.com
       port: 18096
-      username: ${REDIS_USERNAME
+      username: ${REDIS_USERNAME}
       password: ${REDIS_PASSWORD}
       timeout: 6000ms
 
