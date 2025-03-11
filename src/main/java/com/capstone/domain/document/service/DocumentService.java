@@ -1,17 +1,13 @@
 package com.capstone.domain.document.service;
 
 import com.capstone.domain.document.entity.Document;
-import com.capstone.domain.document.exception.DocumentNotFoundException;
-import com.capstone.domain.document.message.DocumentMessage;
 import com.capstone.domain.document.repository.DocumentRepository;
-import com.capstone.global.util.RedisUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +23,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentService {
     private final DocumentRepository documentRepository;
-    private final RedisUtil redisUtil;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")

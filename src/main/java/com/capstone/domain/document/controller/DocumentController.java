@@ -4,7 +4,6 @@ import com.capstone.domain.document.dto.DocumentEditRequest;
 import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
-import com.capstone.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
