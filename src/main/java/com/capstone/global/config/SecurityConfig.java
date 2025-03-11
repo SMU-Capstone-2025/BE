@@ -63,7 +63,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/ws/*")
+                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/document/**")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ); // csrf 공격 방지
 
