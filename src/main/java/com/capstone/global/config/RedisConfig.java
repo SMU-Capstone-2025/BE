@@ -6,14 +6,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.time.Duration;
 
 @Configuration
 public class RedisConfig {
@@ -29,6 +35,19 @@ public class RedisConfig {
 
     @Value("${spring.data.redis.password}")
     private String redisPassword;
+
+    @Bean
+    public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+        // 기본 캐시 설정
+        RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(10))  // 캐시 만료 시간 설정 (10분)
+                .disableCachingNullValues()  // null 값 캐싱 방지
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+
+        return RedisCacheManager.builder(redisConnectionFactory)
+                .cacheDefaults(cacheConfig)
+                .build();
+    }
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
@@ -52,38 +71,24 @@ public class RedisConfig {
 
         return Redisson.create(config);
     }
-//    @Bean
-//    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-//        RedisTemplate<String, Object> template = new RedisTemplate<>();
-//        template.setConnectionFactory(redisConnectionFactory);
-//
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setHashKeySerializer(new StringRedisSerializer());
-//
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        objectMapper.registerModule(new JavaTimeModule()); // LocalDateTime 지원
-//        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-//
-//        template.setValueSerializer(serializer);
-//        template.setHashValueSerializer(serializer);
-//
-//        template.setDefaultSerializer(serializer);
-//
-//        template.afterPropertiesSet();
-//        return template;
-//    }
+
+
 
     @Bean
-    public RedisTemplate<String, Document> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Document> template = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
 
-        // ✅ Key Serializer
-        template.setKeySerializer(new StringRedisSerializer());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.findAndRegisterModules();
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        // ✅ Value Serializer
-        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setKeySerializer(new StringRedisSerializer()); // 키 직렬화
+        template.setValueSerializer(serializer);  // 값 직렬화
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
 
+        template.afterPropertiesSet();
         return template;
     }
 }
