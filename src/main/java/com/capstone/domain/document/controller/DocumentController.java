@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/document")
 public class DocumentController {
     private final SimpMessageSendingOperations messagingTemplate;
     private final DocumentService documentService;
