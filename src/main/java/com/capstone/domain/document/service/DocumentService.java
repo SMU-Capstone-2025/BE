@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -30,11 +30,9 @@ public class DocumentService {
         return documentRepository.findDocumentByDocumentId(key);
     }
 
-    @CachePut(value = "document", key = "'DOC:waited:' + #key")
-    public Document updateDocumentToCache(String key, String changes){
+    public void updateDocumentToCache(String key, String changes){
         Document updatedDocument = new Document(key, changes);
-        documentRepository.save(updatedDocument);  // 먼저 DB에 저장
-        return updatedDocument;  // 저장된 값이 캐시에도 반영됨
+        redisTemplate.opsForValue().set("DOC:waited:" + key, updatedDocument, 1, TimeUnit.HOURS);
     }
 
 
@@ -52,10 +50,10 @@ public class DocumentService {
         return null;
     }
 
-    @Scheduled(fixedRate = 3000) // 3초마다 실행
+    @Scheduled(fixedRate = 5000) // 5초마다 실행
     @Transactional
     public void syncToMongoDB() {
-        Set<String> keys = redisTemplate.keys("document::DOC:waited:*");
+        Set<String> keys = redisTemplate.keys("DOC:waited:*");
 
         if (keys != null && !keys.isEmpty()) {
             for (String key : keys) {
