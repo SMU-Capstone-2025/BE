@@ -1,11 +1,13 @@
-package com.capstone.global.config;
+package test.global.config;
 
-import com.capstone.domain.document.interceptor.AuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.*;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import test.domain.interceptor.AuthInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -14,13 +16,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final AuthInterceptor authInterceptor;
 
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/doc/ws")
-                .setAllowedOriginPatterns("*")
+        registry.addEndpoint("/document")
+                .setAllowedOrigins("https://front.blaybus-glowup.com") // 모든 오리진 허용 (Spring Boot 2.4 이상)
                 .withSockJS();
-        registry.addEndpoint("/doc/ws")
-                .setAllowedOriginPatterns("*");
     }
 
 
