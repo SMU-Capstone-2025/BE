@@ -2,13 +2,18 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cache:
+    type: redis
   data:
     mongodb:
-      uri: mongodb://localhost:27017/
+      uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
     redis:
-      host: localhost
-      port: 6379
+      host: redis-18096.c1.us-central1-2.gce.redns.redis-cloud.com
+      port: 18096
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      timeout: 6000ms
 
   servlet:
     multipart:
