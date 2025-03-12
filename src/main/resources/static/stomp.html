@@ -11,7 +11,7 @@
 <h2>STOMP WebSocket 테스트</h2>
 
 <label>채널 ID:</label>
-<input type="text" id="channelId" value="room1">
+<input type="text" id="documentId" value="room1">
 <br><br>
 
 <button onclick="connect()">🔗 STOMP 연결</button>
@@ -33,6 +33,9 @@
   let stompClient = null;
   let subscription = null;
 
+  // ✅ JWT 토큰 (직접 하드코딩)
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoia2FtaWxsY3JlYW0xQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDE3NzE0NzcsImV4cCI6MTc0MTc3MzI3N30.mNIDZZX0GNiFne481nlvDLFFtwtWgU0xhQh-h6S_HPE";
+
   function logMessage(message) {
       const logDiv = document.getElementById("messageLog");
       logDiv.innerHTML += `<p>${message}</p>`;
@@ -40,14 +43,19 @@
   }
 
   function connect() {
-      const socket = new SockJS("http://172.16.201.119:8080/document"); // WebSocket 엔드포인트
+      const socket = new SockJS("http://localhost:8080/doc/ws"); // WebSocket 엔드포인트
       stompClient = Stomp.over(socket);
 
-      stompClient.connect({}, function(frame) {
-          logMessage("✅ STOMP 연결 성공: " + frame);
-      }, function(error) {
-          logMessage("❌ 연결 실패: " + error);
-      });
+      // ✅ STOMP 연결 시 토큰 포함
+      stompClient.connect(
+          { Authorization: `${token}` },
+          function(frame) {
+              logMessage("✅ STOMP 연결 성공: " + frame);
+          },
+          function(error) {
+              logMessage("❌ 연결 실패: " + error);
+          }
+      );
   }
 
   function disconnect() {
@@ -58,17 +66,22 @@
   }
 
   function subscribe() {
-      const channelId = document.getElementById("channelId").value;
+      const documentId = document.getElementById("documentId").value;
       if (!stompClient || !stompClient.connected) {
           logMessage("🚨 먼저 STOMP에 연결하세요!");
           return;
       }
 
-      subscription = stompClient.subscribe(`/sub/chat/${channelId}`, function(message) {
-          logMessage("📨 받은 메시지: " + message.body);
-      });
+      // ✅ 구독 요청
+      subscription = stompClient.subscribe(
+        `/sub/document/${documentId}`,
+        function(message) {
+            logMessage("📨 받은 메시지: " + message.body);
+        },
+        { Authorization: `${token}` } // 헤더 추가
+    );
 
-      logMessage(`👀 /sub/chat/${channelId} 구독 시작`);
+      logMessage(`👀 /sub/document/${documentId} 구독 시작`);
   }
 
   function unsubscribe() {
@@ -79,7 +92,7 @@
   }
 
   function sendMessage() {
-      const channelId = document.getElementById("channelId").value;
+      const documentId = document.getElementById("documentId").value;
       const message = document.getElementById("messageInput").value;
 
       if (!stompClient || !stompClient.connected) {
@@ -88,11 +101,12 @@
       }
 
       const payload = {
-          channelId: channelId,
+          documentId: documentId,
           message: message
       };
 
-      stompClient.send("/pub/chat/message", {}, JSON.stringify(payload));
+      // ✅ 메시지 전송 시에도 토큰 포함
+      stompClient.send("/pub/editing", { Authorization: `${token}` }, JSON.stringify(payload));
       logMessage(`📩 메시지 전송: ${JSON.stringify(payload)}`);
   }
 </script>
