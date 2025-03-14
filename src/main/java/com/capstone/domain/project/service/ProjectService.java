@@ -42,20 +42,12 @@ public class ProjectService {
     }
 
 
+
+
     @Transactional
     public void updateAuthority(AuthorityRequest authorityRequest){
         Project project = findProjectByProjectIdOrThrow(authorityRequest.getProjectId());
-        Map<String, String> oldAuthorities = project.getAuthorities();
-
-        authorityRequest.getAuthorities().forEach(
-                (email, newRole) -> {
-                    if (oldAuthorities.containsKey(email)){
-                        oldAuthorities.replace(email, newRole);
-                    }
-                }
-        );
-
-        projectRepository.save(project);
+        project.updateAllAuthorities(authorityRequest.getAuthorities());
     }
 
     public Project getProjectContent(String projectId, String accessToken){
