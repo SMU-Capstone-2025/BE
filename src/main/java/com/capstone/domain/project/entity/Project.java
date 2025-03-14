@@ -1,10 +1,12 @@
 package com.capstone.domain.project.entity;
 
 
+import com.capstone.domain.project.dto.AuthorityRequest;
 import com.capstone.domain.project.dto.ProjectDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,4 +40,16 @@ public class Project {
                 .documentIds(new ArrayList<>())
                 .build();
     }
+
+
+    public void updateAllAuthorities(Map<String, String> newAuthorities) {
+        newAuthorities.forEach(this::updateEachAuthority);
+    }
+
+    public void updateEachAuthority(String email, String role) {
+        if (this.authorities.containsKey(email)) {
+            this.authorities.replace(email, role);
+        }
+    }
+
 }
