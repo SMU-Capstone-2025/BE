@@ -37,9 +37,8 @@ public class ProjectService {
     @Transactional
     public void updateProject(ProjectSaveRequest projectSaveRequest){
         Project project = findProjectByProjectIdOrThrow(projectSaveRequest.projectId());
-        project.setProjectName(projectSaveRequest.projectName());
-        project.setDescription(projectSaveRequest.description());
-        saveProject(projectSaveRequest);
+        project.updateProjectInfo(projectSaveRequest);
+        projectRepository.save(project);
     }
 
     public Project getProjectContent(String projectId, String accessToken){
