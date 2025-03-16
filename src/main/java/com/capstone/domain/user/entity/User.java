@@ -1,6 +1,7 @@
 package com.capstone.domain.user.entity;
 
 import com.capstone.domain.auth.register.dto.RegisterRequest;
+import com.capstone.domain.user.mypage.dto.UserDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -32,6 +33,14 @@ public class User {
                 .email(registerRequest.getEmail())
                 .password(registerRequest.getPassword())
                 .projectIds(new ArrayList<>())
+                .build();
+    }
+    public UserDto.UserInfoDto toDto() {
+        return UserDto.UserInfoDto.builder()
+                .name(name)
+                .email(email)
+                .profileImage(profileImage)
+                .social(social)
                 .build();
     }
 
