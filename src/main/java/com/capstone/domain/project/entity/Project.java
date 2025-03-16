@@ -26,4 +26,9 @@ public class Project {
         this.projectName = request.projectName();
         this.description = request.description();
     }
+    public void addAuthorities(Map<String, String> newAuthorities) {
+        if (newAuthorities != null) {
+            this.authorities.putAll(newAuthorities);
+        }
+    }
 }
