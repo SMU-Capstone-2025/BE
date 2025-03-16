@@ -71,34 +71,29 @@ public class NotificationService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = objectMapper.readValue(message, new TypeReference<Map<String, Object>>() {});
 
-        // 필수 데이터 추출
-        String projectName = (String) map.getOrDefault("targetId", "Unknown Project");
-        String descrption = (String) map.getOrDefault("targetId", "변동사항 없음.");
-        String method = (String) map.get("method");
+        Map<String, Object> messageMap = (Map<String, Object>) map.get("data");
+        String projectName = messageMap.get("target").toString();
 
+        String method = (String) map.get("method");
         if (method == null) {
             return;
         }
 
-        // 공통 데이터 저장
         Map<String, Object> messageData = new HashMap<>();
         messageData.put("projectName", projectName);
 
-        // 템플릿 선택
         String template;
-        List<String> emails = new ArrayList<>();
-        List<String> authorities = new ArrayList<>();
 
-        // "data" 필드 처리 (필요한 경우만 사용)
-        Map<String, String> dataMap = (Map<String, String>) map.get("data");
-        if (dataMap != null) {
-            emails = new ArrayList<>(dataMap.keySet());
-            authorities = new ArrayList<>(dataMap.values());
-        }
+        List<String> emails = (List<String>) messageMap.get("emails");
+        List<String> authorities;
+
+        Map<String, String> authoritiesMap = (Map<String, String>) messageMap.get("authorities");
+        authorities = new ArrayList<>(authoritiesMap.values());
+
 
         switch (method) {
             case "UPDATE":
-                messageData.put("description", descrption);
+                messageData.put("description", "변동사항 없음.");
                 template = MessageGenerator.PROJECT_UPDATED;
                 break;
             case "AUTH":
@@ -106,23 +101,17 @@ public class NotificationService {
                 messageData.put("authorities", authorities);
                 template = MessageGenerator.AUTH_UPDATED;
                 break;
-
             case "REGISTER":
                 template = MessageGenerator.PROJECT_CREATED;
                 break;
-
             case "INVITE":
                 template = MessageGenerator.PROJECT_INVITED;
                 break;
-
             default:
                 return;
         }
 
-        // 메시지 생성
         String notificationContent = MessageGenerator.generateFromDto(template, messageData);
-
-        // 알림 저장 및 전송
         Notification notification = createNotification(notificationContent, emails);
         saveNotification(notification);
         notificationWebSocketHandler.broadcastMessage(notificationContent);
