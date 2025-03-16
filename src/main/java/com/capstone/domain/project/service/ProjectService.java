@@ -48,8 +48,12 @@ public class ProjectService {
     public void sendInvitation(ProjectAuthorityRequest projectAuthorityRequest){
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         userService.participateProcess(projectAuthorityRequest.getAuthorityKeysAsList(), projectAuthorityRequest.projectId());
-        kafkaProducerService.sendProjectEvent("update-event", "INVITE", project.getProjectName(), projectAuthorityRequest.authorities());
-        kafkaProducerService.sendMailEvent("mail-event", projectAuthorityRequest.getAuthorityKeysAsList());
+        kafkaProducerService.sendProjectChangedEvent(
+                "INVITE",
+                project.getProjectName(),
+                projectAuthorityRequest.authorities(),
+                projectAuthorityRequest.getAuthorityKeysAsList()
+        );
     }
 
 
@@ -61,34 +65,46 @@ public class ProjectService {
     public void processRegister(ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
-        kafkaProducerService.sendProjectEvent("update-event", "REGISTER", project.getProjectName(), findProjectByProjectIdOrThrow(project.getId()).getAuthorities());
-        kafkaProducerService.sendMailEvent("mail-event", projectSaveRequest.invitedEmails());
+        kafkaProducerService.sendProjectChangedEvent(
+                "REGISTER",
+                project.getProjectName(),
+                null,
+                projectSaveRequest.invitedEmails()
+        );
     }
 
     @Transactional
     public void processAuth(ProjectAuthorityRequest projectAuthorityRequest){
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         projectRepository.updateAuthority(projectAuthorityRequest);
-        kafkaProducerService.sendProjectEvent("update-event", "AUTH", project.getProjectName(), project.getAuthorities());
-        kafkaProducerService.sendMailEvent("mail-event", projectAuthorityRequest.getAuthorityKeysAsList());
+        kafkaProducerService.sendProjectChangedEvent(
+                "AUTH",
+                project.getProjectName(),
+                null,
+                projectAuthorityRequest.getAuthorityKeysAsList()
+        );
     }
 
     public void processUpdate(ProjectSaveRequest projectSaveRequest){
         updateProject(projectSaveRequest);
-        kafkaProducerService.sendProjectEvent("update-event", "UPDATE", projectSaveRequest.projectName(), findProjectByProjectIdOrThrow(projectSaveRequest.projectId()).getAuthorities());
-        kafkaProducerService.sendMailEvent("mail-event", projectRepository.getAuthorityKeysByProjectId(projectSaveRequest.projectId()));
+        kafkaProducerService.sendProjectChangedEvent(
+                "UPDATE",
+                projectSaveRequest.projectName(),
+                null,
+                projectSaveRequest.invitedEmails()
+        );
     }
 
     public void processInvite(ProjectAuthorityRequest projectAuthorityRequest) {
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         Map<String, String> existingAuthorities = project.getAuthorities();
-
         Map<String, String> newInvites = projectAuthorityRequest.authorities().entrySet().stream()
                 .filter(entry -> !existingAuthorities.containsKey(entry.getKey())) // 기존 참여자가 아닌 사람만 남김
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (!newInvites.isEmpty()) {
-            projectRepository.updateAuthority(new ProjectAuthorityRequest(projectAuthorityRequest.projectId(), newInvites));
+            project.addAuthorities(newInvites);
+            projectRepository.save(project);
             sendInvitation(new ProjectAuthorityRequest(projectAuthorityRequest.projectId(), newInvites));
         }
     }
