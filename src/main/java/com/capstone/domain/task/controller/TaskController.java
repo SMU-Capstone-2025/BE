@@ -7,6 +7,7 @@ import com.capstone.domain.task.service.TaskService;
 import com.capstone.global.elastic.entity.LogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,12 +18,11 @@ import java.util.List;
 @RequestMapping("/task")
 @RequiredArgsConstructor
 @CrossOrigin("*")
+@PreAuthorize("hasAnyRole('MEMBER', 'MANAGER')")
 public class TaskController {
 
     private final TaskService taskService;
 
-    // TODO: ApiResponse 생성해서 응답이 일관되도록 보장.
-    // TODO: 사용자의 토큰을 기반으로 작업이 포함된 프로젝트에 참여 중인지 확인.
     @PostMapping("/post")
     public ResponseEntity<String> postTask(@RequestBody TaskDto taskDto) {
         return ResponseEntity.ok(taskService.saveTask(taskDto));

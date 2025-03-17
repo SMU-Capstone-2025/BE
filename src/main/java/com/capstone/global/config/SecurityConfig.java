@@ -84,7 +84,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
                                 "/v3/api-docs/**","/csrf-token", "/project/register", "/doc/ws", "/doc/ws/**", "/document/**", "/editing").permitAll()
-                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("ROLE_MANAGER")
+                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
+                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(configure ->
