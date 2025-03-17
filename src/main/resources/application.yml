@@ -46,6 +46,7 @@ spring:
               - name
               - email
               - profile_image
+
             client-name: Naver
 
           kakao:

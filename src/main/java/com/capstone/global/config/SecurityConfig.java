@@ -1,9 +1,15 @@
 package com.capstone.global.config;
 
+import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
+import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.CookieUtil;
 import com.capstone.global.jwt.JwtFilter;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.jwt.LoginFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -31,15 +37,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
-    // 이하 OAuth2.0 도입할 때 해제.
-    // private final CustomOAuth2UserService customOAuth2UserService;
-    // private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    // private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    // private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
     private final CookieUtil cookieUtil;
 
     @Bean
@@ -57,7 +63,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/ws/*")
+                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/document/**")
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
         ); // csrf 공격 방지
 
@@ -68,22 +74,29 @@ public class SecurityConfig {
         http.formLogin((auth) -> auth.disable());
         http.httpBasic((auth) -> auth.disable());
         http
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized request\"}");
+                        })
+                )
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/register", "/ws/*").permitAll()
-                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
+                                "/v3/api-docs/**","/csrf-token", "/project/register", "/doc/ws", "/doc/ws/**", "/document/**", "/editing").permitAll()
+                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("ROLE_MANAGER")
                         .anyRequest().authenticated()
-                );
-                /*.oauth2Login(configure ->
-                        configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
-                                .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
-                                .successHandler(oAuth2AuthenticationSuccessHandler)
-                                .failureHandler(oAuth2AuthenticationFailureHandler)
-                );*/
+                )
+                .oauth2Login(configure ->
+                configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
+        );
 
         http
                 .addFilterAt(
-                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil),
+                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
