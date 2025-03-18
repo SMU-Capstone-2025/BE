@@ -17,11 +17,11 @@ public record TaskDto (String id,
                        String summary,
                        String content){
 
-    public Task toTask(TaskDto taskDto) {
+    public Task toTask() {
         return Task.builder()
-                .title(taskDto.title())
+                .title(this.title())
                 .status(Status.IN_PROGRESS)
-                .currentVersion(taskDto.version)
+                .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
                 .build();
     }
