@@ -28,7 +28,7 @@ public class TaskService {
 
     @Transactional
     public String saveTask(TaskDto taskDto){
-        taskRepository.save(taskDto.toTask(taskDto));
+        taskRepository.save(taskDto.toTask());
         return TaskMessages.TASK_CREATED;
     }
 
