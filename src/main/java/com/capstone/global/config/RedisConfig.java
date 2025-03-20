@@ -1,8 +1,8 @@
 package com.capstone.global.config;
 
-import com.capstone.domain.document.entity.Document;
+import com.capstone.domain.chat.config.RedisSubscriber;
+import com.capstone.domain.chat.dto.ChatRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -15,7 +15,13 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -83,12 +89,43 @@ public class RedisConfig {
         objectMapper.findAndRegisterModules();
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        template.setKeySerializer(new StringRedisSerializer()); // 키 직렬화
-        template.setValueSerializer(serializer);  // 값 직렬화
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(serializer);
 
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ChatRequest.ChatMessageDTO> redisTemplateMessage(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, ChatRequest.ChatMessageDTO> redisTemplateMessage = new RedisTemplate<>();
+        redisTemplateMessage.setConnectionFactory(connectionFactory);
+        redisTemplateMessage.setKeySerializer(new StringRedisSerializer());
+        redisTemplateMessage.setValueSerializer(new Jackson2JsonRedisSerializer<>(ChatRequest.ChatMessageDTO.class));
+
+        return redisTemplateMessage;
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
+                                                        MessageListenerAdapter listenerAdapter,
+                                                        MessageListenerAdapter chatListenerAdapter) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(chatListenerAdapter, new PatternTopic("chatRoom:*"));
+        return container;
+    }
+
+
+    @Bean
+    public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory connectionFactory) {
+        return new StringRedisTemplate(connectionFactory);
+    }
+
+    @Bean
+    public MessageListenerAdapter chatListenerAdapter(RedisSubscriber redisSubscriber) {
+        return new MessageListenerAdapter(redisSubscriber);
     }
 }
