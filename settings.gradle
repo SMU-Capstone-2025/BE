@@ -1,1 +1,9 @@
 rootProject.name = 'capstone'
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS) // 변경: FAIL_ON_PROJECT_REPOS → PREFER_SETTINGS
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' } // JitPack 저장소 추가
+    }
+}
