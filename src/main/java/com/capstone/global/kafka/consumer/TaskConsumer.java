@@ -5,15 +5,19 @@ import com.capstone.global.elastic.repository.LogRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class TaskConsumer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final LogRepository logRepository;
@@ -23,18 +27,11 @@ public class TaskConsumer {
     public void consumeLogMessage(String message) {
         try {
             JsonNode jsonNode = objectMapper.readTree(message);
-
-            String taskId = jsonNode.get("taskId").asText();
-            String method = jsonNode.get("method").asText();
-            String email = jsonNode.get("email").asText();
-            String data = jsonNode.get("data").toString(); // data 필드를 문자열로 유지
-
+            log.info("jsonNode: {}", jsonNode);
             LogEntity logEntity = LogEntity.builder()
-                    .id(UUID.randomUUID().toString())
-                    .taskId(taskId)
-                    .email(email)
-                    .method(method)
-                    .log(data)
+                    .email(jsonNode.get("email").toString())
+                    .method(jsonNode.get("method").toString())
+                    .log(jsonNode.get("data").toString())
                     .timestamp(LocalDateTime.now().toString())
                     .build();
 
