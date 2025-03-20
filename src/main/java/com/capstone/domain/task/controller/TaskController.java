@@ -44,9 +44,10 @@ public class TaskController {
     }
 
     @PostMapping("/version/save")
-    public ResponseEntity<String> postVersion(@RequestBody TaskDto taskDto,
+    public ResponseEntity<String> postVersion(@RequestHeader("Authorization") String token,
+                                              @RequestBody TaskDto taskDto,
                                               @RequestParam(value = "fileId", required = false) String fileId){
-        return ResponseEntity.ok(taskService.saveVersion(taskDto, fileId));
+        return ResponseEntity.ok(taskService.saveVersion(taskDto, fileId, token));
     }
 
     @GetMapping("/version/list")
