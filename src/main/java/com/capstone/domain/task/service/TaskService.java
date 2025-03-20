@@ -9,6 +9,7 @@ import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.global.elastic.entity.LogEntity;
 import com.capstone.global.elastic.repository.LogRepository;
+import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class TaskService {
     private final LogRepository logRepository;
     private final KafkaProducerService kafkaProducerService;
     private final TaskUtil taskUtil;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public String saveTask(TaskDto taskDto){
@@ -39,13 +41,13 @@ public class TaskService {
     }
 
     @Transactional
-    public String saveVersion(TaskDto taskDto, String fileId){
+    public String saveVersion(TaskDto taskDto, String fileId, String token){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
         Task task = findTaskByIdOrThrow(taskDto.id());
         task.addNewVersion(version);
         taskRepository.save(task);
 
-        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto, "pjy1121");
+        kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, jwtUtil.getEmail(token));
         return TaskMessages.VERSION_ADDED;
     }
 
