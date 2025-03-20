@@ -2,7 +2,9 @@ package com.capstone.global.elastic.repository;
 
 import com.capstone.global.elastic.entity.LogEntity;
 import com.capstone.global.elastic.repository.custom.CustomLogRepository;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface LogRepository extends ElasticsearchRepository<LogEntity, String>, CustomLogRepository {
+@Repository
+public interface LogRepository extends MongoRepository<LogEntity, String>, CustomLogRepository {
 }

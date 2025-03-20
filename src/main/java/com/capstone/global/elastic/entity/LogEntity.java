@@ -7,17 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(indexName = "logs") // Elasticsearch 인덱스 이름
+@Document(collection = "logs")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class LogEntity {
     @Id
     private String id;
-    private String taskId;
     private String email;
     private String method;
     private String log;
