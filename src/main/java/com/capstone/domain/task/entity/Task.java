@@ -18,6 +18,7 @@ public class Task {
     private String title;
     private String currentVersion;
     private String status;
+    private List<String> editors;
     private List<Version> versionHistory;
 
     public void updateStatus(String status){
