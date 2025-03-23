@@ -29,7 +29,7 @@ public class KafkaProducerService {
                     email,
                     action,
                     new TaskChangePayload(taskDto.id(), taskDto.title(), taskDto.modifiedBy(), taskDto.version()
-                            ,taskDto.summary(), taskDto.content())
+                            ,taskDto.summary(), taskDto.content(), taskDto.editors())
             );
 
             String message = objectMapper.writeValueAsString(payload);
