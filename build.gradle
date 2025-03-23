@@ -74,6 +74,9 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.20'
     annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
+//    implementation 'org.springframework.boot:spring-boot-starter-mustache'
+    implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+
 }
 
 tasks.named('test') {
