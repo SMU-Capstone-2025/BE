@@ -24,14 +24,12 @@ public class LogConsumer {
         try {
             JsonNode jsonNode = objectMapper.readTree(message);
 
-            String taskId = jsonNode.get("taskId").asText();
             String method = jsonNode.get("method").asText();
             String email = jsonNode.get("email").asText();
             String data = jsonNode.get("data").toString(); // data 필드를 문자열로 유지
 
             LogEntity logEntity = LogEntity.builder()
                     .id(UUID.randomUUID().toString())
-                    .taskId(taskId)
                     .email(email)
                     .method(method)
                     .log(data)
