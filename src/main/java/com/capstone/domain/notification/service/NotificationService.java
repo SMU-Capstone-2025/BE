@@ -9,8 +9,11 @@ import com.capstone.global.elastic.entity.LogEntity;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,10 +27,12 @@ import static com.capstone.domain.notification.entity.Notification.createNotific
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ObjectMapper objectMapper;
     private final NotificationWebSocketHandler notificationWebSocketHandler;
+    private final SimpMessageSendingOperations messagingTemplate;
 
 
 
@@ -56,16 +61,41 @@ public class NotificationService {
 
     public void processLogNotification(String message) {
         try {
-            LogEntity log = objectMapper.readValue(message, LogEntity.class);
-            String notificationContent = MessageGenerator.generateFromDto(MessageGenerator.TASK_CREATED, log);
-            Notification notification = createNotification(notificationContent);
+            JsonNode rootNode = objectMapper.readTree(message);
+
+            // "log" 필드 안의 문자열을 다시 파싱 (이건 JSON 문자열임)
+            String logString = rootNode.get("log").asText();
+            JsonNode logNode = objectMapper.readTree(logString);
+            log.info("logNode : {}", logNode);
+
+            // editors 필드 가져오기
+            JsonNode editorsNode = logNode.get("editors");
+            List<String> owners = new ArrayList<>();
+            if (editorsNode != null && editorsNode.isArray()) {
+                for (JsonNode editor : editorsNode) {
+                    owners.add(editor.asText());
+                }
+            }
+
+            // LogEntity 매핑 (원한다면 logNode로 매핑)
+            LogEntity logEntity = objectMapper.treeToValue(logNode, LogEntity.class);
+
+            String notificationContent = MessageGenerator.generateFromDto(MessageGenerator.TASK_CREATED, logNode);
+            Notification notification = createNotification(notificationContent, owners);
+
             saveNotification(notification);
-            notificationWebSocketHandler.broadcastMessage(notificationContent);
+
+            sendNotificationByOwnersId(owners, notificationContent);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public void sendNotificationByOwnersId(List<String> editors, String content){
+        editors.forEach(ownerEmail -> {
+            messagingTemplate.convertAndSend("/sub/notification/" + ownerEmail, content);
+        });
+    }
 
     public void processUpdateNotification(String message) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
