@@ -9,7 +9,7 @@ import java.util.stream.StreamSupport;
 
 public class MessageGenerator {
 
-    public static final String TASK_CREATED = "작업이 생성되었습니다. 제목: {title}, 생성자: {createdBy}, ID: {id}";
+    public static final String TASK_CREATED = "작업이 생성되었습니다. 제목: {title}, 생성자: {modifiedBy}";
 
     public static final String PROJECT_UPDATED =
             "프로젝트에 변동사항이 있습니다! <br>"
