@@ -1,6 +1,6 @@
 package com.capstone.global.config;
 
-import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
+//import com.capstone.domain.chat.interceptor.WebSocketSecurityInterceptor;
 import com.capstone.domain.document.interceptor.AuthInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +14,15 @@ import org.springframework.web.socket.config.annotation.*;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final AuthInterceptor authInterceptor;
-    private final WebSocketSecurityInterceptor interceptors;
+    //private final WebSocketSecurityInterceptor interceptors;
 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/doc/ws")
+        registry.addEndpoint("/doc/ws", "/notification/ws")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
-        registry.addEndpoint("/doc/ws")
+        registry.addEndpoint("/doc/ws", "/notification/ws")
                 .setAllowedOriginPatterns("*");
         registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*").withSockJS();
         registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*");
@@ -43,6 +43,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // connect / disconnect 인터셉터
-        registration.interceptors(authInterceptor, interceptors);
+        registration.interceptors(authInterceptor);
     }
 }
