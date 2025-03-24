@@ -7,15 +7,13 @@ import com.capstone.domain.task.exception.TaskNotFoundException;
 import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
-import com.capstone.global.elastic.entity.LogEntity;
-import com.capstone.global.elastic.repository.LogRepository;
+import com.capstone.domain.log.entity.LogEntity;
+import com.capstone.domain.log.repository.LogRepository;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

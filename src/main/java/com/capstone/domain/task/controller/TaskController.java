@@ -4,12 +4,11 @@ import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.service.TaskService;
-import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.domain.log.entity.LogEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
