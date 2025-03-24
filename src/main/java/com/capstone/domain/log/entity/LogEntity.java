@@ -1,4 +1,4 @@
-package com.capstone.global.elastic.entity;
+package com.capstone.domain.log.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

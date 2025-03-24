@@ -1,6 +1,6 @@
-package com.capstone.global.elastic.repository.custom;
+package com.capstone.domain.log.repository.custom;
 
-import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.domain.log.entity.LogEntity;
 
 import java.util.List;
 
