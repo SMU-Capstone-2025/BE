@@ -28,16 +28,8 @@ public class Notification {
         return Notification.builder()
                 .content(content)
                 .expiredDate(LocalDateTime.now().toString())
-                .isRead(false)
                 .owners(emails)
-                .build();
-    }
-    public static Notification createNotification(String content){
-        return Notification.builder()
-                .content(content)
-                .expiredDate(LocalDateTime.now().toString())
                 .isRead(false)
-                .owners(null)
                 .build();
     }
 }

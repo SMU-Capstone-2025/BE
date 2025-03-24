@@ -5,7 +5,7 @@ import com.capstone.domain.notification.exception.NotificationNotFoundException;
 import com.capstone.domain.notification.handler.NotificationWebSocketHandler;
 import com.capstone.domain.notification.message.NotificationMessages;
 import com.capstone.domain.notification.repository.NotificationRepository;
-import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -15,13 +15,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.capstone.domain.notification.entity.Notification.createNotification;
 
@@ -40,11 +40,13 @@ public class NotificationService {
         return notificationRepository.findAllByEmail(email);
     }
 
+    @Transactional
     public String saveNotification(Notification notification){
         notificationRepository.save(notification);
         return NotificationMessages.NOTIFICATION_SAVED;
     }
 
+    @Transactional
     public String markNotificationAsRead(String id){
         Notification notification = findNotificationByIdOrThrow(id);
         notification.setRead(true); // read 유무에 따라 프론트단에서 하이라이트를 다르게 하던지 할 필요가 있어보임.
@@ -53,12 +55,13 @@ public class NotificationService {
         return notification.getId(); // 프론트 단에서 변경된 알림의 아이디 값을 알면 하이라이트 변경을 알 수 있지 않을까?
     }
 
+    @Transactional
     public void deleteExpiredNotification(){
         List<Notification> notifications = notificationRepository.findAllByExpiredDateBefore(LocalDateTime.now().toString());
         notificationRepository.deleteAll(notifications);
-
     }
 
+    @Transactional
     public void processLogNotification(String message) {
         try {
             JsonNode rootNode = objectMapper.readTree(message);
@@ -97,6 +100,7 @@ public class NotificationService {
         });
     }
 
+    @Transactional
     public void processUpdateNotification(String message) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = objectMapper.readValue(message, new TypeReference<Map<String, Object>>() {});
