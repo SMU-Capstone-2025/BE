@@ -21,6 +21,7 @@ public class TaskConsumer {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
     private final LogService logService;
+    private final NotificationService notificationService;
 
     @KafkaListener(topics = "task.changed", groupId = "log-service")
     public void processLogSave(String message) {
@@ -31,6 +32,15 @@ public class TaskConsumer {
             kafkaTemplate.send("notification-event", logEntity.toJson());
         } catch (Exception e) {
             System.err.println("메시지 처리 실패: " + e.getMessage());
+        }
+    }
+
+    @KafkaListener(topics = "task.changed", groupId = "notification-service")
+    public void consumeUpdateMessage(String message){
+        try {
+            notificationService.processUpdateNotification(message);
+        } catch (Exception e) {
+            System.err.println("Failed to process log message: " + e.getMessage());
         }
     }
 }

@@ -38,8 +38,11 @@ public class TaskController {
     }
 
     @PutMapping("/status")
-    public ResponseEntity<String> putStatus(@RequestParam String id, @RequestParam String status){
-        return ResponseEntity.ok(taskService.updateStatus(id, status));
+    public ResponseEntity<String> putStatus(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String id,
+            @RequestParam String status){
+        return ResponseEntity.ok(taskService.updateStatus(id, status, token));
     }
 
     @PostMapping("/version/save")

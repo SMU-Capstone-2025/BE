@@ -28,5 +28,4 @@ public class NotificationConsumer {
             System.err.println("Failed to process log message: " + e.getMessage());
         }
     }
-
 }

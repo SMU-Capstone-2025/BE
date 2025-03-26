@@ -57,10 +57,12 @@ public class TaskService {
     }
 
     @Transactional
-    public String updateStatus(String id, String status){
+    public String updateStatus(String id, String status, String token){
         Task task = findTaskByIdOrThrow(id);
         task.updateStatus(status);
         taskRepository.save(task);
+        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", task, jwtUtil.getEmail(token));
+
         return TaskMessages.STATUS_UPDATED;
     }
 
