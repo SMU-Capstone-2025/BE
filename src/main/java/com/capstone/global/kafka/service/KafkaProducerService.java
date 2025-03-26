@@ -34,33 +34,18 @@ public class KafkaProducerService {
             log.error("Kafka 메시지 전송 실패", e);
         }
     }
-
-
-    public void sendProjectEvent(String topic, String action, String projectName, Map<String, String> authorities) {
+    public void sendProjectChangedEvent(String action, String projectName, Map<String, String> authorities, List<String> emails) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            RequestPayload<Map<String, String>> payload = new RequestPayload<>(
-
-                    );
-            String message = objectMapper.writeValueAsString(payload);
-            kafkaTemplate.send(topic, message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void sendMailEvent(String topic, List<String> emails) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            RequestPayload<List<String>> payload = new RequestPayload<>(
+            RequestPayload<ProjectChangePayload> payload = new RequestPayload<>(
                     null,
-                    null,
-                    "null",
-                    emails
-                    );
+                    action,
+                    new ProjectChangePayload(projectName, authorities, emails)
+            );
+
             String message = objectMapper.writeValueAsString(payload);
-            kafkaTemplate.send(topic, message);
+            kafkaTemplate.send("project.changed", message);
         } catch (Exception e) {
             e.printStackTrace();
         }
