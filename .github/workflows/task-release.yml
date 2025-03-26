@@ -105,19 +105,19 @@ jobs:
             curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 
+      - name: Delete existing Kafka (Helm, PVC, Secret)
+        run: |
+          helm uninstall kafka || true
+          kubectl delete pvc -l app.kubernetes.io/name=kafka || true
+          kubectl delete secret kafka || true
+          
+          
       - name: Deploy Kafka using Helm
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           
-          export CLUSTER_ID=$(kubectl get secret kafka -o jsonpath="{.data.cluster-id}" | base64 -d)
-          export KAFKA_PASSWORD=$(kubectl get secret kafka -o jsonpath="{.data.kafka-password}" | base64 -d)
-  
-  
           helm upgrade --install kafka bitnami/kafka \
-          --set clusterId=$CLUSTER_ID \
-          --set auth.clientProtocol=plaintext \
-          --set auth.plaintext.password=$KAFKA_PASSWORD \
           --set global.storageClass=standard \
           --set persistence.enabled=true \
           --set persistence.size=10Gi \
