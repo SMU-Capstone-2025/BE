@@ -133,16 +133,19 @@ jobs:
 
       - name: Deploy Kafka using Helm
         run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
-          
           helm upgrade --install kafka bitnami/kafka \
-          --set global.storageClass=standard \
-          --set persistence.enabled=true \
-          --set persistence.size=10Gi \
-          --set zookeeper.enabled=false \
+          --set replicaCount=1 \
           --set controller.replicaCount=1 \
-          --set replicaCount=3
+          --set zookeeper.enabled=false \
+          --set kraft.enabled=true \
+          --set externalAccess.enabled=true \
+          --set externalAccess.service.type=LoadBalancer \
+          --set externalAccess.service.loadBalancerIPs={35.193.38.89} \
+          --set externalAccess.advertisedListener.host=35.193.38.89 \
+          --set auth.clientProtocol=plaintext \
+          --set persistence.enabled=true \
+          --set global.storageClass=standard \
+          --set persistence.size=10Gi
 
       - name: Kubernetes Deployment 적용
         run: |
