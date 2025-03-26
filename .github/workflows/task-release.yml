@@ -111,7 +111,7 @@ jobs:
           kubectl delete pvc -l app.kubernetes.io/name=kafka || true
           kubectl delete secret kafka || true
           
-          
+
       - name: Deploy Kafka using Helm
         run: |
           helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -129,6 +129,7 @@ jobs:
         run: |
           kubectl apply -f ./k8s/task-deployment.yaml
           kubectl apply -f ./k8s/service.yaml
+          kubectl apply -f ./k8s/kafka-external.yaml
 
       - name: 최신 이미지로 업데이트
         run: |
