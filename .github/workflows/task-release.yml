@@ -133,6 +133,9 @@ jobs:
 
       - name: Deploy Kafka using Helm
         run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo update
+          
           helm upgrade --install kafka bitnami/kafka \
           --set replicaCount=1 \
           --set controller.replicaCount=1 \
