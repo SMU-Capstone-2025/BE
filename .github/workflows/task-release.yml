@@ -97,6 +97,9 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
           
+      - name: GKE 클러스터 인증
+        run: gcloud container clusters get-credentials cluster-1 --region us-central1
+
       - name: Create Kubernetes Secret
         run: |
           kubectl delete secret app-secrets --ignore-not-found
@@ -115,8 +118,6 @@ jobs:
             --from-literal=REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
             --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
 
-      - name: GKE 클러스터 인증
-        run: gcloud container clusters get-credentials cluster-1 --region us-central1
 
       - name: Install Helm (Kubernetes 패키지 매니저)
         run: |
