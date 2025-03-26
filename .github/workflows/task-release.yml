@@ -100,23 +100,23 @@ jobs:
       - name: GKE 클러스터 인증
         run: gcloud container clusters get-credentials cluster-1 --region us-central1
 
-      - name: Create Kubernetes Secret
+      - name: Generate .env and create Kubernetes Secret
         run: |
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" > app.env
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> app.env
+          echo "IMP_API_KEY=${{ secrets.IMP_API_KEY }}" >> app.env
+          echo "IMP_API_SECRET=${{ secrets.IMP_API_SECRET }}" >> app.env
+          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> app.env
+          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> app.env
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> app.env
+          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> app.env
+          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> app.env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> app.env
+          echo "REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}" >> app.env
+          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> app.env
+
           kubectl delete secret app-secrets --ignore-not-found
-      
-          kubectl create secret generic app-secrets \
-            --from-literal=GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-            --from-literal=GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-            --from-literal=IMP_API_KEY=${{ secrets.IMP_API_KEY }} \
-            --from-literal=IMP_API_SECRET=${{ secrets.IMP_API_SECRET }} \
-            --from-literal=KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-            --from-literal=KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-            --from-literal=MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
-            --from-literal=NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-            --from-literal=NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-            --from-literal=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-            --from-literal=REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
-            --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          kubectl create secret generic app-secrets --from-env-file=app.env
 
 
       - name: Install Helm (Kubernetes 패키지 매니저)
