@@ -96,6 +96,24 @@ jobs:
           echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee /etc/apt/sources.list.d/google-cloud-sdk.list
           sudo apt-get update
           sudo apt-get install -y google-cloud-cli-gke-gcloud-auth-plugin
+          
+      - name: Create Kubernetes Secret
+  run: |
+    kubectl delete secret app-secrets --ignore-not-found
+
+    kubectl create secret generic app-secrets \
+      --from-literal=GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+      --from-literal=GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+      --from-literal=IMP_API_KEY=${{ secrets.IMP_API_KEY }} \
+      --from-literal=IMP_API_SECRET=${{ secrets.IMP_API_SECRET }} \
+      --from-literal=KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+      --from-literal=KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
+      --from-literal=MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+      --from-literal=NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
+      --from-literal=NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
+      --from-literal=OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
+      --from-literal=REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
+      --from-literal=REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
 
       - name: GKE 클러스터 인증
         run: gcloud container clusters get-credentials cluster-1 --region us-central1
