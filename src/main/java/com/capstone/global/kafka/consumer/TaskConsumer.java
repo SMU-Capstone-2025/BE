@@ -23,7 +23,7 @@ public class TaskConsumer {
     private final LogService logService;
     private final NotificationService notificationService;
 
-    @KafkaListener(topics = "task.changed", groupId = "log-service")
+    @KafkaListener(topics = "task.created", groupId = "log-service")
     public void processLogSave(String message) {
         try {
             JsonNode jsonNode = objectMapper.readTree(message);
@@ -35,7 +35,7 @@ public class TaskConsumer {
         }
     }
 
-    @KafkaListener(topics = "task.changed", groupId = "notification-service")
+    @KafkaListener(topics = "task.updated", groupId = "notification-service")
     public void consumeUpdateMessage(String message){
         try {
             notificationService.processUpdateNotification(message);

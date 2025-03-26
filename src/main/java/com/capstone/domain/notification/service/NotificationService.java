@@ -115,7 +115,6 @@ public class NotificationService {
             return;
         }
 
-
         // 템플릿 선택
         String template;
         List<String> emails = new ArrayList<>();
