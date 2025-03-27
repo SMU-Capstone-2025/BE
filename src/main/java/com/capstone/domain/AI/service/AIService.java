@@ -27,8 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AIService
 {
     //TODO: 멤버쉽 기능 개발 후 멤버쉽에 따라 gemini 버전 차별화
-    @Value("${openai.api.url}")
-    private String geminiUrl;
 
     @Value("${openai.api.key}")
     private String apiKey;
@@ -114,12 +112,10 @@ public class AIService
 
     public Mono<String> askGemini(String prompt)
     {
-        String url= geminiUrl+apiKey;
-        System.out.println(url);
 
         return webClient.post()
-                .uri(url)
                 .header("Content-Type", "application/json")
+                .header("x-goog-api-key", apiKey)
                 .bodyValue(Map.of(
                         "contents", new Object[]{
                                 Map.of("parts", new Object[]{
