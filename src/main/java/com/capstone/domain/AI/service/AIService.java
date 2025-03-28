@@ -2,8 +2,14 @@ package com.capstone.domain.AI.service;
 
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.AI.dto.AIReviseRequest;
+import com.capstone.domain.AI.exception.AIException;
 import com.capstone.domain.AI.message.AIMessages;
+import com.capstone.domain.user.entity.MembershipType;
+import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.UserNotFoundException;
+import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.capstone.domain.AI.message.AIMessages.AI_LIMIT_EXCEEDED;
+import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
+
 @Service
+@RequiredArgsConstructor
 public class AIService
 {
     //TODO: 멤버쉽 기능 개발 후 멤버쉽에 따라 gemini 버전 차별화
@@ -42,11 +52,7 @@ public class AIService
 
     private final StringRedisTemplate redisTemplate;
 
-    public AIService(JwtUtil jwtUtil, WebClient webClient, StringRedisTemplate redisTemplate) {
-        this.jwtUtil = jwtUtil;
-        this.webClient = webClient;
-        this.redisTemplate = redisTemplate;
-    }
+    private final UserRepository userRepository;
 
     public boolean isUsageLimitExceeded(String userEmail)
     {
@@ -64,14 +70,27 @@ public class AIService
         redisTemplate.expire(key, EXPIRATION_TIME, TimeUnit.HOURS); // 24시간 후 초기화
     }
 
+    public void checkUserMembership(String email)
+    {
+        User user = userRepository.findUserByEmail(email);
+        if(user==null)
+        {
+            throw new UserNotFoundException(USER_NOT_FOUND);
+        }
+        if(user.getMembership().equals(MembershipType.FREE_USER))
+        {
+            if (isUsageLimitExceeded(email)) {
+                throw new AIException(AI_LIMIT_EXCEEDED);
+            }
+            incrementUsage(email);
+        }
+
+    }
     public String correctGrammar(AIRequest aiRequest, String token)
     {
 
         String userEmail= jwtUtil.getEmail(token);
-        if (isUsageLimitExceeded(userEmail)) {
-            return AIMessages.AI_LIMIT_EXCEEDED;
-        }
-        incrementUsage(userEmail);
+        checkUserMembership(userEmail);
 
         String request= aiRequest.getRequest();
 
@@ -82,10 +101,7 @@ public class AIService
     public String sumUpDocument(AIRequest aiRequest,String token)
     {
         String userEmail= jwtUtil.getEmail(token);
-        if (isUsageLimitExceeded(userEmail)) {
-            return AIMessages.AI_LIMIT_EXCEEDED;
-        }
-        incrementUsage(userEmail);
+        checkUserMembership(userEmail);
 
         String request= aiRequest.getRequest();
 
@@ -96,10 +112,7 @@ public class AIService
     public String reviseSummary(AIReviseRequest aiReviseRequest, String token)
     {
         String userEmail= jwtUtil.getEmail(token);
-        if (isUsageLimitExceeded(userEmail)) {
-            return AIMessages.AI_LIMIT_EXCEEDED;
-        }
-        incrementUsage(userEmail);
+        checkUserMembership(userEmail);
         String originalSummary=aiReviseRequest.getAiResponse();
         String feedback =aiReviseRequest.getReviseRequest();
 
@@ -109,6 +122,7 @@ public class AIService
 
         return askGemini(prompt).block();
     }
+
 
     public Mono<String> askGemini(String prompt)
     {
