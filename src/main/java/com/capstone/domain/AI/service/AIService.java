@@ -36,8 +36,6 @@ import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
 @RequiredArgsConstructor
 public class AIService
 {
-    //TODO: 멤버쉽 기능 개발 후 멤버쉽에 따라 gemini 버전 차별화
-
     @Value("${openai.api.key}")
     private String apiKey;
 
