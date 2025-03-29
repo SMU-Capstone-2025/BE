@@ -7,6 +7,8 @@ package com.capstone.domain.mypage.service;
 import com.capstone.domain.mypage.dto.CalendarTaskDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.exception.InvalidPasswordException;
+import com.capstone.domain.payment.entity.PaymentEntity;
+import com.capstone.domain.payment.repository.PaymentRepository;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.repository.ProjectRepository;
@@ -43,6 +45,7 @@ public class MypageService
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final PaymentRepository paymentRepository;
 
 
     public UserDto.UserInfoDto getUser(String accessToken)
@@ -128,6 +131,12 @@ public class MypageService
                 project.setAuthorities(authorities);
                 projectRepository.save(project);
             }
+        }
+        List<PaymentEntity> paymentEntityList=paymentRepository.findByUserEmail(email);
+        for(PaymentEntity paymentEntity:paymentEntityList)
+        {
+            paymentEntity.setUserEmail(userEmailDto.getNewEmail());
+            paymentRepository.save(paymentEntity);
         }
 
     }
