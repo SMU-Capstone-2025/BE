@@ -1,6 +1,8 @@
 package com.capstone.domain.user.mypage.service;
 
 
+import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserFoundException;
@@ -15,7 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import static com.capstone.domain.project.message.ProjectMessages.PROJECT_NOT_FOUND;
 import static com.capstone.domain.user.message.UserMessages.*;
 import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_MISMATCH;
 import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_NOT_FOUND;
@@ -99,18 +105,55 @@ public class MypageService
         }
         user.setEmail(userEmailDto.getNewEmail());
         userRepository.save(user);
+
+        List<Project> projectList=getUserProject(user);
+        for(Project project:projectList)
+        {
+            Map<String, String> authorities = project.getAuthorities();
+            if (authorities.containsKey(email)) {
+                String role = authorities.get(email);
+                authorities.remove(email);
+                authorities.put(userEmailDto.getNewEmail(), role);
+                project.setAuthorities(authorities);
+                projectRepository.save(project);
+            }
+        }
+
     }
 
     public void removeUser(String accessToken)
     {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
+
         if(user==null)
         {
             throw new UserNotFoundException(USER_NOT_FOUND);
         }
+        List<Project> projectList=getUserProject(user);
+        if(projectList==null)
+        {
+            throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
+        }
+        for(Project project:projectList)
+        {
+            Map<String, String> authorities = project.getAuthorities();
+            authorities.put(email,"DELETED_USER");
+            projectRepository.save(project);
+        }
         userRepository.delete(user);
     }
+    public List<Project> getUserProject(User user)
+    {
+        List<String> projectIds= user.getProjectIds();
+        if (projectIds == null || projectIds.isEmpty()) {
+            return new ArrayList<>(); //비어있ㅅ는 리스트 반환
+        }
+        return projectRepository.findAllById(projectIds);
+    }
+
+
+
 
 
 }
