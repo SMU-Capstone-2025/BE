@@ -1,9 +1,13 @@
 package com.capstone.global.mail.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,15 +15,17 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
 
     private final JavaMailSender javaMailSender;
     private String ePw;
+    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String id;
@@ -58,7 +64,7 @@ public class MailService {
         return key.toString();
     }
 
-    public String sendSimpleMessage(String email)throws Exception {
+    public String sendSimpleMessage(String email) throws Exception {
         MimeMessage message = createMessage(email);
         try{
             javaMailSender.send(message); // 메일 발송
@@ -67,5 +73,34 @@ public class MailService {
             throw new IllegalArgumentException();
         }
         return ePw; // 메일로 보냈던 인증 코드를 클라이언트로 리턴
+    }
+
+    public void sendMultipleMessages(List<String> emails){
+        emails.forEach(email -> {
+                    try{
+                        sendSimpleMessage(email);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
+    }
+
+    public void processSendMessages(String message) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            Map<String, Object> map = objectMapper.readValue(
+                    message, new TypeReference<Map<String, Object>>() {}
+            );
+
+            Map<String, Object> data = (Map<String, Object>) map.get("data");
+
+            List<String> emails = (List<String>) data.get("emails");
+
+            sendMultipleMessages(emails);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 }

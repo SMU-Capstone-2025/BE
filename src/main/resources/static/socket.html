@@ -72,53 +72,57 @@
 <p class="status" id="status">Connecting to WebSocket...</p>
 
 <script>
-    const wsUrl = "ws://localhost:8081/ws/notifications"; // WebSocket 서버 URL
+    const wsUrl = "ws://localhost:8081/ws/notifications"; // 필요 시 wss://로 변경
     let socket;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 10;
 
     const messagesDiv = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
     const statusDiv = document.getElementById('status');
 
-    // Initialize WebSocket connection
     function connectWebSocket() {
+        if (reconnectAttempts >= maxReconnectAttempts) {
+            statusDiv.textContent = "Failed to reconnect after multiple attempts.";
+            return;
+        }
+
         socket = new WebSocket(wsUrl);
 
-        // Connection opened
         socket.onopen = () => {
+            reconnectAttempts = 0; // 재연결 성공 시 초기화
             statusDiv.textContent = 'Connected to WebSocket server.';
             statusDiv.classList.remove('error');
         };
 
-        // Message received
         socket.onmessage = (event) => {
             const message = event.data;
             displayMessage(`Received: ${message}`);
         };
 
-        // Connection closed
         socket.onclose = () => {
             statusDiv.textContent = 'Disconnected. Reconnecting...';
             statusDiv.classList.add('error');
-            setTimeout(connectWebSocket, 3000); // Retry connection after 3 seconds
+            reconnectAttempts++;
+            setTimeout(connectWebSocket, 3000);
         };
 
-        // Error handling
         socket.onerror = (error) => {
             statusDiv.textContent = `WebSocket error: ${error.message}`;
             statusDiv.classList.add('error');
         };
     }
 
-    // Display a message in the messages div
+    // Display a message with HTML support
     function displayMessage(message) {
         const p = document.createElement('p');
-        p.textContent = message;
+        p.innerHTML = message; // innerHTML 사용하여 HTML 태그 적용
         messagesDiv.appendChild(p);
-        messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to the bottom
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
-    // Send a message to the WebSocket server
+    // Send message function
     sendButton.addEventListener('click', () => {
         const message = messageInput.value;
         if (message && socket.readyState === WebSocket.OPEN) {
@@ -130,7 +134,7 @@
         }
     });
 
-    // Connect to the WebSocket server
+    // Connect WebSocket
     connectWebSocket();
 </script>
 </body>

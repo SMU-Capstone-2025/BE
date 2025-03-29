@@ -49,13 +49,12 @@ public class NotificationWebSocketHandler extends TextWebSocketHandler {
         exception.printStackTrace();
     }
 
-    public void broadcastMessage(Notification notification) {
+    public void broadcastMessage(String message) {
         for (WebSocketSession session : sessions) {
             try {
                 if (session.isOpen()) {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    notification.setExpiredDate(DateUtil.formatLocalDateTime(notification.getExpiredDate()));
-                    String jsonMessage = objectMapper.writeValueAsString(notification);
+                    String jsonMessage = objectMapper.writeValueAsString(message);
                     System.out.println("세션 열림: " + session.getId());
                     session.sendMessage(new TextMessage(jsonMessage));
                     System.out.println("알림 메시지 전송: " + jsonMessage);
