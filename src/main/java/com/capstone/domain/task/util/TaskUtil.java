@@ -19,27 +19,18 @@ import java.util.List;
 public class TaskUtil {
     private final TaskRepository taskRepository;
 
-    public Task toEntity(TaskDto taskDto) {
-        return Task.builder()
-                .title(taskDto.getTitle())
-                .status(Status.IN_PROGRESS)
-                .currentVersion(taskDto.getVersion())
-                .versionHistory(new ArrayList<>())
-                .build();
-    }
-
     public Version createOrGetVersion(TaskDto taskDto, String fileId) {
-        Version version = taskRepository.findByTaskIdAndVersion(taskDto.getId(), taskDto.getVersion());
+        Version version = taskRepository.findByTaskIdAndVersion(taskDto.id(), taskDto.version());
         if (version == null){
             List<String> attachmentList = new ArrayList<>(); // 새로운 리스트 생성
             attachmentList.add(fileId);
             return Version.builder()
-                    .taskId(taskDto.getId())
-                    .version(taskDto.getVersion())
+                    .taskId(taskDto.id())
+                    .version(taskDto.version())
                     .modifiedDateTime(DateUtil.getCurrentFormattedDateTime())
-                    .modifiedBy(taskDto.getModifiedBy())
-                    .summary(taskDto.getSummary())
-                    .content(taskDto.getContent())
+                    .modifiedBy(taskDto.modifiedBy())
+                    .summary(taskDto.summary())
+                    .content(taskDto.content())
                     .attachmentList(attachmentList)
                     .build();
         }

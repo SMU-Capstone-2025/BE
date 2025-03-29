@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,8 +17,8 @@ import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -119,10 +120,18 @@ public class MailService {
 
     public void processSendMessages(String message) {
         try {
-            Map<String, List<String>> map = objectMapper.readValue(message, new TypeReference<Map<String, List<String>>>() {});
-            List<String> emails = map.get("data");
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            Map<String, Object> map = objectMapper.readValue(
+                    message, new TypeReference<Map<String, Object>>() {}
+            );
+
+            Map<String, Object> data = (Map<String, Object>) map.get("data");
+
+            List<String> emails = (List<String>) data.get("emails");
+
             sendMultipleMessages(emails);
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }

@@ -1,8 +1,8 @@
-package com.capstone.global.elastic.repository.custom;
+package com.capstone.domain.log.repository.custom;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import com.capstone.global.elastic.entity.LogEntity;
+import com.capstone.domain.log.entity.LogEntity;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHits;

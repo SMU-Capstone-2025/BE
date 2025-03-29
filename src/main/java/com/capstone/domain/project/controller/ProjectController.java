@@ -1,7 +1,7 @@
 package com.capstone.domain.project.controller;
 
-import com.capstone.domain.project.dto.AuthorityRequest;
-import com.capstone.domain.project.dto.ProjectDto;
+import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
+import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -16,26 +16,26 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping("/register")
-    public void registerProject(@RequestBody ProjectDto projectDto){
-        projectService.processRegister(projectDto);
+    public void registerProject(@RequestBody ProjectSaveRequest projectSaveRequest){
+        projectService.processRegister(projectSaveRequest);
     }
 
     @PreAuthorize("ROLE_MANAGER")
     @PutMapping("/update")
-    public void updateProject(@RequestBody ProjectDto projectDto){
-        projectService.processUpdate(projectDto);
+    public void updateProject(@RequestBody ProjectSaveRequest projectSaveRequest){
+        projectService.processUpdate(projectSaveRequest);
     }
 
     @PreAuthorize("ROLE_MANAGER")
     @PutMapping("/auth")
-    public void updateAuthority(@RequestBody AuthorityRequest authorityRequest){
-        projectService.processAuth(authorityRequest);
+    public void updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+        projectService.processAuth(projectAuthorityRequest);
     }
 
     @PreAuthorize("ROLE_MANAGER")
     @PutMapping("/invite")
-    public void inviteProject(@RequestBody AuthorityRequest authorityRequest){
-        projectService.processInvite(authorityRequest);
+    public void inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+        projectService.processInvite(projectAuthorityRequest);
     }
 
     @GetMapping("/load")

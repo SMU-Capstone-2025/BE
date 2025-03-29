@@ -1,4 +1,4 @@
-package com.capstone.global.elastic.entity;
+package com.capstone.domain.log.entity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,17 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(indexName = "logs") // Elasticsearch 인덱스 이름
+@Document(collection = "logs")
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class LogEntity {
     @Id
     private String id;
-    private String taskId;
     private String email;
     private String method;
     private String log;

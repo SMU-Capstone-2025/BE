@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STOMP WebSocket Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h2>STOMP WebSocket Notification Test</h2>
+<label for="email">Enter Email:</label>
+<input type="text" id="email" placeholder="example@email.com">
+<button onclick="connectWebSocket()">Connect</button>
+<button onclick="disconnectWebSocket()">Disconnect</button>
+
+<h3>Received Notifications:</h3>
+<ul id="notifications"></ul>
+
+<script>
+  let stompClient = null;
+  let userEmail = null;
+
+  function connectWebSocket() {
+    userEmail = document.getElementById("email").value;
+    if (!userEmail) {
+        alert("Please enter your email!");
+        return;
+    }
+
+    // JWT 토큰 예시 (실제로는 로그인 후 받은 토큰을 사용해야 함)
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidGVzdDFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfTUFOQUdFUiIsImlhdCI6MTc0Mjk4MDM2NywiZXhwIjoxNzQyOTgyMTY3fQ.jFab5xLRsXC5dSR-b6B3diWkxJBWgxHregWaxlj60P8";
+    let socket = new SockJS('http://localhost:8080/notification/ws');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect(
+        {
+            Authorization: "Bearer " + token
+        },
+        function (frame) {
+            console.log("Connected: " + frame);
+
+            stompClient.subscribe(
+                "/sub/notification/" + userEmail,
+                function (message) {
+                    showNotification(message.body); // ✅ 여기에서 JSON.parse 절대 쓰지 마세요
+                },
+                {
+                    Authorization: "Bearer " + token
+                }
+            );
+
+            alert("WebSocket connected for: " + userEmail);
+        },
+        function (error) {
+            console.error("WebSocket connection error:", error);
+            alert("WebSocket connection failed!");
+        }
+    );
+}
+
+  function disconnectWebSocket() {
+      if (stompClient !== null) {
+          stompClient.disconnect();
+          console.log("Disconnected");
+          alert("WebSocket disconnected");
+      }
+  }
+
+  // JSON 파싱 없이 문자열로 바로 출력
+  function showNotification(message) {
+    const notificationsList = document.getElementById("notifications");
+    const listItem = document.createElement("li");
+    listItem.textContent = message; // ✅ 그대로 출력
+    notificationsList.appendChild(listItem);
+}
+</script>
+</body>
+</html>

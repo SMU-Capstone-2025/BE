@@ -7,13 +7,13 @@ import com.capstone.domain.task.exception.TaskNotFoundException;
 import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
-import com.capstone.global.elastic.entity.LogEntity;
-import com.capstone.global.elastic.repository.LogRepository;
+import com.capstone.domain.log.entity.LogEntity;
+import com.capstone.domain.log.repository.LogRepository;
+import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,9 +24,11 @@ public class TaskService {
     private final LogRepository logRepository;
     private final KafkaProducerService kafkaProducerService;
     private final TaskUtil taskUtil;
+    private final JwtUtil jwtUtil;
 
+    @Transactional
     public String saveTask(TaskDto taskDto){
-        taskRepository.save(taskUtil.toEntity(taskDto));
+        taskRepository.save(taskDto.toTask());
         return TaskMessages.TASK_CREATED;
     }
 
@@ -36,25 +38,31 @@ public class TaskService {
         return taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
     }
 
-    public String saveVersion(TaskDto taskDto, String fileId){
+    @Transactional
+    public String saveVersion(TaskDto taskDto, String fileId, String token){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
-        Task task = findTaskByIdOrThrow(taskDto.getId());
-        task.getVersionHistory().add(version);
+        Task task = findTaskByIdOrThrow(taskDto.id());
+        task.addNewVersion(version);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto, "pjy1121");
+
+        kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, jwtUtil.getEmail(token));
         return TaskMessages.VERSION_ADDED;
     }
 
+    @Transactional
     public String dropTask(String id){
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
         return TaskMessages.TASK_DROPPED;
     }
 
-    public String updateStatus(String id, String status){
+    @Transactional
+    public String updateStatus(String id, String status, String token){
         Task task = findTaskByIdOrThrow(id);
-        task.setStatus(status);
+        task.updateStatus(status);
         taskRepository.save(task);
+        kafkaProducerService.sendTaskEvent("task.updated", "UPDATE", task, jwtUtil.getEmail(token));
+
         return TaskMessages.STATUS_UPDATED;
     }
 
@@ -63,9 +71,10 @@ public class TaskService {
         return task.getVersionHistory();
     }
 
+    @Transactional
     public Task rollbackVersion(String taskId, String version){
         Task task = findTaskByIdOrThrow(taskId);
-        task.setCurrentVersion(version);
+        task.updateCurrentVersion(version);
         taskRepository.save(task);
         return task;
     }
