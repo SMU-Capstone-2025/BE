@@ -20,5 +20,12 @@ public class NotificationConsumer {
             System.err.println("Failed to process log message: " + e.getMessage());
         }
     }
-
+    @KafkaListener(topics = "update-event", groupId = "update-group")
+    public void consumeUpdateMessage(String message){
+        try {
+            notificationService.processUpdateNotification(message);
+        } catch (Exception e) {
+            System.err.println("Failed to process log message: " + e.getMessage());
+        }
+    }
 }

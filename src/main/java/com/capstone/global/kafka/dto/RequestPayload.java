@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class RequestPayload<T> {
     @Nullable
     private String email;
+    private String topic; // project , task, document
     private String method;
     private T data;
 
