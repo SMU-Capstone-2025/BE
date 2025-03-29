@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.List;
+
 
 @RequiredArgsConstructor
 public class CustomTaskRepositoryImpl implements CustomTaskRepository{
@@ -55,5 +57,10 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         return TaskMessages.VERSION_MODIFIED;
     }
 
-
+    @Override
+    public List<Task> findByIds(List<String> taskIds) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").in(taskIds));
+        return mongoTemplate.find(query, Task.class);
+    }
 }
