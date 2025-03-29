@@ -1,14 +1,17 @@
-package com.capstone.domain.user.mypage.service;
+package com.capstone.domain.mypage.service;
 
 
+
+
+
+import com.capstone.domain.mypage.dto.UserDto;
+import com.capstone.domain.mypage.exception.InvalidPasswordException;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserFoundException;
 import com.capstone.domain.user.exception.UserNotFoundException;
-import com.capstone.domain.user.mypage.dto.UserDto;
-import com.capstone.domain.user.mypage.exception.InvalidPasswordException;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.mail.service.MailService;
@@ -16,14 +19,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.capstone.domain.user.message.UserMessages.*;
-import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_MISMATCH;
-import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_NOT_FOUND;
+import static com.capstone.domain.mypage.message.MypageMessages.PASSWORD_MISMATCH;
+import static com.capstone.domain.mypage.message.MypageMessages.PASSWORD_NOT_FOUND;
+import static com.capstone.domain.user.message.UserMessages.USER_FOUND;
+import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
+
 
 @Service
 @RequiredArgsConstructor

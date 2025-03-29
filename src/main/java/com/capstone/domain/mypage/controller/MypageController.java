@@ -1,20 +1,19 @@
-package com.capstone.domain.user.mypage.controller;
+package com.capstone.domain.mypage.controller;
 
-import com.capstone.domain.project.entity.Project;
 
-import com.capstone.domain.user.mypage.dto.UserDto;
-import com.capstone.domain.user.mypage.service.MypageService;
+
+import com.capstone.domain.mypage.dto.UserDto;
+import com.capstone.domain.mypage.service.MypageService;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.global.mail.service.MailService;
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 
-//TODO: 멤버쉽, 화상회의 개발 후 추가
+//TODO: 화상회의 개발 후 캘린더에 추가
 
 @RestController
 @RequiredArgsConstructor
@@ -72,6 +71,11 @@ public class MypageController
         return ResponseEntity.ok().build();
     }
 
+//    @GetMapping("/calendar/events/task")
+//    public ResponseEntity<List<Task>> getTasks(@RequestHeader("Authorization") String accessToken)
+//    {
+//
+//    }
 
 
 }

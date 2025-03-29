@@ -1,4 +1,4 @@
-package com.capstone.domain.user.mypage.exception;
+package com.capstone.domain.mypage.exception;
 
 public class InvalidPasswordException extends RuntimeException {
     public InvalidPasswordException(String message) {

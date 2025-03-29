@@ -1,4 +1,4 @@
-package com.capstone.domain.user.mypage.message;
+package com.capstone.domain.mypage.message;
 
 public class MypageMessages
 {

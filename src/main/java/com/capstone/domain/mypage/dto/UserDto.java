@@ -1,12 +1,10 @@
-package com.capstone.domain.user.mypage.dto;
+package com.capstone.domain.mypage.dto;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
