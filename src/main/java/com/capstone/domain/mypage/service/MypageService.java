@@ -4,11 +4,15 @@ package com.capstone.domain.mypage.service;
 
 
 
+import com.capstone.domain.mypage.dto.CalendarTaskDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.exception.InvalidPasswordException;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.repository.ProjectRepository;
+import com.capstone.domain.task.dto.TaskDto;
+import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserFoundException;
 import com.capstone.domain.user.exception.UserNotFoundException;
@@ -36,7 +40,7 @@ public class MypageService
     private final JwtUtil jwtUtil;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
-    private final MailService mailService;
+    private final TaskRepository taskRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
@@ -146,6 +150,7 @@ public class MypageService
         }
         userRepository.delete(user);
     }
+
     public List<Project> getUserProject(User user)
     {
         List<String> projectIds= user.getProjectIds();
@@ -153,6 +158,34 @@ public class MypageService
             return new ArrayList<>(); //비어있ㅅ는 리스트 반환
         }
         return projectRepository.findAllById(projectIds);
+    }
+
+    public List<CalendarTaskDto> getUserTask(String accessToken)
+    {
+        String email=jwtUtil.getEmail(accessToken);
+        User user=userRepository.findUserByEmail(email);
+        if(user==null)
+        {
+            throw new UserNotFoundException(USER_NOT_FOUND);
+        }
+
+        List<Project> projectList=getUserProject(user);
+        List<CalendarTaskDto> calendarTaskDtoList=new ArrayList<>();
+        for(Project project:projectList)
+        {
+            List<String> taskIds= project.getTaskIds();
+            if(taskIds == null || taskIds.isEmpty()) {
+                continue;
+            }
+            List<Task> tasks = taskRepository.findByIds(taskIds);
+            for (Task task : tasks) {
+                CalendarTaskDto calendarTaskDto=CalendarTaskDto.from(task);
+                calendarTaskDtoList.add(calendarTaskDto);
+            }
+        }
+        return calendarTaskDtoList;
+
+
     }
 
 
