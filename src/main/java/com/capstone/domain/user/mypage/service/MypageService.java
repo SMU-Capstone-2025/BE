@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.capstone.domain.project.message.ProjectMessages.PROJECT_NOT_FOUND;
 import static com.capstone.domain.user.message.UserMessages.*;
 import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_MISMATCH;
 import static com.capstone.domain.user.mypage.message.MypageMessages.PASSWORD_NOT_FOUND;
@@ -133,7 +132,7 @@ public class MypageService
         List<Project> projectList=getUserProject(user);
         if(projectList==null)
         {
-            throw new ProjectNotFoundException(PROJECT_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
         for(Project project:projectList)
         {
