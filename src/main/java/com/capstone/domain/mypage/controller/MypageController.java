@@ -2,8 +2,10 @@ package com.capstone.domain.mypage.controller;
 
 
 
+import com.capstone.domain.mypage.dto.CalendarTaskDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.service.MypageService;
+import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.global.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
@@ -71,11 +73,11 @@ public class MypageController
         return ResponseEntity.ok().build();
     }
 
-//    @GetMapping("/calendar/events/task")
-//    public ResponseEntity<List<Task>> getTasks(@RequestHeader("Authorization") String accessToken)
-//    {
-//
-//    }
+    @GetMapping("/calendar/events/task")
+    public ResponseEntity<List<CalendarTaskDto>> getTasks(@RequestHeader("Authorization") String accessToken)
+    {
+        return ResponseEntity.ok(mypageService.getUserTask(accessToken));
+    }
 
 
 }
