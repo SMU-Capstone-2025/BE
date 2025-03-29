@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Document(collection= "project")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
