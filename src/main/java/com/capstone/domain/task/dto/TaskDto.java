@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +19,9 @@ public record TaskDto (String id,
                        String summary,
                        String content,
                        @Nullable
-                       List<String> editors
-                       ){
+                       List<String> editors,
+                       @Nullable LocalDate deadline
+                       ) {
 
     public Task toTask() {
         return Task.builder()
@@ -28,6 +30,7 @@ public record TaskDto (String id,
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
                 .editors(editors)
+                .deadline(deadline)
                 .build();
     }
 }

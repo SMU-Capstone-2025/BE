@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "task")
@@ -20,7 +21,7 @@ public class Task {
     private String status;
     private List<String> editors;
     private List<Version> versionHistory;
-
+    private LocalDate deadline;
     public void updateStatus(String status){
         this.status = status;
     }
