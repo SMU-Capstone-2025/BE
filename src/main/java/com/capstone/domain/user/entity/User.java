@@ -1,7 +1,7 @@
 package com.capstone.domain.user.entity;
 
 import com.capstone.domain.auth.register.dto.RegisterRequest;
-import com.capstone.domain.user.mypage.dto.UserDto;
+import com.capstone.domain.mypage.dto.UserDto;
 import lombok.*;
 import org.apache.lucene.spatial3d.geom.Membership;
 import org.springframework.data.annotation.Id;
