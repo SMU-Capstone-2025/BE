@@ -22,6 +22,7 @@ import com.capstone.global.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class MypageService
         return user.toDto();
     }
 
+    @Transactional
     public void modifyPassword(String accessToken, UserDto.UserPasswordDto userPasswordDto)
     {
         String email=jwtUtil.getEmail(accessToken);
@@ -93,6 +95,8 @@ public class MypageService
         user.setProfileImage(userProfileDto.getProfileImage());
         userRepository.save(user);
     }
+
+    @Transactional
     public void modifyEmail(String accessToken, UserDto.UserEmailDto userEmailDto) throws Exception {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
@@ -127,7 +131,7 @@ public class MypageService
         }
 
     }
-
+    @Transactional
     public void removeUser(String accessToken)
     {
         String email=jwtUtil.getEmail(accessToken);
@@ -187,6 +191,7 @@ public class MypageService
 
 
     }
+
 
 
 
