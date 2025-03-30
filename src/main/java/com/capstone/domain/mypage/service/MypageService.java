@@ -176,8 +176,26 @@ public class MypageService
         for(Project project:projectList)
         {
             Map<String, String> authorities = project.getAuthorities();
-            authorities.put(email,"DELETED_USER");
+            authorities.remove(email);
+            authorities.put("알수없음","DELETED_USER");
+
             projectRepository.save(project);
+
+
+            List<String> taskIds= project.getTaskIds();
+            List<Task> taskList=taskRepository.findByIds(taskIds);
+            if (taskIds != null && !taskIds.isEmpty())
+            {
+                for (Task task : taskList) {
+                    List<String> editors = task.getEditors();
+                    if (editors != null && editors.contains(email))
+                    {
+                        editors.remove(email);
+                        editors.add("알수없음");
+                        taskRepository.save(task);
+                    }
+                }
+            }
         }
         userRepository.delete(user);
     }
