@@ -120,24 +120,42 @@ public class MypageService
         user.setEmail(userEmailDto.getNewEmail());
         userRepository.save(user);
 
+        //프로젝트 및 작업에 저장된 이메일 변경
         List<Project> projectList=getUserProject(user);
         for(Project project:projectList)
         {
             Map<String, String> authorities = project.getAuthorities();
-            if (authorities.containsKey(email)) {
+            if (authorities!=null && authorities.containsKey(email)) {
                 String role = authorities.get(email);
                 authorities.remove(email);
                 authorities.put(userEmailDto.getNewEmail(), role);
                 project.setAuthorities(authorities);
                 projectRepository.save(project);
             }
+            List<String> taskIds= project.getTaskIds();
+            List<Task> taskList=taskRepository.findByIds(taskIds);
+            if (taskIds != null && !taskIds.isEmpty())
+            {
+                for (Task task : taskList) {
+                    List<String> editors = task.getEditors();
+                    if (editors != null && editors.contains(email))
+                    {
+                        editors.remove(email);
+                        editors.add(userEmailDto.getNewEmail());
+                        task.setEditors(editors);
+                        taskRepository.save(task);
+                    }
+                }
+            }
         }
+        //결제 엔티티에 저장된 이메일 변경
         List<PaymentEntity> paymentEntityList=paymentRepository.findByUserEmail(email);
         for(PaymentEntity paymentEntity:paymentEntityList)
         {
             paymentEntity.setUserEmail(userEmailDto.getNewEmail());
             paymentRepository.save(paymentEntity);
         }
+
 
     }
     @Transactional
