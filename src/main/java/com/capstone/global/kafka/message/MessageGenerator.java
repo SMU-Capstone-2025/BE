@@ -11,8 +11,9 @@ import java.util.stream.StreamSupport;
 @Slf4j
 public class MessageGenerator {
 
-    public static final String TASK_CREATED = "작업이 생성되었습니다. 제목: {title}, 생성자: {modifiedBy}";
-    public static final String TASK_UPDATED = "작업에 변동사항이 있습니다. 제목: {title}, 생성자: {email}";
+    public static final String TASK_CREATED = "작업이 생성되었습니다. 제목: {title}, 작업자: {modifiedBy}";
+    public static final String TASK_UPDATED = "작업에 변동사항이 있습니다. 제목: {title}, 작업자: {email}";
+    public static final String TASK_DELETED = "작업이 삭제되었습니다. 제목: {title}, 작업자: {email}";
 
     public static final String PROJECT_UPDATED =
             "프로젝트에 변동사항이 있습니다! <br>"
