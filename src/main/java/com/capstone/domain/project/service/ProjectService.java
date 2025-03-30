@@ -49,8 +49,8 @@ public class ProjectService {
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         userService.participateProcess(projectAuthorityRequest.getAuthorityKeysAsList(), projectAuthorityRequest.projectId());
         kafkaProducerService.sendProjectChangedEvent(
+                "project.changed",
                 "INVITE",
-                project.getProjectName(),
                 projectAuthorityRequest.authorities(),
                 projectAuthorityRequest.getAuthorityKeysAsList()
         );
@@ -66,8 +66,8 @@ public class ProjectService {
         Project project = saveProject(projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
         kafkaProducerService.sendProjectChangedEvent(
-                "REGISTER",
-                project.getProjectName(),
+                "project.changed",
+                "CREATE",
                 null,
                 projectSaveRequest.invitedEmails()
         );
@@ -78,9 +78,9 @@ public class ProjectService {
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         projectRepository.updateAuthority(projectAuthorityRequest);
         kafkaProducerService.sendProjectChangedEvent(
+                "project.changed",
                 "AUTH",
-                project.getProjectName(),
-                null,
+                project,
                 projectAuthorityRequest.getAuthorityKeysAsList()
         );
     }
@@ -88,8 +88,8 @@ public class ProjectService {
     public void processUpdate(ProjectSaveRequest projectSaveRequest){
         updateProject(projectSaveRequest);
         kafkaProducerService.sendProjectChangedEvent(
+                "project.changed",
                 "UPDATE",
-                projectSaveRequest.projectName(),
                 null,
                 projectSaveRequest.invitedEmails()
         );
@@ -107,6 +107,13 @@ public class ProjectService {
             projectRepository.save(project);
             sendInvitation(new ProjectAuthorityRequest(projectAuthorityRequest.projectId(), newInvites));
         }
+
+        kafkaProducerService.sendProjectChangedEvent(
+                "project.changed",
+                "INVITE",
+                project,
+                projectAuthorityRequest.getAuthorityKeysAsList()
+        );
     }
 
     public Project findProjectByProjectIdOrThrow(String projectId){
