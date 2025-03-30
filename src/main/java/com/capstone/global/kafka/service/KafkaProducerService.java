@@ -22,30 +22,26 @@ public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public <T> void sendTaskEvent(String topic, String action, T data, String email) {
+    public <T, U> void sendTaskEvent(String topic, String action, T data, U email) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            RequestPayload<T> payload = new RequestPayload<>(email, "TASK", action, data);
-
+            RequestPayload<T, U> payload = new RequestPayload<>(email, "TASK", action, data);
             String message = objectMapper.writeValueAsString(payload);
+            log.info("message: {}", message);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
             log.error("Kafka 메시지 전송 실패", e);
         }
     }
-    public void sendProjectChangedEvent(String action, String projectName, Map<String, String> authorities, List<String> emails) {
+    public <T, U> void sendProjectChangedEvent(String topic, String action, T data, U email) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            RequestPayload<ProjectChangePayload> payload = new RequestPayload<>(
-                    null,
-                    action,
-                    new ProjectChangePayload(projectName, authorities, emails)
-            );
+            RequestPayload<T, U> payload = new RequestPayload<>(email, "PROJECT", action, data);
 
             String message = objectMapper.writeValueAsString(payload);
-            kafkaTemplate.send("project.changed", message);
+            kafkaTemplate.send(topic, message);
         } catch (Exception e) {
             e.printStackTrace();
         }
