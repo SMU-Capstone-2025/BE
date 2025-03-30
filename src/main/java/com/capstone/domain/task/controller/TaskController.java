@@ -33,8 +33,10 @@ public class TaskController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteTask(@RequestParam String id){
-        return ResponseEntity.ok(taskService.dropTask(id));
+    public ResponseEntity<String> deleteTask(
+            @RequestHeader("Authorization") String token,
+            @RequestParam String id){
+        return ResponseEntity.ok(taskService.dropTask(id, token));
     }
 
     @PutMapping("/status")
