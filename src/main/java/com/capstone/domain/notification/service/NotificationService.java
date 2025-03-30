@@ -2,28 +2,23 @@ package com.capstone.domain.notification.service;
 
 import com.capstone.domain.notification.entity.Notification;
 import com.capstone.domain.notification.exception.NotificationNotFoundException;
-import com.capstone.domain.notification.handler.NotificationWebSocketHandler;
+import com.capstone.domain.notification.handler.NotificationHandler;
 import com.capstone.domain.notification.message.NotificationMessages;
 import com.capstone.domain.notification.repository.NotificationRepository;
 
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.capstone.domain.notification.entity.Notification.createNotification;
 
@@ -33,7 +28,7 @@ import static com.capstone.domain.notification.entity.Notification.createNotific
 public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final ObjectMapper objectMapper;
-    private final NotificationWebSocketHandler notificationWebSocketHandler;
+    private final List<NotificationHandler> handlers;
     private final SimpMessageSendingOperations messagingTemplate;
     private final JwtUtil jwtUtil;
 
@@ -63,37 +58,6 @@ public class NotificationService {
         notificationRepository.deleteAll(notifications);
     }
 
-    @Transactional
-    public void processLogNotification(String message) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(message);
-
-            // "log" 필드 안의 문자열을 다시 파싱 (이건 JSON 문자열임)
-            String logString = rootNode.get("log").asText();
-            JsonNode logNode = objectMapper.readTree(logString);
-            log.info("logNode : {}", logNode);
-
-            // editors 필드 가져오기
-            JsonNode editorsNode = logNode.get("editors");
-            List<String> owners = new ArrayList<>();
-            if (editorsNode != null && editorsNode.isArray()) {
-                for (JsonNode editor : editorsNode) {
-                    owners.add(editor.asText());
-                }
-            }
-
-
-            String notificationContent = MessageGenerator.generateFromDto(MessageGenerator.TASK_CREATED, logNode);
-            Notification notification = createNotification(notificationContent, owners);
-
-            saveNotification(notification);
-
-            sendNotificationByOwnersId(owners, notificationContent);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void sendNotificationByOwnersId(List<String> editors, String content){
         log.info("content: {}", content);
         editors.forEach(ownerEmail -> {
@@ -102,68 +66,40 @@ public class NotificationService {
     }
 
     @Transactional
-    public void processUpdateNotification(String message) throws JsonProcessingException {
-        JsonNode rootNode = objectMapper.readTree(message);
-        log.info("message: {}", rootNode);
+    public void processUpdateNotification(String message) {
+        try {
+            JsonNode rootNode = objectMapper.readTree(message);
+            String method = rootNode.get("method").asText();
+            String topic = rootNode.get("topic").asText();
 
-        String email = rootNode.get("email").asText();
-        String method = rootNode.get("method").asText();
-        String topic = rootNode.get("topic").asText();
-        JsonNode data = rootNode.get("data");
 
-        if (method == null) {
-            return;
+            Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, method, topic);
+            log.info("matched Handler: {}", matchedHandler);
+
+            matchedHandler.ifPresent(handler -> {
+                String notificationContent = handler.generateMessage(rootNode);
+                log.info("notification content: {}", notificationContent);
+                List<String> coworkers = handler.findCoworkers(rootNode);
+
+                Notification notification = createNotification(notificationContent, coworkers);
+                saveNotification(notification);
+                sendNotificationByOwnersId(coworkers, notificationContent);
+            });
+
+            // 핸들러 못 찾은 경우 로그 남기기
+            if (matchedHandler.isEmpty()) {
+                log.warn("No matching handler found for method: {}, topic: {}", method, topic);
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Failed to parse notification message: {}", message, e);
+            throw new RuntimeException("Invalid notification message format", e);
         }
+    }
 
-        // 템플릿 선택
-        String template;
-        List<String> emails = new ArrayList<>();
-        List<String> authorities = new ArrayList<>();
-        String notificationContent = " ";
-
-        log.info("method : {}", method);
-        switch (method) {
-            case "UPDATE":
-                if (topic.equals("TASK")) {
-                    emails.add(email);
-                    template = MessageGenerator.TASK_UPDATED;
-
-                    // 필요한 값만 추출
-                    Map<String, Object> merged = new HashMap<>();
-                    merged.put("email", email); // 루트의 이메일
-                    merged.put("title", data.get("title").asText()); // data 안의 title
-
-                    notificationContent = MessageGenerator.generateFromDto(template, merged);
-                } else {
-                    template = MessageGenerator.PROJECT_UPDATED;
-                    notificationContent = MessageGenerator.generateFromDto(template, data); // 예: 프로젝트 업데이트 내용
-                }
-
-                log.info("NotificationContent: {}", notificationContent);
-                break;
-            /*case "AUTH":
-                messageData.put("names", emails);
-                messageData.put("authorities", authorities);
-                template = MessageGenerator.AUTH_UPDATED;
-                break;
-            */
-            case "REGISTER":
-                template = MessageGenerator.PROJECT_CREATED;
-                break;
-
-            case "INVITE":
-                template = MessageGenerator.PROJECT_INVITED;
-                break;
-
-            default:
-                return;
-        }
-
-
-        // 알림 저장 및 전송
-        Notification notification = createNotification(notificationContent, emails);
-        saveNotification(notification);
-        sendNotificationByOwnersId(emails, notificationContent);
+    public Optional<NotificationHandler> findProperHandler(List<NotificationHandler> handlers, String method, String topic){
+        return handlers.stream()
+                .filter(handler -> handler.canHandle(method, topic))
+                .findFirst();
     }
 
 
