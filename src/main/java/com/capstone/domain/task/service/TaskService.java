@@ -50,9 +50,10 @@ public class TaskService {
     }
 
     @Transactional
-    public String dropTask(String id){
+    public String dropTask(String id, String token){
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
+        kafkaProducerService.sendTaskEvent("task.changed", "DELETE", task, jwtUtil.getEmail(token));
         return TaskMessages.TASK_DROPPED;
     }
 
@@ -61,7 +62,7 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(id);
         task.updateStatus(status);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("task.updated", "UPDATE", task, jwtUtil.getEmail(token));
+        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", task, jwtUtil.getEmail(token));
 
         return TaskMessages.STATUS_UPDATED;
     }
