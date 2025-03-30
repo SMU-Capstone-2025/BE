@@ -96,7 +96,7 @@ public class MailService {
 
             Map<String, Object> data = (Map<String, Object>) map.get("data");
 
-            List<String> emails = (List<String>) data.get("emails");
+            List<String> emails = (List<String>) map.get("email");
 
             sendMultipleMessages(emails);
         } catch (JsonProcessingException e) {
