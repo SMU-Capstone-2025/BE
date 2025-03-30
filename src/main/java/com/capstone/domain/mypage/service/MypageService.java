@@ -47,6 +47,8 @@ public class MypageService
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final PaymentRepository paymentRepository;
 
+    private static final String UNKNOWN_USER = "알수없음";
+    private static final String DELETED_USER_ROLE = "DELETED_USER";
 
     public UserDto.UserInfoDto getUser(String accessToken)
     {
@@ -177,7 +179,7 @@ public class MypageService
         {
             Map<String, String> authorities = project.getAuthorities();
             authorities.remove(email);
-            authorities.put("알수없음","DELETED_USER");
+            authorities.put(UNKNOWN_USER,DELETED_USER_ROLE);
 
             projectRepository.save(project);
 
@@ -191,7 +193,7 @@ public class MypageService
                     if (editors != null && editors.contains(email))
                     {
                         editors.remove(email);
-                        editors.add("알수없음");
+                        editors.add(UNKNOWN_USER);
                         taskRepository.save(task);
                     }
                 }
