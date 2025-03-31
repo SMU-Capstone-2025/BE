@@ -4,9 +4,11 @@ import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,8 +41,8 @@ public class ProjectController {
     }
 
     @GetMapping("/load")
-    public ResponseEntity<Project> loadProject(@RequestHeader("Authorization") String accessToken, @RequestParam String projectId){
-        return ResponseEntity.ok().body(projectService.getProjectContent(projectId, accessToken));
+    public ResponseEntity<Project> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
+        return ResponseEntity.ok().body(projectService.getProjectContent(projectId, userDetails));
     }
 
 }

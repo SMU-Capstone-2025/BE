@@ -11,6 +11,7 @@ import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.service.UserService;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,6 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final KafkaProducerService kafkaProducerService;
-    private final JwtUtil jwtUtil;
 
     @Transactional
     public Project saveProject(ProjectSaveRequest projectSaveRequest){
@@ -41,8 +41,8 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
-    public Project getProjectContent(String projectId, String accessToken){
-        return checkUserInProject(projectId, accessToken);
+    public Project getProjectContent(String projectId, CustomUserDetails customUserDetails){
+        return checkUserInProject(projectId, customUserDetails);
     }
 
     public void sendInvitation(ProjectAuthorityRequest projectAuthorityRequest){
@@ -121,9 +121,9 @@ public class ProjectService {
                 .orElseThrow(ProjectNotFoundException::new);
     }
 
-    public Project checkUserInProject(String projectId, String accessToken){
+    public Project checkUserInProject(String projectId, CustomUserDetails customUserDetails){
         Project project = findProjectByProjectIdOrThrow(projectId);
-        if (!project.getAuthorities().containsKey(jwtUtil.getEmail(accessToken))){
+        if (!project.getAuthorities().containsKey(customUserDetails.getEmail())){
             throw new ProjectInvalidAccessException();
         }
         return project;
