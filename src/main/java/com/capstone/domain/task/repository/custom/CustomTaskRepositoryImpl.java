@@ -1,6 +1,6 @@
 package com.capstone.domain.task.repository.custom;
 
-import com.capstone.domain.task.dto.TaskDto;
+import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.VersionNotFoundException;
@@ -35,7 +35,7 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     }
 
     @Override
-    public String modifyVersion(TaskDto taskDto){
+    public String modifyVersion(TaskRequest taskDto){
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(taskDto.id())
                 .and("versionHistory.version").is(taskDto.version()));
@@ -54,6 +54,4 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
 
         return TaskMessages.VERSION_MODIFIED;
     }
-
-
 }

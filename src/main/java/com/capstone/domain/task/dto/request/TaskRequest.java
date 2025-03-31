@@ -1,23 +1,19 @@
-package com.capstone.domain.task.dto;
+package com.capstone.domain.task.dto.request;
 
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.message.Status;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nullable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record TaskDto (String id,
-                       String title,
-                       String modifiedBy,
-                       String version,
-                       String summary,
-                       String content,
-                       @Nullable
+public record TaskRequest(String id,
+                          String title,
+                          String modifiedBy,
+                          String version,
+                          String summary,
+                          String content,
+                          @Nullable
                        List<String> editors
                        ){
 
