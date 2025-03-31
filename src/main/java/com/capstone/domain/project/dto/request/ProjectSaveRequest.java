@@ -26,7 +26,7 @@ public record ProjectSaveRequest(
                 .projectName(this.projectName())
                 .description(this.description())
                 .authorities(defaultAuthorities)
-                .projectIds(new ArrayList<>())
+                .taskIds(new ArrayList<>())
                 .documentIds(new ArrayList<>())
                 .build();
     }
