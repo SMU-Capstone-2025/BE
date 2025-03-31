@@ -63,4 +63,10 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository{
             mongoTemplate.updateFirst(query, update, Project.class);
         }
     }
+
+    @Override
+    public List<Project> findAllById(List<String> ids) {
+        Query query = new Query(Criteria.where("_id").in(ids));
+        return mongoTemplate.find(query, Project.class);
+    }
 }

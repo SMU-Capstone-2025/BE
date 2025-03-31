@@ -10,6 +10,7 @@ import java.util.Map;
 
 @Document(collection= "project")
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class Project {
     private String projectName;
     private String description;
     private Map<String, String> authorities; // email:authority 구조
-    private List<String> projectIds;
+    private List<String> taskIds;
     private List<String> documentIds;
 
     public void updateProjectInfo(ProjectSaveRequest request) {
