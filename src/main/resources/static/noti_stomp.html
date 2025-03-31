@@ -29,7 +29,7 @@
     }
 
     // JWT 토큰 예시 (실제로는 로그인 후 받은 토큰을 사용해야 함)
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoidGVzdDFAZ21haWwuY29tIiwicm9sZSI6IlJPTEVfTUFOQUdFUiIsImlhdCI6MTc0Mjk4MDM2NywiZXhwIjoxNzQyOTgyMTY3fQ.jFab5xLRsXC5dSR-b6B3diWkxJBWgxHregWaxlj60P8";
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoia2FtaWxsY3JlYW0xQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDMyMzQ3NzMsImV4cCI6MTc0MzIzNjU3M30.PwaCXbEPcLdT8Bhh7e8tJ1E-VjDqFJH4rbuePXBJ9l0";
     let socket = new SockJS('http://localhost:8080/notification/ws');
     stompClient = Stomp.over(socket);
 
