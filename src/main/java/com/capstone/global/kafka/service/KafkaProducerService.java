@@ -1,19 +1,11 @@
 package com.capstone.global.kafka.service;
 
-import com.capstone.domain.task.dto.TaskDto;
-import com.capstone.domain.task.entity.Task;
 import com.capstone.global.kafka.dto.RequestPayload;
-import com.capstone.global.kafka.dto.TaskChangePayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
