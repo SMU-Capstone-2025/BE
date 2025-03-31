@@ -1,14 +1,10 @@
 package com.capstone.domain.task.util;
 
-import com.capstone.domain.task.message.Status;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.global.util.DateUtil;
-import com.capstone.domain.task.dto.TaskDto;
-import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.entity.Version;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,7 +15,7 @@ import java.util.List;
 public class TaskUtil {
     private final TaskRepository taskRepository;
 
-    public Version createOrGetVersion(TaskDto taskDto, String fileId) {
+    public Version createOrGetVersion(TaskRequest taskDto, String fileId) {
         Version version = taskRepository.findByTaskIdAndVersion(taskDto.id(), taskDto.version());
         if (version == null){
             List<String> attachmentList = new ArrayList<>(); // 새로운 리스트 생성
