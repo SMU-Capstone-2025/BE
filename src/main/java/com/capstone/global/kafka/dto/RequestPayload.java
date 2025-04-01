@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RequestPayload<T> {
+public class RequestPayload<T,U> {
     @Nullable
-    private String email;
+    private U email;
     private String topic; // project , task, document
     private String method;
     private T data;

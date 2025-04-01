@@ -16,9 +16,13 @@ public class ProjectConsumer {
     private final NotificationService notificationService;
 
     @KafkaListener(topics = "project.changed", groupId = "mail-service")
-    public void sendChangeEmail(String message) {mailService.processSendMessages(message);}
+    public void sendChangeEmail(String message) {
+        mailService.processSendMessages(message);
+    }
 
     @KafkaListener(topics = "project.changed", groupId = "notification-service")
-    public void sendChangeNotification(String message) throws JsonProcessingException {notificationService.processUpdateNotification(message);}
+    public void sendChangeNotification(String message) throws JsonProcessingException {
+        notificationService.processUpdateNotification(message);
+    }
 
 }
