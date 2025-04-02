@@ -1,5 +1,6 @@
 package com.capstone.domain.auth.token.controller;
 
+import com.capstone.domain.auth.docs.TokenControllerDocs;
 import com.capstone.global.jwt.CookieUtil;
 import com.capstone.global.jwt.JwtUtil;
 import jakarta.servlet.http.Cookie;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-public class TokenController {
+public class TokenController implements TokenControllerDocs {
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
 
