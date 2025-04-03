@@ -1,4 +1,4 @@
-package com.capstone.domain.auth.docs;
+package com.capstone.docs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

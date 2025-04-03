@@ -1,4 +1,4 @@
-package com.capstone.domain.auth.docs;
+package com.capstone.docs;
 
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import io.swagger.v3.oas.annotations.Operation;
