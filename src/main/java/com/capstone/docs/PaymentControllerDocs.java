@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@Tag(name = "결제 관련 API", description = "결제 검증 및 처리 API")
+@Tag(name = "결제 관련 API")
 public interface PaymentControllerDocs {
 
     @Operation(summary = "아임포트 결제 검증", description = "아임포트 결제 정보를 검증하고 유저 멤버십 변경")
