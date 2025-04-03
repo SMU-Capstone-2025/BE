@@ -5,10 +5,7 @@ import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
 import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
 import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
 import com.capstone.domain.user.repository.UserRepository;
-import com.capstone.global.jwt.CookieUtil;
-import com.capstone.global.jwt.JwtFilter;
-import com.capstone.global.jwt.JwtUtil;
-import com.capstone.global.jwt.LoginFilter;
+import com.capstone.global.jwt.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -101,6 +99,8 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
