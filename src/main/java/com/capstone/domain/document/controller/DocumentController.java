@@ -1,5 +1,6 @@
 package com.capstone.domain.document.controller;
 
+import com.capstone.docs.DocumentControllerDocs;
 import com.capstone.domain.document.dto.DocumentEditRequest;
 import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.entity.Document;
@@ -18,7 +19,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/document")
-public class DocumentController {
+public class DocumentController implements DocumentControllerDocs {
     private final SimpMessageSendingOperations messagingTemplate;
     private final DocumentService documentService;
 

@@ -1,5 +1,6 @@
 package com.capstone.domain.auth.login.controller;
 
+import com.capstone.docs.LoginControllerDocs;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin(value = "http://localhost:63342")
-public class LoginController {
+public class LoginController implements LoginControllerDocs {
 
     // 로그인 전 해당 경로로 요청을 보내 토큰 획득
     @GetMapping("/csrf-token")
