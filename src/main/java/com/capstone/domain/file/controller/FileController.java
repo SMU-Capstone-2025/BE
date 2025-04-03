@@ -1,5 +1,6 @@
 package com.capstone.domain.file.controller;
 
+import com.capstone.docs.FileControllerDocs;
 import com.capstone.domain.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -13,7 +14,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @RequestMapping("/file")
 @CrossOrigin("*")
-public class FileController {
+public class FileController implements FileControllerDocs {
     private final FileService fileService;
 
     @PostMapping("/upload")
