@@ -2,10 +2,11 @@ package com.capstone.domain.mypage.controller;
 
 
 
+import com.capstone.docs.MypageControllerDocs;
 import com.capstone.domain.mypage.dto.CalendarTaskDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.service.MypageService;
-import com.capstone.domain.task.dto.TaskDto;
+
 import com.capstone.domain.task.entity.Task;
 import com.capstone.global.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mypage")
-public class MypageController
+public class MypageController implements MypageControllerDocs
 {
     private final MypageService mypageService;
     private final MailService mailService;
