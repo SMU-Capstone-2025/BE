@@ -12,7 +12,7 @@ import com.capstone.domain.payment.repository.PaymentRepository;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.repository.ProjectRepository;
-import com.capstone.domain.task.dto.TaskDto;
+
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.user.entity.User;
