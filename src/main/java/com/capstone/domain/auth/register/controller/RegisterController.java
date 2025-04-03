@@ -1,6 +1,6 @@
 package com.capstone.domain.auth.register.controller;
 
-import com.capstone.domain.auth.docs.RegisterControllerDocs;
+import com.capstone.docs.RegisterControllerDocs;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.auth.register.service.RegisterService;
 import com.capstone.global.mail.service.MailService;

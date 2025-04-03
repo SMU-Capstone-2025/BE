@@ -1,6 +1,6 @@
 package com.capstone.domain.auth.login.controller;
 
-import com.capstone.domain.auth.docs.LoginControllerDocs;
+import com.capstone.docs.LoginControllerDocs;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

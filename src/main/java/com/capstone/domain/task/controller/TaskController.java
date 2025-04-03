@@ -1,5 +1,6 @@
 package com.capstone.domain.task.controller;
 
+import com.capstone.docs.TaskControllerDocs;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.entity.Task;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin("*")
 @PreAuthorize("hasAnyRole('MEMBER', 'MANAGER')")
-public class TaskController {
+public class TaskController implements TaskControllerDocs {
 
     private final TaskService taskService;
 

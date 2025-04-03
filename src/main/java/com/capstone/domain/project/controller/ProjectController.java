@@ -1,5 +1,6 @@
 package com.capstone.domain.project.controller;
 
+import com.capstone.docs.ProjectControllerDocs;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/project")
-public class ProjectController {
+public class ProjectController implements ProjectControllerDocs {
     private final ProjectService projectService;
 
     @PostMapping("/register")

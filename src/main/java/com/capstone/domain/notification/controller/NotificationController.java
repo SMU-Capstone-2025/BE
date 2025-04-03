@@ -1,5 +1,6 @@
 package com.capstone.domain.notification.controller;
 
+import com.capstone.docs.NotificationControllerDocs;
 import com.capstone.domain.notification.entity.Notification;
 import com.capstone.domain.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +12,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/notification")
 @RequiredArgsConstructor
-public class NotificationController {
+public class NotificationController implements NotificationControllerDocs {
     private final NotificationService notificationService;
 
     @GetMapping("/get")
-    public ResponseEntity<List<Notification>> getNotificationLists(
-            @RequestHeader("Authorization") String token){
+    public ResponseEntity<List<Notification>> getNotificationLists(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(notificationService.findAllNotifications(token));
     }
 
