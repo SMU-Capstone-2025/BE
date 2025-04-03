@@ -1,5 +1,6 @@
 package com.capstone.domain.AI.controller;
 
+import com.capstone.docs.AIControllerDocs;
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.AI.dto.AIReviseRequest;
 import com.capstone.domain.AI.service.AIService;
@@ -13,7 +14,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RequestMapping("/ai/text")
 @CrossOrigin("*")
-public class AIController
+public class AIController implements AIControllerDocs
 {
     private final AIService aiService;
 
