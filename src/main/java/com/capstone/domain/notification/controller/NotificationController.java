@@ -14,10 +14,10 @@ import java.util.List;
 public class NotificationController {
     private final NotificationService notificationService;
 
-    //TODO: 시큐리티 도입 시 헤더로 토큰을 받아온 후 이메일 추출하는 방식으로 변경.
     @GetMapping("/get")
-    public ResponseEntity<List<Notification>> getNotificationLists(@RequestParam("email") String email){
-        return ResponseEntity.ok(notificationService.findAllNotifications(email));
+    public ResponseEntity<List<Notification>> getNotificationLists(
+            @RequestHeader("Authorization") String token){
+        return ResponseEntity.ok(notificationService.findAllNotifications(token));
     }
 
     @PutMapping("/read")

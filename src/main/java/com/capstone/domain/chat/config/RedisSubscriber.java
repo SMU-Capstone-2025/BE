@@ -10,11 +10,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.nio.charset.StandardCharsets;
-
 @Slf4j
 @Component // Spring Bean 등록
-public class    RedisSubscriber implements MessageListener {
+public class  RedisSubscriber implements MessageListener {
     private final SimpMessagingTemplate messagingTemplate;
     private final ObjectMapper objectMapper;
     private final RedisTemplate redisTemplate;

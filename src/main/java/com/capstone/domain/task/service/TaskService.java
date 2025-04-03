@@ -1,22 +1,27 @@
 package com.capstone.domain.task.service;
 
-import com.capstone.domain.task.dto.TaskDto;
+import com.capstone.domain.task.dto.request.TaskRequest;
+import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.TaskNotFoundException;
 import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
-import com.capstone.global.elastic.entity.LogEntity;
-import com.capstone.global.elastic.repository.LogRepository;
+import com.capstone.domain.log.entity.LogEntity;
+import com.capstone.domain.log.repository.LogRepository;
+import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TaskService {
@@ -25,8 +30,9 @@ public class TaskService {
     private final KafkaProducerService kafkaProducerService;
     private final TaskUtil taskUtil;
 
-    public String saveTask(TaskDto taskDto){
-        taskRepository.save(taskUtil.toEntity(taskDto));
+    @Transactional
+    public String saveTask(TaskRequest taskDto){
+        taskRepository.save(taskDto.toTask());
         return TaskMessages.TASK_CREATED;
     }
 
@@ -36,25 +42,33 @@ public class TaskService {
         return taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
     }
 
-    public String saveVersion(TaskDto taskDto, String fileId){
+    @Transactional
+    public String saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
-        Task task = findTaskByIdOrThrow(taskDto.getId());
-        task.getVersionHistory().add(version);
+        Task task = findTaskByIdOrThrow(taskDto.id());
+        task.addNewVersion(version);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("log-event", "ADD", taskDto, "pjy1121");
+
+        kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, customUserDetails.getEmail());
         return TaskMessages.VERSION_ADDED;
     }
 
-    public String dropTask(String id){
+    @Transactional
+    public String dropTask(String id, CustomUserDetails userDetails){
+        log.info("userDetails: {}", userDetails.getEmail());
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
+        kafkaProducerService.sendTaskEvent("task.changed", "DELETE", task, userDetails.getEmail());
         return TaskMessages.TASK_DROPPED;
     }
 
-    public String updateStatus(String id, String status){
+    @Transactional
+    public String updateStatus(String id, String status, CustomUserDetails userDetails){
         Task task = findTaskByIdOrThrow(id);
-        task.setStatus(status);
+        task.updateStatus(status);
         taskRepository.save(task);
+        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", task, userDetails.getEmail());
+
         return TaskMessages.STATUS_UPDATED;
     }
 
@@ -63,11 +77,12 @@ public class TaskService {
         return task.getVersionHistory();
     }
 
-    public Task rollbackVersion(String taskId, String version){
+    @Transactional
+    public TaskResponse rollbackVersion(String taskId, String version){
         Task task = findTaskByIdOrThrow(taskId);
-        task.setCurrentVersion(version);
+        task.updateCurrentVersion(version);
         taskRepository.save(task);
-        return task;
+        return TaskResponse.from(task);
     }
 
 

@@ -23,6 +23,9 @@ public class UserService {
     private final MongoTemplate mongoTemplate;
 
     public void participateProcess(List<String> emails, String projectId) {
+        if (emails.size() == 0){
+            return;
+        }
         BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, User.class);
 
         for (String email : emails) {

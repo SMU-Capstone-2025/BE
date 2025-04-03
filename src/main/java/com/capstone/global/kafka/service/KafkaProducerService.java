@@ -1,74 +1,37 @@
 package com.capstone.global.kafka.service;
 
-import com.capstone.domain.task.dto.TaskDto;
 import com.capstone.global.kafka.dto.RequestPayload;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KafkaProducerService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void sendTaskEvent(String topic, String action, TaskDto taskDto, String email) {
+    public <T, U> void sendTaskEvent(String topic, String action, T data, U email) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("version", taskDto.getVersion());
-            data.put("content", taskDto.getContent());
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object>[] requestData = new Map[]{data};
-
-            RequestPayload<Map<String, Object>[]> payload = new RequestPayload<>(
-                    taskDto.getId(),
-                    email,
-                    action,
-                    requestData
-            );
-
+            RequestPayload<T, U> payload = new RequestPayload<>(email, "TASK", action, data);
             String message = objectMapper.writeValueAsString(payload);
+            log.info("message: {}", message);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Kafka 메시지 전송 실패", e);
         }
     }
-
-    public void sendProjectEvent(String topic, String action, String projectName, Map<String, String> authorities) {
+    public <T, U> void sendProjectChangedEvent(String topic, String action, T data, U email) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            RequestPayload<Map<String, String>> payload = new RequestPayload<>(
-                    projectName,
-                    null,
-                    action,
-                    authorities
-                    );
-            String message = objectMapper.writeValueAsString(payload);
-            kafkaTemplate.send(topic, message);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+            RequestPayload<T, U> payload = new RequestPayload<>(email, "PROJECT", action, data);
 
-    public void sendMailEvent(String topic, List<String> emails) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            RequestPayload<List<String>> payload = new RequestPayload<>(
-                    null,
-                    null,
-                    null,
-                    (emails != null) ? emails : new ArrayList<>()
-                    );
             String message = objectMapper.writeValueAsString(payload);
             kafkaTemplate.send(topic, message);
         } catch (Exception e) {

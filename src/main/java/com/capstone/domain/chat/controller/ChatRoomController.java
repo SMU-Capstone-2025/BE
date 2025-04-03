@@ -2,7 +2,6 @@ package com.capstone.domain.chat.controller;
 
 import com.capstone.domain.chat.dto.ChatRequest;
 import com.capstone.domain.chat.dto.ChatRoom;
-import com.capstone.domain.chat.repository.ChatRoomRepository;
 import com.capstone.domain.chat.service.ChatRoomService;
 import com.capstone.domain.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;

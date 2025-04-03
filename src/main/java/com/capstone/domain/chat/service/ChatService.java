@@ -2,18 +2,14 @@ package com.capstone.domain.chat.service;
 
 import com.capstone.domain.chat.dto.ChatRequest;
 import com.capstone.domain.chat.exception.ChatNotFoundException;
-import com.capstone.domain.chat.exception.MessageProcessingException;
 import com.capstone.global.jwt.JwtUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
@@ -37,7 +33,7 @@ public class ChatService {
         saveChatMessage(chatRoomId, message,name);
 
         message.setSender(name);
-
+        System.out.println("Message saved to: " + message.getContent());
         redisTemplate.convertAndSend("chatRoom:" + chatRoomId, message);
         return message;
     }

@@ -1,19 +1,17 @@
 package com.capstone.domain.project.entity;
 
-
-import com.capstone.domain.project.dto.ProjectDto;
+import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Document(collection= "project")
 @Getter
-@Builder
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project {
@@ -22,20 +20,16 @@ public class Project {
     private String projectName;
     private String description;
     private Map<String, String> authorities; // email:authority 구조
-    private List<String> projectIds;
+    private List<String> taskIds;
     private List<String> documentIds;
 
-    public String getAuthority(String email){
-        return (authorities != null) ? authorities.get(email) : null;
+    public void updateProjectInfo(ProjectSaveRequest request) {
+        this.projectName = request.projectName();
+        this.description = request.description();
     }
-
-    public static Project createProject(ProjectDto projectDto, Map<String, String> defaultAuthorities) {
-        return Project.builder()
-                .projectName(projectDto.getProjectName())
-                .description(projectDto.getDescription())
-                .authorities(defaultAuthorities)
-                .projectIds(new ArrayList<>())
-                .documentIds(new ArrayList<>())
-                .build();
+    public void addAuthorities(Map<String, String> newAuthorities) {
+        if (newAuthorities != null) {
+            this.authorities.putAll(newAuthorities);
+        }
     }
 }

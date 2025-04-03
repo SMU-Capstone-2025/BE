@@ -2,13 +2,18 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cache:
+    type: redis
   data:
     mongodb:
-      uri: mongodb://localhost:27017/
+      uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
     redis:
-      host: localhost
-      port: 6379
+      host: redis-18096.c1.us-central1-2.gce.redns.redis-cloud.com
+      port: 18096
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      timeout: 6000ms
 
   servlet:
     multipart:
@@ -38,9 +43,10 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: "http://localhost:8080/login/oauth2/code/naver"
             scope:
-                          - name
-                          - email
-                          - profile_image
+              - name
+              - email
+              - profile_image
+
             client-name: Naver
 
           kakao:
@@ -121,3 +127,6 @@ openai:
   api:
     url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
     key: ${OPENAI_API_KEY}
+
+IMP_API_KEY: ${IMP_API_KEY}
+IMP_API_SECRET: ${IMP_API_SECRET}
