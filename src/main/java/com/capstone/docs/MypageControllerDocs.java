@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Map;
 
-@Tag(name = "마이페이지 서비스 API", description = "사용자 조회 및 사용자 계정 수정 API")
+@Tag(name = "마이페이지 서비스 API")
 public interface MypageControllerDocs
 {
     @Operation(summary = "유저 정보 조회", description = "토큰을 이용해 유저 정보 획득")

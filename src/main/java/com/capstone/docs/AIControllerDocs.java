@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Map;
 
-@Tag(name = "AI 서비스 API", description = "문법 수정 및 요약 관련 API")
+@Tag(name = "AI 서비스 API")
 public interface AIControllerDocs {
 
     @Operation(summary = "문법 수정", description = "입력된 텍스트의 문법을 수정하여 반환")
