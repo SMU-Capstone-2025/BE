@@ -1,5 +1,6 @@
 package com.capstone.domain.payment.controller;
 
+import com.capstone.docs.PaymentControllerDocs;
 import com.capstone.domain.payment.dto.PaymentRequestDto;
 import com.capstone.domain.payment.exception.InvaildPaymentException;
 import com.capstone.domain.payment.service.PaymentService;
@@ -24,7 +25,7 @@ import static com.capstone.domain.payment.message.PaymentMessages.PAYMENT_NOT_FO
 @RequestMapping("/api/v1/payment")
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentController
+public class PaymentController implements PaymentControllerDocs
 {
 
     private final PaymentService paymentService;
