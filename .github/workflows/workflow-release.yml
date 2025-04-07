@@ -80,7 +80,13 @@ jobs:
           username: ${{ secrets.DEPLOY_SERVER_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           debug: true
-          envs: GCP_PROJECT_ID, IMAGE_NAME, IMAGE_TAG, DEPLOY_PATH, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, KAKAOPAY_KEY
+          envs: GCP_PROJECT_ID, IMAGE_NAME, IMAGE_TAG, \
+            GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, \
+            IMP_API_KEY, IMP_API_SECRET, \
+            KAKAO_CLIENT_ID, KAKAO_CLIENT_SECRET, \
+            KAKAOPAY_KEY, MAIL_PASSWORD, \
+            NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
+            OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
           script: |
             sudo docker stop ${IMAGE_NAME} || true
             sudo docker rm ${IMAGE_NAME} || true
