@@ -18,7 +18,7 @@ public interface LoginControllerDocs {
             @ApiResponse(responseCode = "401", description = "인증 실패"),
             @ApiResponse(responseCode = "500", description = "서버 에러")
     })
-    ResponseEntity<String> doLogin();
+    ResponseEntity<String> doLogin(@RequestBody LoginRequest loginRequest);
 
 //    @Operation(summary = "csrf 토큰 발급", description = "로그인 전 본 api 호출 후 csrf 토큰 발급")
 //    @ApiResponses(value = {

@@ -20,7 +20,7 @@ public class LoginController implements LoginControllerDocs {
 //    }
 
     @PostMapping("/login")
-    public ResponseEntity<String> doLogin(){
+    public ResponseEntity<String> doLogin(@RequestBody LoginRequest loginRequest){
         return ResponseEntity.ok().build();
     }
 }
