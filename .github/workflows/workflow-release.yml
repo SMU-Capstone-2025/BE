@@ -90,6 +90,8 @@ jobs:
             sudo docker pull us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
             
             sudo docker run -d \
+            --name ${IMAGE_NAME} \
+            --network compose_default \
             -e GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }} \
             -e GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }} \
             -e IMP_API_KEY=${{ env.IMP_API_KEY }} \
@@ -103,6 +105,5 @@ jobs:
             -e OPENAI_API_KEY=${{ env.OPENAI_API_KEY }} \
             -e REDIS_USERNAME=${{ env.REDIS_USERNAME }} \
             -e REDIS_PASSWORD=${{ env.REDIS_PASSWORD }} \
-            --name my-container \
-            my-image:latest
+            us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
             
