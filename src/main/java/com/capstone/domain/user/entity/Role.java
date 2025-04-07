@@ -1,7 +1,7 @@
 package com.capstone.domain.user.entity;
 
 public enum Role {
-    MEMBER, MANAGER;
+    ROLE_MEMBER, ROLE_MANAGER;
 
     public static boolean isValid(String value) {
         try {

@@ -32,16 +32,6 @@ public class User {
     //멤버 멤버쉽
     private MembershipType membership;
 
-
-    public static User createUser(RegisterRequest registerRequest){
-        return User.builder()
-                .name(registerRequest.getName())
-                .email(registerRequest.getEmail())
-                .password(registerRequest.getPassword())
-                .projectIds(new ArrayList<>())
-                .membership(MembershipType.FREE_USER)
-                .build();
-    }
     public UserDto.UserInfoDto toDto() {
         return UserDto.UserInfoDto.builder()
                 .name(name)

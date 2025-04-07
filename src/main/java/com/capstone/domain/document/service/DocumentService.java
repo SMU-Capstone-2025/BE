@@ -82,8 +82,6 @@ public class DocumentService {
                     }
                 }
             }
-        } else {
-            System.out.println("저장할 데이터 없음.");
         }
     }
 

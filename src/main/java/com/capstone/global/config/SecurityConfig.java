@@ -60,9 +60,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/document/**", "/task/**", "/notification/**")
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        http.csrf(csrf -> csrf.disable()
         ); // csrf 공격 방지
 
         //WebMvcConfig 설정에 따름
@@ -94,13 +92,13 @@ public class SecurityConfig {
         );
 
         http
-                .addFilterAt(
-                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
-                        UsernamePasswordAuthenticationFilter.class
-                )
-                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class)
+                .addFilterBefore(
+                new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
+                UsernamePasswordAuthenticationFilter.class);
+
         http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -112,9 +110,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:63342"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
+        configuration.addExposedHeader("access");
         configuration.setAllowCredentials(true); // 쿠키 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

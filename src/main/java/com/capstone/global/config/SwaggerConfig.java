@@ -10,37 +10,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+
 public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        // Define the security scheme
-        SecurityScheme apiKey = new SecurityScheme()
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-                .in(SecurityScheme.In.HEADER)
-                .name("Authorization");
-
-        // Define the security requirement
-        SecurityRequirement securityRequirement = new SecurityRequirement()
-                .addList("Authorization");
-
-        // Add the security scheme to components
-        Components components = new Components()
-                .addSecuritySchemes("Authorization", apiKey);
-
+        Info info = new Info()
+                .version("v1.0")
+                .title("DocTalk API");
         return new OpenAPI()
-                .addServersItem(new Server().url("/"))
-                .components(components)
-                .addSecurityItem(securityRequirement)
-                .info(apiInfo());
-    }
-
-    private Info apiInfo() {
-        return new Info()
-                .title("Doctalk API 명세서")
-                .version("1.0.0");
+                .info(info);
     }
 
 }
