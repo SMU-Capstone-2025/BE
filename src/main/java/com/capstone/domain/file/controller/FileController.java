@@ -2,6 +2,7 @@ package com.capstone.domain.file.controller;
 
 import com.capstone.docs.FileControllerDocs;
 import com.capstone.domain.file.service.FileService;
+import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +19,8 @@ public class FileController implements FileControllerDocs {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        return fileService.upload(file);
+    public ResponseEntity<ApiResponse<String>> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(file)));
     }
 
     @GetMapping("/download")
@@ -28,7 +29,7 @@ public class FileController implements FileControllerDocs {
     }
 
     @DeleteMapping("delete")
-    public void deleteFile(@RequestParam("fileId") String fileId){
-        fileService.delete(fileId);
+    public ResponseEntity<ApiResponse<String>> deleteFile(@RequestParam("fileId") String fileId){
+        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.delete(fileId)));
     }
 }

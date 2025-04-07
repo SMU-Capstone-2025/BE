@@ -3,18 +3,24 @@ package com.capstone.domain.task.dto.request;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.message.Status;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public record TaskRequest(String id,
+                          @NotNull
                           String title,
+                          @NotNull
                           String modifiedBy,
+                          @NotNull
                           String version,
+                          @NotNull
                           String summary,
+                          @NotNull
                           String content,
                           @Nullable
-                       List<String> editors
+                          List<String> editors
                        ){
 
     public Task toTask() {
