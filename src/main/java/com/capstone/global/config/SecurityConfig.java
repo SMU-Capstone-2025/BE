@@ -99,6 +99,16 @@ public class SecurityConfig {
 
 //        http
 //                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+
+
+
+//        http
+//                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+        // 필터 알맞는 위치 일단 주석으로 추가
+
+
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
