@@ -130,3 +130,7 @@ openai:
 
 IMP_API_KEY: ${IMP_API_KEY}
 IMP_API_SECRET: ${IMP_API_SECRET}
+
+springdoc:
+  default-produces-media-type: application/json
+  override-with-generic-response: false
