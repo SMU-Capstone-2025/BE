@@ -2,6 +2,8 @@ package com.capstone.domain.document.service;
 
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.repository.DocumentRepository;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +30,8 @@ public class DocumentService {
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
     public Document findDocumentCacheFirst(String key){
-        return documentRepository.findDocumentByDocumentId(key);
+        return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
+                .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
     }
 
     public void updateDocumentToCache(String key, String changes){
@@ -78,4 +82,5 @@ public class DocumentService {
             System.out.println("저장할 데이터 없음.");
         }
     }
+
 }

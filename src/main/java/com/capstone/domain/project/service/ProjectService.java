@@ -11,6 +11,8 @@ import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.service.UserService;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,10 +37,11 @@ public class ProjectService {
 
 
     @Transactional
-    public void updateProject(ProjectSaveRequest projectSaveRequest){
+    public Project updateProject(ProjectSaveRequest projectSaveRequest){
         Project project = findProjectByProjectIdOrThrow(projectSaveRequest.projectId());
         project.updateProjectInfo(projectSaveRequest);
         projectRepository.save(project);
+        return project;
     }
 
     public Project getProjectContent(String projectId, CustomUserDetails customUserDetails){
@@ -62,7 +65,7 @@ public class ProjectService {
                 .collect(Collectors.toMap(email -> email, email-> "ROLE_USER"));
     }
 
-    public void processRegister(ProjectSaveRequest projectSaveRequest){
+    public Project processRegister(ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
         kafkaProducerService.sendProjectChangedEvent(
@@ -71,10 +74,11 @@ public class ProjectService {
                 null,
                 projectSaveRequest.invitedEmails()
         );
+        return project;
     }
 
     @Transactional
-    public void processAuth(ProjectAuthorityRequest projectAuthorityRequest){
+    public Project processAuth(ProjectAuthorityRequest projectAuthorityRequest){
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         projectRepository.updateAuthority(projectAuthorityRequest);
         kafkaProducerService.sendProjectChangedEvent(
@@ -83,19 +87,22 @@ public class ProjectService {
                 project,
                 projectAuthorityRequest.getAuthorityKeysAsList()
         );
+        return project;
     }
 
-    public void processUpdate(ProjectSaveRequest projectSaveRequest){
-        updateProject(projectSaveRequest);
+    @Transactional
+    public Project processUpdate(ProjectSaveRequest projectSaveRequest){
         kafkaProducerService.sendProjectChangedEvent(
                 "project.changed",
                 "UPDATE",
                 null,
                 projectSaveRequest.invitedEmails()
         );
+        return updateProject(projectSaveRequest);
     }
 
-    public void processInvite(ProjectAuthorityRequest projectAuthorityRequest) {
+    @Transactional
+    public Project processInvite(ProjectAuthorityRequest projectAuthorityRequest) {
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         Map<String, String> existingAuthorities = project.getAuthorities();
         Map<String, String> newInvites = projectAuthorityRequest.authorities().entrySet().stream()
@@ -114,17 +121,18 @@ public class ProjectService {
                 project,
                 projectAuthorityRequest.getAuthorityKeysAsList()
         );
+        return project;
     }
 
     public Project findProjectByProjectIdOrThrow(String projectId){
         return projectRepository.findById(projectId)
-                .orElseThrow(ProjectNotFoundException::new);
+                .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
     }
 
     public Project checkUserInProject(String projectId, CustomUserDetails customUserDetails){
         Project project = findProjectByProjectIdOrThrow(projectId);
         if (!project.getAuthorities().containsKey(customUserDetails.getEmail())){
-            throw new ProjectInvalidAccessException();
+            throw new GlobalException(ErrorStatus.INVALID_MEMBER);
         }
         return project;
     }
