@@ -5,7 +5,9 @@ import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
+import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,31 +21,33 @@ public class ProjectController implements ProjectControllerDocs {
     private final ProjectService projectService;
 
     @PostMapping("/register")
-    public void registerProject(@RequestBody ProjectSaveRequest projectSaveRequest){
-        projectService.processRegister(projectSaveRequest);
+    public ResponseEntity<ApiResponse<Project>> registerProject(@Valid @RequestBody ProjectSaveRequest projectSaveRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processRegister(projectSaveRequest)));
     }
 
-    @PreAuthorize("ROLE_MANAGER")
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/update")
-    public void updateProject(@RequestBody ProjectSaveRequest projectSaveRequest){
-        projectService.processUpdate(projectSaveRequest);
+    public ResponseEntity<ApiResponse<Project>> updateProject(@Valid @RequestBody ProjectSaveRequest projectSaveRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectSaveRequest)));
     }
 
-    @PreAuthorize("ROLE_MANAGER")
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/auth")
-    public void updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
-        projectService.processAuth(projectAuthorityRequest);
+    public ResponseEntity<ApiResponse<Project>> updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+        projectAuthorityRequest.validateRoles();
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processAuth(projectAuthorityRequest)));
     }
 
-    @PreAuthorize("ROLE_MANAGER")
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/invite")
-    public void inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
-        projectService.processInvite(projectAuthorityRequest);
+    public ResponseEntity<ApiResponse<Project>> inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+        projectAuthorityRequest.validateRoles();
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processInvite(projectAuthorityRequest)));
     }
 
     @GetMapping("/load")
-    public ResponseEntity<Project> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
-        return ResponseEntity.ok().body(projectService.getProjectContent(projectId, userDetails));
+    public ResponseEntity<ApiResponse<Project>> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectContent(projectId, userDetails)));
     }
 
 }

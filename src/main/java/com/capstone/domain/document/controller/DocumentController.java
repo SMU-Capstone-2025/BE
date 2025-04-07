@@ -5,7 +5,10 @@ import com.capstone.domain.document.dto.DocumentEditRequest;
 import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
+import com.capstone.global.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -24,15 +27,15 @@ public class DocumentController implements DocumentControllerDocs {
     private final DocumentService documentService;
 
     @GetMapping("/load")
-    public Document getDocument(@RequestParam("documentId") String documentId){
-        return documentService.findDocumentCacheFirst(documentId);
+    public ResponseEntity<ApiResponse<Document>> getDocument(@RequestParam("documentId") String documentId){
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentCacheFirst(documentId)));
     }
 
     @MessageMapping("/editing")
-    public void sendMessage(DocumentEditRequest params,
+    public void sendMessage(@Valid DocumentEditRequest params,
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
-        DocumentEditResponse documentEditResponse = new DocumentEditResponse((String) sessionAttributes.get("email"), params.getMessage());
-        messagingTemplate.convertAndSend("/sub/document/" + params.getDocumentId(), documentEditResponse);
-        documentService.updateDocumentToCache(params.getDocumentId(), params.getMessage());
+        DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
+        messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
+        documentService.updateDocumentToCache(params.documentId(), params.message());
     }
 }
