@@ -58,6 +58,7 @@ jobs:
     env:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       IMAGE_NAME: doctalk
+      GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       IMAGE_TAG: ${{ github.sha }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -82,6 +83,7 @@ jobs:
           debug: true
           envs: GCP_PROJECT_ID, IMAGE_NAME, IMAGE_TAG, \
             GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, \
+            GCP_SA_KEY, \
             IMP_API_KEY, IMP_API_SECRET, \
             KAKAO_CLIENT_ID, KAKAO_CLIENT_SECRET, \
             KAKAOPAY_KEY, MAIL_PASSWORD, \
