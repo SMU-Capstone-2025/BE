@@ -8,14 +8,12 @@ import com.capstone.domain.document.service.DocumentService;
 import com.capstone.global.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -30,6 +28,11 @@ public class DocumentController implements DocumentControllerDocs {
     public ResponseEntity<ApiResponse<Document>> getDocument(@RequestParam("documentId") String documentId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentCacheFirst(documentId)));
     }
+
+//    @DeleteMapping("/delete")
+//    public ResponseEntity<ApiResponse<Document>> deleteDocument(@RequestParam("documentId") String documentId){
+//        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.deleteDocument(documentId)));
+//    }
 
     @MessageMapping("/editing")
     public void sendMessage(@Valid DocumentEditRequest params,
