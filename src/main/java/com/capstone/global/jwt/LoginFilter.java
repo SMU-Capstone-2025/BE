@@ -70,7 +70,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         String email = userDetails.getEmail();
         try {
-
             response.addHeader("access", jwtUtil.createAccess(email));
         } catch (Exception e) {
             log.error("Error generating JWT: ", e);

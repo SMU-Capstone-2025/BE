@@ -30,14 +30,16 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = request.getHeader("Authorization");
 
+
         if (accessToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        String token = accessToken.substring(7).trim();
+
         try {
-            log.info("token: {}", accessToken);
-            jwtUtil.isExpired(accessToken);
+            jwtUtil.isExpired(token);
         } catch (ExpiredJwtException e) {
             PrintWriter writer = response.getWriter();
             writer.print("access token expired");
@@ -45,11 +47,12 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        String email = jwtUtil.getEmail(accessToken);
+        String email = jwtUtil.getEmail(token);
+
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        Authentication authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);

@@ -9,11 +9,13 @@ import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/project")
@@ -47,6 +49,7 @@ public class ProjectController implements ProjectControllerDocs {
 
     @GetMapping("/load")
     public ResponseEntity<ApiResponse<Project>> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
+        log.info("user: {}", userDetails.getEmail());
         return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectContent(projectId, userDetails)));
     }
 

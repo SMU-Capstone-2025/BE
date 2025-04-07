@@ -16,7 +16,7 @@ import java.util.*;
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
-    private final List<Project> projects; // ✅ 프로젝트 목록을 생성자로 받음
+    private final List<Project> projects;
 
     public String getEmail() {
         return user.getEmail();
