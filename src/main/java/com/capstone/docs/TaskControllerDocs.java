@@ -315,26 +315,28 @@ public interface TaskControllerDocs {
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<TaskResponse>> getVersionRollback(@RequestParam String taskId, @RequestParam String version);
 
-    @Operation(description = "작업의 로그 목록 반환")
+
+
+    @Operation(description = "작업을 deadline을 기준으로 정렬")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "반혼 성공"),
+            @ApiResponse(responseCode = "200", description = "정렬 성공"),
             @ApiResponse(
-                responseCode = "401",
-                description = "인증 실패",
-                content = @Content(
-                    mediaType = "application/json",
-                    examples = @ExampleObject(
-                        name = "인증 실패 응답",
-                        summary = "유효하지 않은 토큰 또는 로그인 필요",
-                        value = """
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "인증 실패 응답",
+                                    summary = "유효하지 않은 토큰 또는 로그인 필요",
+                                    value = """
                         {
                           "success": false,
                           "code": "COMMON_401",
                           "message": "인증이 필요합니다."
                         }
                         """
+                            )
                     )
-                )
             ),
             @ApiResponse(responseCode = "500", description = "서버 에러",
                     content = @Content(
@@ -354,5 +356,5 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<LogEntity>>> getLogList(@RequestParam String taskId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getDeadlineList(@AuthenticationPrincipal CustomUserDetails userDetails);
 }
