@@ -84,7 +84,7 @@ jobs:
             GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, \
             IMP_API_KEY, IMP_API_SECRET, \
             KAKAO_CLIENT_ID, KAKAO_CLIENT_SECRET, \
-            KAKAOPAY_KEY, MAIL_PASSWORD, \
+            MAIL_PASSWORD, \
             NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
             OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
           script: |
@@ -110,11 +110,10 @@ jobs:
             -e IMP_API_SECRET=$IMP_API_SECRET \
             -e KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID \
             -e KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET \
-            -e KAKAOPAY_KEY=$KAKAOPAY_KEY \
             -e MAIL_PASSWORD=$MAIL_PASSWORD \
             -e NAVER_CLIENT_ID=$NAVER_CLIENT_ID \
             -e NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET \
             -e OPENAI_API_KEY=$OPENAI_API_KEY \
             -e REDIS_USERNAME=$REDIS_USERNAME \
             -e REDIS_PASSWORD=$REDIS_PASSWORD \
-            us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG \
+            us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
