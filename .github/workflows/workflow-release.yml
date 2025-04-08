@@ -117,4 +117,4 @@ jobs:
             -e OPENAI_API_KEY=$OPENAI_API_KEY \
             -e REDIS_USERNAME=$REDIS_USERNAME \
             -e REDIS_PASSWORD=$REDIS_PASSWORD \
-            us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
+            us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG \
