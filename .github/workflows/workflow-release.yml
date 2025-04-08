@@ -88,20 +88,4 @@ jobs:
             sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev <<< '${{ secrets.GCP_SA_KEY }}'
             sudo docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
 
-            sudo docker run -d \
-              --name $IMAGE_NAME \
-              --network bridge \
-              -p 8080:8080 \
-              -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
-              -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
-              -e KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID \
-              -e KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET \
-              -e NAVER_CLIENT_ID=$NAVER_CLIENT_ID \
-              -e NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET \
-              -e IMP_API_KEY=$IMP_API_KEY \
-              -e IMP_API_SECRET=$IMP_API_SECRET \
-              -e MAIL_PASSWORD=$MAIL_PASSWORD \
-              -e OPENAI_API_KEY=$OPENAI_API_KEY \
-              -e REDIS_USERNAME=$REDIS_USERNAME \
-              -e REDIS_PASSWORD=$REDIS_PASSWORD \
-              us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
+            sudo docker run -d --name $IMAGE_NAME --network bridge -p 8080:8080 -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET -e KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID -e KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET -e NAVER_CLIENT_ID=$NAVER_CLIENT_ID -e NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET -e IMP_API_KEY=$IMP_API_KEY -e IMP_API_SECRET=$IMP_API_SECRET -e MAIL_PASSWORD=$MAIL_PASSWORD -e OPENAI_API_KEY=$OPENAI_API_KEY -e REDIS_USERNAME=$REDIS_USERNAME -e REDIS_PASSWORD=$REDIS_PASSWORD us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
