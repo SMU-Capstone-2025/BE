@@ -74,4 +74,11 @@ public class TaskController implements TaskControllerDocs {
     public ResponseEntity<ApiResponse<List<LogEntity>>> getLogList(@RequestParam String taskId){
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.findLogsByTaskId(taskId)));
     }
+
+
+    @GetMapping("/list/deadline")
+    public ResponseEntity<ApiResponse<List<Task>>> getDeadlineList(@AuthenticationPrincipal CustomUserDetails userDetails)
+    {
+        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listByDeadLine(userDetails)));
+    }
 }
