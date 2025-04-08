@@ -88,7 +88,8 @@ jobs:
             NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
             OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
           script: |
-            
+            echo "[DEBUG] IMAGE_NAME=$IMAGE_NAME"
+            echo "[DEBUG] GCP_PROJECT_ID=$GCP_PROJECT_ID"
             sudo docker container prune -f
             sudo docker image prune -a -f
             sudo docker volume prune -f
