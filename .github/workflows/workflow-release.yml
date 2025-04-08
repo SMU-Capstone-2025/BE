@@ -103,7 +103,7 @@ jobs:
             
             sudo docker run -d \
             --name $IMAGE_NAME \
-            --network compose_default \
+            --network bridge \
             -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
             -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
             -e IMP_API_KEY=$IMP_API_KEY \
