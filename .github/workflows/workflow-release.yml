@@ -88,6 +88,12 @@ jobs:
             NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
             OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
           script: |
+            
+            sudo docker container prune -f
+            sudo docker image prune -a -f
+            sudo docker volume prune -f
+            sudo docker network prune -f
+            
             sudo docker stop ${IMAGE_NAME} || true
             sudo docker rm ${IMAGE_NAME} || true
             
