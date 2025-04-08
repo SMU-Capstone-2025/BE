@@ -87,6 +87,13 @@ jobs:
                 MAIL_PASSWORD, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
                 OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
               script: |
+                echo "======ENV (디버깅용)======"
+                echo "GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID'"
+                echo "KAKAO_CLIENT_ID='$KAKAO_CLIENT_ID'"
+                echo "IMP_API_KEY='$IMP_API_KEY'"
+                echo "MAIL_PASSWORD='$MAIL_PASSWORD'"
+                echo "OPENAI_API_KEY='$OPENAI_API_KEY'"
+                echo "======END======"
                 sudo docker stop $IMAGE_NAME || true
                 sudo docker rm $IMAGE_NAME || true
                 
