@@ -55,42 +55,59 @@ jobs:
     runs-on: ubuntu-latest
     needs: CI
 
+    env:
+      IMAGE_NAME: doctalk
+      IMAGE_TAG: ${{ github.sha }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      IMP_API_KEY: ${{ secrets.IMP_API_KEY }}
+      IMP_API_SECRET: ${{ secrets.IMP_API_SECRET }}
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+
     steps:
       - name: 배포 서버에 SSH로 연결하여 배포
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: ${{ secrets.DEPLOY_SERVER_HOST }}
-          username: ${{ secrets.DEPLOY_SERVER_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          debug: true
-          script: |
-            IMAGE_NAME=doctalk
-            IMAGE_TAG=${{ github.sha }}
-            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-
-            echo "[DEBUG] Pulling image: $IMAGE_NAME:$IMAGE_TAG"
-
-            sudo docker stop $IMAGE_NAME || true
-            sudo docker rm $IMAGE_NAME || true
-
-            sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev <<< '${{ secrets.GCP_SA_KEY }}'
-            sudo docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
-
-            sudo docker run -d \
-              --name $IMAGE_NAME \
-              --network bridge \
-              -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
-              -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
-              -e IMP_API_KEY=${{ secrets.IMP_API_KEY }} \
-              -e IMP_API_SECRET=${{ secrets.IMP_API_SECRET }} \
-              -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-              -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
-              -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
-              -e NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }} \
-              -e NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }} \
-              -e OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} \
-              -e REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} \
-              -e REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} \
-              us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
+              host: ${{ secrets.DEPLOY_SERVER_HOST }}
+              username: ${{ secrets.DEPLOY_SERVER_USER }}
+              key: ${{ secrets.DEPLOY_SSH_KEY }}
+              debug: true
+              envs: IMAGE_NAME, IMAGE_TAG, GCP_PROJECT_ID, \
+                GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, \
+                IMP_API_KEY, IMP_API_SECRET, \
+                KAKAO_CLIENT_ID, KAKAO_CLIENT_SECRET, \
+                MAIL_PASSWORD, NAVER_CLIENT_ID, NAVER_CLIENT_SECRET, \
+                OPENAI_API_KEY, REDIS_USERNAME, REDIS_PASSWORD
+              script: |
+                sudo docker stop $IMAGE_NAME || true
+                sudo docker rm $IMAGE_NAME || true
+                
+                sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev <<< '${{ secrets.GCP_SA_KEY }}'
+                sudo docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
+                
+                sudo docker run -d \
+                  --name $IMAGE_NAME \
+                  --network bridge \
+                  -p 8080:8080 \
+                  -e SPRING_PROFILES_ACTIVE=prod \
+                  -e GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID \
+                  -e GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET \
+                  -e IMP_API_KEY=$IMP_API_KEY \
+                  -e IMP_API_SECRET=$IMP_API_SECRET \
+                  -e KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID \
+                  -e KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET \
+                  -e MAIL_PASSWORD=$MAIL_PASSWORD \
+                  -e NAVER_CLIENT_ID=$NAVER_CLIENT_ID \
+                  -e NAVER_CLIENT_SECRET=$NAVER_CLIENT_SECRET \
+                  -e OPENAI_API_KEY=$OPENAI_API_KEY \
+                  -e REDIS_USERNAME=$REDIS_USERNAME \
+                  -e REDIS_PASSWORD=$REDIS_PASSWORD \
+                  us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
