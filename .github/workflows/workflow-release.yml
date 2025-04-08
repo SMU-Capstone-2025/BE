@@ -97,7 +97,7 @@ jobs:
             
             sudo docker stop ${IMAGE_NAME} || true
             sudo docker rm ${IMAGE_NAME} || true
-            
+            echo "[DEBUG] GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"
             sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev <<< '${{ secrets.GCP_SA_KEY }}'
             sudo docker pull us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
             
@@ -105,6 +105,7 @@ jobs:
             --name ${IMAGE_NAME} \
             --network bridge \
             -p 8080:8080 \
+            -e SPRING_PROFILES_ACTIVE=prod \
             -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
             -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
             -e IMP_API_KEY=${IMP_API_KEY} \
