@@ -5,6 +5,7 @@ import com.capstone.domain.task.message.Status;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,9 @@ public record TaskRequest(String id,
                           @NotNull
                           String content,
                           @Nullable
-                          List<String> editors
+                          List<String> editors,
+                          @NotNull
+                          LocalDate deadline
                        ){
 
     public Task toTask() {
@@ -30,6 +33,7 @@ public record TaskRequest(String id,
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
                 .editors(editors)
+                .deadline(this.deadline)
                 .build();
     }
 }
