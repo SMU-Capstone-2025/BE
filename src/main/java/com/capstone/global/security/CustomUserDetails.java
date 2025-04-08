@@ -2,7 +2,9 @@ package com.capstone.global.security;
 
 
 import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.user.entity.User;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,7 +18,10 @@ import java.util.*;
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+    @Getter
     private final List<Project> projects;
+    @Getter
+    private final List<Task> tasks;
 
     public String getEmail() {
         return user.getEmail();

@@ -3,6 +3,7 @@ package com.capstone.domain.project.controller;
 import com.capstone.docs.ProjectControllerDocs;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
+import com.capstone.domain.project.dto.response.ProjectListResponse;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
 import com.capstone.global.response.ApiResponse;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -51,6 +54,11 @@ public class ProjectController implements ProjectControllerDocs {
     public ResponseEntity<ApiResponse<Project>> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
         log.info("user: {}", userDetails.getEmail());
         return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectContent(projectId, userDetails)));
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<ProjectListResponse>>> loadProjectList(@AuthenticationPrincipal CustomUserDetails userDetails){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectList(userDetails)));
     }
 
 }

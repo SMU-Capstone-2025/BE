@@ -1,5 +1,6 @@
 package com.capstone.domain.project.service;
 
+import com.capstone.domain.project.dto.response.ProjectListResponse;
 import com.capstone.domain.project.exception.InvalidMemberException;
 import com.capstone.domain.project.exception.ProjectInvalidAccessException;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
@@ -8,6 +9,7 @@ import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.exception.ProjectNotFoundException;
 import com.capstone.domain.project.message.ProjectMessages;
 import com.capstone.domain.project.repository.ProjectRepository;
+import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.service.UserService;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
@@ -135,5 +137,11 @@ public class ProjectService {
             throw new GlobalException(ErrorStatus.INVALID_MEMBER);
         }
         return project;
+    }
+
+    public List<ProjectListResponse> getProjectList(CustomUserDetails customUserDetails) {
+        return customUserDetails.getProjects().stream()
+                .map(ProjectListResponse::from)
+                .toList();
     }
 }

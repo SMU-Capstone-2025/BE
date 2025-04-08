@@ -28,7 +28,7 @@ public class User {
     private String social;
     private String password;
     private List<String> projectIds;
-
+    private List<String> taskIds;
     //멤버 멤버쉽
     private MembershipType membership;
 

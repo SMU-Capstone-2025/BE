@@ -1,6 +1,7 @@
 package com.capstone.global.security;
 
 import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,11 @@ public class CustomUserDetailsService implements UserDetailsService{
                 Project.class
         );
 
-        return new CustomUserDetails(user, projects);
+        List<Task> tasks = mongoTemplate.find(
+                new Query(Criteria.where("_id").in(user.getTaskIds())),
+                Task.class
+        );
+
+        return new CustomUserDetails(user, projects, tasks);
     }
 }

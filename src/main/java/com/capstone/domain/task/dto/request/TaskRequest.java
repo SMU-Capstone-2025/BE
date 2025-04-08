@@ -24,12 +24,17 @@ public record TaskRequest(String id,
                        ){
 
     public Task toTask() {
+        List<String> updatedEditors = editors != null ? new ArrayList<>(editors) : new ArrayList<>();
+        if (!updatedEditors.contains(modifiedBy)) {
+            updatedEditors.add(modifiedBy);
+        }
+
         return Task.builder()
                 .title(this.title())
                 .status(Status.IN_PROGRESS)
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
-                .editors(editors)
+                .editors(updatedEditors)
                 .build();
     }
 }

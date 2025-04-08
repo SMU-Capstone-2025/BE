@@ -69,4 +69,5 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository{
         Query query = new Query(Criteria.where("_id").in(ids));
         return mongoTemplate.find(query, Project.class);
     }
+
 }
