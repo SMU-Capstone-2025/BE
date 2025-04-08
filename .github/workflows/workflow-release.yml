@@ -106,7 +106,7 @@ jobs:
             --network bridge \
             -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=prod \
-            -e GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
+            -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
             -e GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
             -e IMP_API_KEY=${IMP_API_KEY} \
             -e IMP_API_SECRET=${IMP_API_SECRET} \
