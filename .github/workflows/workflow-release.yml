@@ -102,9 +102,6 @@ jobs:
             sudo docker pull us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
             
             sudo docker run -d \
-            --name $IMAGE_NAME \
-            --network bridge \
-            sudo docker run -d \
             --name ${IMAGE_NAME} \
             --network bridge \
             -p 8080:8080 \
@@ -121,4 +118,3 @@ jobs:
             -e REDIS_USERNAME=${REDIS_USERNAME} \
             -e REDIS_PASSWORD=${REDIS_PASSWORD} \
             us-central1-docker.pkg.dev/${GCP_PROJECT_ID}/docker/${IMAGE_NAME}:${IMAGE_TAG}
-            us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
