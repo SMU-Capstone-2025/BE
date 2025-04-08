@@ -1,9 +1,9 @@
 package com.capstone.global.config;
-//
-//import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-//import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
-//import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
-//import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
+
+import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.*;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,10 +35,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
-//    private final CustomOAuth2UserService customOAuth2UserService;
-//    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-//    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-//    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
