@@ -4,6 +4,7 @@ import com.capstone.docs.AIControllerDocs;
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.AI.dto.AIReviseRequest;
 import com.capstone.domain.AI.service.AIService;
+import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,27 +20,27 @@ public class AIController implements AIControllerDocs
     private final AIService aiService;
 
     @PostMapping("/correct")
-    public ResponseEntity<Map<String, Object>>ModifyGrammar (@RequestHeader("Authorization") String token, @RequestBody AIRequest aiRequest)
+    public ResponseEntity<ApiResponse<Map<String, Object>>>ModifyGrammar (@RequestHeader("Authorization") String token, @RequestBody AIRequest aiRequest)
     {
         String response= aiService.correctGrammar(aiRequest,token);
-        return ResponseEntity.ok(Map.of("correctedText", response));
+        return ResponseEntity.ok(ApiResponse.onSuccess(Map.of("correctedText", response)));
     }
     @PostMapping("/summarize")
-    public ResponseEntity<Map<String, Object>>ModifyDocument (@RequestHeader("Authorization") String token,@RequestBody AIRequest aiRequest)
+    public ResponseEntity<ApiResponse<Map<String, Object>>>ModifyDocument (@RequestHeader("Authorization") String token,@RequestBody AIRequest aiRequest)
     {
         String response= aiService.sumUpDocument(aiRequest,token);
-        return ResponseEntity.ok(Map.of("summaryText", response));
+        return ResponseEntity.ok(ApiResponse.onSuccess(Map.of("summaryText", response)));
     }
     @GetMapping("/preview")
-    public ResponseEntity<Map<String, Object>> previewSummary(@RequestHeader("Authorization") String token,@RequestParam AIRequest aiRequest)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> previewSummary(@RequestHeader("Authorization") String token,@RequestParam AIRequest aiRequest)
     {
         String response = aiService.sumUpDocument(aiRequest,token);
-        return ResponseEntity.ok(Map.of("preview", response));
+        return ResponseEntity.ok(ApiResponse.onSuccess(Map.of("preview", response)));
     }
     @PostMapping("/revise")
-    public ResponseEntity<Map<String, Object>> reviseSummary(@RequestHeader("Authorization") String token, @RequestBody AIReviseRequest request)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> reviseSummary(@RequestHeader("Authorization") String token, @RequestBody AIReviseRequest request)
     {
         String revisedSummary = aiService.reviseSummary(request,token);
-        return ResponseEntity.ok(Map.of("revisedText", revisedSummary));
+        return ResponseEntity.ok(ApiResponse.onSuccess(Map.of("revisedText", revisedSummary)));
     }
 }

@@ -95,4 +95,12 @@ public class TaskService {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.TASK_NOT_FOUND));
     }
+
+    public List<Task> listByDeadLine(CustomUserDetails customUserDetails)
+    {
+        String email = customUserDetails.getEmail();
+        List<Task>taskList=taskRepository.findByUserEmailAndSortDeadLine(email);
+        return taskList;
+
+    }
 }

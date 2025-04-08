@@ -62,7 +62,7 @@ public class MypageService
     }
 
     @Transactional
-    public void modifyPassword(String accessToken, UserDto.UserPasswordDto userPasswordDto)
+    public String modifyPassword(String accessToken, UserDto.UserPasswordDto userPasswordDto)
     {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
@@ -87,9 +87,10 @@ public class MypageService
         String password=bCryptPasswordEncoder.encode(userPasswordDto.getNewPassword());
         user.setPassword(password);
         userRepository.save(user);
+        return email;
     }
 
-    public void modifyProfile(String accessToken, UserDto.UserProfileDto userProfileDto)
+    public String modifyProfile(String accessToken, UserDto.UserProfileDto userProfileDto)
     {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
@@ -99,10 +100,11 @@ public class MypageService
         }
         user.setProfileImage(userProfileDto.getProfileImage());
         userRepository.save(user);
+        return email;
     }
 
     @Transactional
-    public void modifyEmail(String accessToken, UserDto.UserEmailDto userEmailDto) throws Exception {
+    public String modifyEmail(String accessToken, UserDto.UserEmailDto userEmailDto) throws Exception {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
         if(user==null)
@@ -158,10 +160,10 @@ public class MypageService
             paymentRepository.save(paymentEntity);
         }
 
-
+        return userEmailDto.getNewEmail();
     }
     @Transactional
-    public void removeUser(String accessToken)
+    public String removeUser(String accessToken)
     {
         String email=jwtUtil.getEmail(accessToken);
         User user=userRepository.findUserByEmail(email);
@@ -200,6 +202,7 @@ public class MypageService
             }
         }
         userRepository.delete(user);
+        return email;
     }
 
     public List<Project> getUserProject(User user)

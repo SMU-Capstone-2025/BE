@@ -1,9 +1,9 @@
 package com.capstone.global.config;
-
-import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
-import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
-import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
+//
+//import com.capstone.domain.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+//import com.capstone.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
+//import com.capstone.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+//import com.capstone.domain.oauth2.service.CustomOAuth2UserService;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.*;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,10 +35,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
-    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
-    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+//    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+//    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+//    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
@@ -83,13 +83,13 @@ public class SecurityConfig {
                         .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
                         .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER")
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(configure ->
-                configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
-                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
-                        .failureHandler(oAuth2AuthenticationFailureHandler)
-        );
+                );
+//                .oauth2Login(configure ->
+//                configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+//                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
+//                        .successHandler(oAuth2AuthenticationSuccessHandler)
+//                        .failureHandler(oAuth2AuthenticationFailureHandler)
+//        );
 
         http
                 .addFilterAt(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class)
@@ -99,6 +99,16 @@ public class SecurityConfig {
 
 //        http
 //                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+
+
+
+//        http
+//                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+        // 필터 알맞는 위치 일단 주석으로 추가
+
+
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
