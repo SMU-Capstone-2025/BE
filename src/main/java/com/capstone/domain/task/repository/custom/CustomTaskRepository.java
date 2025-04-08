@@ -11,4 +11,5 @@ public interface CustomTaskRepository {
     Version findByTaskIdAndVersion(String taskId, String version);
     String modifyVersion(TaskRequest taskDto);
     List<Task> findByIds(List<String> taskIds);
+    List<Task> findByUserEmailAndSortDeadLine(String email);
 }
