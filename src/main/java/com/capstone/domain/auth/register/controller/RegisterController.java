@@ -27,7 +27,7 @@ public class RegisterController implements RegisterControllerDocs {
         return ResponseEntity.ok(ApiResponse.onSuccess(registerService.checkEmail(email)));
     }
 
-    @PostMapping("/mail-check")
+    @GetMapping("/mail-check")
     public ResponseEntity<ApiResponse<String>> sendMailConfirm(@RequestParam String email) throws Exception {
         return ResponseEntity.ok(ApiResponse.onSuccess(registerService.validateAndSendMail(email)));
     }

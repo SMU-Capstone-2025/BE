@@ -24,6 +24,7 @@ public class RegisterService {
 
     public boolean checkEmail(String email){
         if (userRepository.findUserByEmail(email) != null){
+            System.out.println(email);
             throw new GlobalException(ErrorStatus.USER_ALREADY_EXISTS);
         }
         return true;
