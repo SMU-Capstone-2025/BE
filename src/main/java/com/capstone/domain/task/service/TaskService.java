@@ -103,4 +103,10 @@ public class TaskService {
         return taskList;
 
     }
+
+    public List<Task> listTask(CustomUserDetails customUserDetails){
+        String email = customUserDetails.getEmail();
+        List<Task>taskList=taskRepository.findByUserEmail(email);
+        return taskList;
+    }
 }

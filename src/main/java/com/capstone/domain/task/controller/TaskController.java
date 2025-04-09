@@ -81,4 +81,10 @@ public class TaskController implements TaskControllerDocs {
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listByDeadLine(userDetails)));
     }
+    @GetMapping("/list/get")
+    public ResponseEntity<ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails)
+    {
+        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(userDetails)));
+    }
+
 }

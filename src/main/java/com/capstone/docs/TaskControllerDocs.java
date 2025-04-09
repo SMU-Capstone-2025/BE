@@ -357,4 +357,49 @@ public interface TaskControllerDocs {
 
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getDeadlineList(@AuthenticationPrincipal CustomUserDetails userDetails);
+
+
+
+
+
+    @Operation(description = "사용자 별 작업 리스트 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "인증 실패 응답",
+                                    summary = "유효하지 않은 토큰 또는 로그인 필요",
+                                    value = """
+                        {
+                          "success": false,
+                          "code": "COMMON_401",
+                          "message": "인증이 필요합니다."
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "서버 에러 응답",
+                                    summary = "예상치 못한 서버 에러",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_500",
+                  "message": "서버 에러, 관리자에게 문의 바랍니다."
+                }
+                """
+                            )
+                    )
+            )
+
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails);
 }

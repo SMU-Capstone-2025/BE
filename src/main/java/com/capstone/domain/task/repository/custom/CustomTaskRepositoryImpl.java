@@ -72,4 +72,11 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         return mongoTemplate.find(query, Task.class);
     }
 
+    @Override
+    public List<Task> findByUserEmail(String email) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("editors").in(email));
+        return mongoTemplate.find(query, Task.class);
+    }
+
 }
