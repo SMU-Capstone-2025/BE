@@ -91,20 +91,20 @@ jobs:
             sudo docker rm $IMAGE_NAME || true
             echo "${{ secrets.GCP_SA_KEY }}" | sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
             sudo docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
-          
+            
             cat <<EOF > .env.production
-            GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-            GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-            IMP_API_KEY=${IMP_API_KEY}
-            IMP_API_SECRET=${IMP_API_SECRET}
-            KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
-            KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
-            MAIL_PASSWORD=${MAIL_PASSWORD}
-            NAVER_CLIENT_ID=${NAVER_CLIENT_ID}
-            NAVER_CLIENT_SECRET=${NAVER_CLIENT_SECRET}
-            OPENAI_API_KEY=${OPENAI_API_KEY}
-            REDIS_USERNAME=${REDIS_USERNAME}
-            REDIS_PASSWORD=${REDIS_PASSWORD}
+            GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID"
+            GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET"
+            IMP_API_KEY="$IMP_API_KEY"
+            IMP_API_SECRET="$IMP_API_SECRET"
+            KAKAO_CLIENT_ID="$KAKAO_CLIENT_ID"
+            KAKAO_CLIENT_SECRET="$KAKAO_CLIENT_SECRET"
+            MAIL_PASSWORD="$MAIL_PASSWORD"
+            NAVER_CLIENT_ID="$NAVER_CLIENT_ID"
+            NAVER_CLIENT_SECRET="$NAVER_CLIENT_SECRET"
+            OPENAI_API_KEY="$OPENAI_API_KEY"
+            REDIS_USERNAME="$REDIS_USERNAME"
+            REDIS_PASSWORD="$REDIS_PASSWORD"
             SPRING_PROFILES_ACTIVE=prod
             EOF
           
