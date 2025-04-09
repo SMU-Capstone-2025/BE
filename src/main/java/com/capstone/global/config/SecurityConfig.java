@@ -83,29 +83,30 @@ public class SecurityConfig {
                         .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
                         .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER")
                         .anyRequest().authenticated()
-                );
-//                .oauth2Login(configure ->
-//                configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
-//                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
-//                        .successHandler(oAuth2AuthenticationSuccessHandler)
-//                        .failureHandler(oAuth2AuthenticationFailureHandler)
-//        );
+                )
+                .oauth2Login(configure ->
+                configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                        .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(oAuth2AuthenticationFailureHandler)
+        );
+
+//        http
+//                .addFilterAt(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class)
+//                .addFilterBefore(
+//                new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
+//                UsernamePasswordAuthenticationFilter.class);
+
+//        http
+//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+
+
+
 
         http
-                .addFilterAt(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class)
-                .addFilterBefore(
-                new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
-                UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class);
 
-//        http
-//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
-
-
-
-//        http
-//                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
         // 필터 알맞는 위치 일단 주석으로 추가
 
 

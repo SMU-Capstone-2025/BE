@@ -37,11 +37,11 @@ public class CustomUserDetailsService implements UserDetailsService{
                 Project.class
         );
 
-        List<Task> tasks = mongoTemplate.find(
-                new Query(Criteria.where("_id").in(user.getTaskIds())),
-                Task.class
-        );
+//        List<Task> tasks = mongoTemplate.find(
+//                new Query(Criteria.where("_id").in(user.getTaskIds())),
+//                Task.class
+//        );
 
-        return new CustomUserDetails(user, projects, tasks);
+        return new CustomUserDetails(user, projects);
     }
 }

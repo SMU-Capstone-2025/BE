@@ -20,8 +20,8 @@ public class CustomUserDetails implements UserDetails {
     private final User user;
     @Getter
     private final List<Project> projects;
-    @Getter
-    private final List<Task> tasks;
+//    @Getter
+//    private final List<Task> tasks;
 
     public String getEmail() {
         return user.getEmail();
