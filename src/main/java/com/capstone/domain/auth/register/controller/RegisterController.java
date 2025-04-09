@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/register")
 public class RegisterController implements RegisterControllerDocs {
     private final RegisterService registerService;
-    private final MailService mailService;
 
     @PostMapping("/new")
     public ResponseEntity<ApiResponse<User>> registerUser(@RequestBody RegisterRequest registerRequest){
@@ -30,7 +29,7 @@ public class RegisterController implements RegisterControllerDocs {
 
     @PostMapping("/mail-check")
     public ResponseEntity<ApiResponse<String>> sendMailConfirm(@RequestParam String email) throws Exception {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessage(email)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(registerService.validateAndSendMail(email)));
     }
 
 }

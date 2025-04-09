@@ -33,14 +33,16 @@ public class DocumentService {
         return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
     }
-//
-//    public Document deleteDocument(String documentId){
-//        Document document =
-//    }
 
     public void updateDocumentToCache(String key, String changes){
         Document updatedDocument = new Document(key, changes);
         redisTemplate.opsForValue().set("DOC:waited:" + key, updatedDocument, 1, TimeUnit.HOURS);
+    }
+
+    public Document deleteDocumentFromCacheAndDB(String key){
+        Document document = documentRepository.findDocumentByDocumentId(key);
+        redisTemplate.delete(key);
+        return document;
     }
 
 

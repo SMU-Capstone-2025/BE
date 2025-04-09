@@ -29,7 +29,7 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = request.getHeader("Authorization");
-        String token =accessToken;
+        String token = accessToken;
 
 
         if (accessToken == null) {
@@ -41,6 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
             token = token.substring(7);
         }
 
+        log.info("token: {}", token);
+        log.info("access: {}", accessToken);
 
 
         try {

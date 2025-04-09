@@ -22,7 +22,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/task")
 @RequiredArgsConstructor
-@CrossOrigin("*")
 @PreAuthorize("hasAnyRole('MEMBER', 'MANAGER')")
 public class TaskController implements TaskControllerDocs {
 
