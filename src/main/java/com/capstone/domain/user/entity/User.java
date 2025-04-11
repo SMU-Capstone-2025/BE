@@ -2,6 +2,7 @@ package com.capstone.domain.user.entity;
 
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.mypage.dto.UserDto;
+import com.capstone.global.entity.BaseDocument;
 import lombok.*;
 import org.apache.lucene.spatial3d.geom.Membership;
 import org.springframework.data.annotation.Id;
@@ -12,13 +13,12 @@ import java.util.List;
 
 
 @Document(collection = "user")
-
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User extends BaseDocument {
     @Id
     private String id;
     private String name;
