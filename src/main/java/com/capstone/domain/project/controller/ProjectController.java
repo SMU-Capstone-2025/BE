@@ -3,9 +3,12 @@ package com.capstone.domain.project.controller;
 import com.capstone.docs.ProjectControllerDocs;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
-import com.capstone.domain.project.dto.response.ProjectListResponse;
+import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
+import com.capstone.domain.project.dto.response.ProjectResponse;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
+
+import com.capstone.domain.user.service.ProjectUserService;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -24,40 +27,42 @@ import java.util.List;
 @RequestMapping("/project")
 public class ProjectController implements ProjectControllerDocs {
     private final ProjectService projectService;
+    private final ProjectUserService projectUserService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Project>> registerProject(@Valid @RequestBody ProjectSaveRequest projectSaveRequest){
         return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processRegister(projectSaveRequest)));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Project>> updateProject(@Valid @RequestBody ProjectSaveRequest projectSaveRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectSaveRequest)));
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectUpdateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<Project>> updateProject(@Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest)));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/auth")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Project>> updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
         projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processAuth(projectAuthorityRequest)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(projectAuthorityRequest)));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/invite")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Project>> inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
         projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processInvite(projectAuthorityRequest)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processInvite(projectAuthorityRequest)));
     }
 
     @GetMapping("/load")
-    public ResponseEntity<ApiResponse<Project>> loadProject(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam String projectId){
-        log.info("user: {}", userDetails.getEmail());
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectContent(projectId, userDetails)));
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<ProjectResponse>> loadProject(@RequestParam String projectId){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectContent(projectId)));
     }
 
     @GetMapping("/list")
-    public ResponseEntity<ApiResponse<List<ProjectListResponse>>> loadProjectList(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<ApiResponse<List<ProjectResponse>>> loadProjectList(@AuthenticationPrincipal CustomUserDetails userDetails){
         return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectList(userDetails)));
     }
 
