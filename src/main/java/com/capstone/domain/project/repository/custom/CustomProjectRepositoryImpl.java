@@ -26,45 +26,6 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository{
     }
 
     @Override
-    public List<String> getAuthorityKeysByProjectId(String projectId) {
-        Query query = new Query(Criteria.where("_id").is(projectId));
-        query.fields().include("authorities");
-        Project project = mongoTemplate.findOne(query, Project.class);
-
-        if (project == null || project.getAuthorities() == null) {
-            throw new IllegalArgumentException("Project not found or authorities field is missing: " + projectId);
-        }
-
-        Map<String, String> authorities = project.getAuthorities();
-        return new ArrayList<>(authorities.keySet());
-    }
-
-    @Transactional
-    public void updateAuthority(ProjectAuthorityRequest projectAuthorityRequest) {
-        Query query = new Query(Criteria.where("_id").is(projectAuthorityRequest.projectId()));
-
-        Project project = mongoTemplate.findOne(query, Project.class);
-
-        if (project == null) {
-            return;
-        }
-
-        Map<String, String> existingAuthorities = project.getAuthorities();
-
-        Update update = new Update();
-        projectAuthorityRequest.authorities().forEach((email, role) -> {
-            if (existingAuthorities.containsKey(email)) {
-                String field = "authorities." + email.replace(".", "_");
-                update.set(field, role);
-            }
-        });
-
-        if (!update.getUpdateObject().isEmpty()) {
-            mongoTemplate.updateFirst(query, update, Project.class);
-        }
-    }
-
-    @Override
     public List<Project> findAllById(List<String> ids) {
         Query query = new Query(Criteria.where("_id").in(ids));
         return mongoTemplate.find(query, Project.class);

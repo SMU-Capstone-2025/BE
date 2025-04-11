@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface CustomProjectRepository {
     Project findByProjectName(String projectName);
-    List<String> getAuthorityKeysByProjectId(String projectId);
-    void updateAuthority(ProjectAuthorityRequest projectAuthorityRequest);
     List<Project> findAllById(List<String> ids);
 }
