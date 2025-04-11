@@ -121,7 +121,7 @@ jobs:
             --network bridge \
             -e ALLOW_ANONYMOUS_LOGIN=yes \
             bitnami/zookeeper:latest
-        
+            
             
             sudo docker run -d \
             --name kafka \
@@ -131,6 +131,7 @@ jobs:
             -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
             -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 \
             -e ALLOW_PLAINTEXT_LISTENER=yes \
+            -e KAFKA_CFG_ENABLE_KRAFT=no \
             bitnami/kafka:latest
             
             sudo docker run -d \
