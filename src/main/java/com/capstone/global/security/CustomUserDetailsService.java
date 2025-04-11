@@ -32,16 +32,6 @@ public class CustomUserDetailsService implements UserDetailsService{
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
 
-        List<Project> projects = mongoTemplate.find(
-                new Query(Criteria.where("_id").in(user.getProjectIds())),
-                Project.class
-        );
-
-//        List<Task> tasks = mongoTemplate.find(
-//                new Query(Criteria.where("_id").in(user.getTaskIds())),
-//                Task.class
-//        );
-
-        return new CustomUserDetails(user, projects);
+        return new CustomUserDetails(user);
     }
 }
