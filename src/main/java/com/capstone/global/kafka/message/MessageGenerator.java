@@ -17,8 +17,7 @@ public class MessageGenerator {
 
     public static final String PROJECT_UPDATED =
             "프로젝트에 변동사항이 있습니다! <br>"
-                + "- 프로젝트 이름: {title}<br>"
-                + "- 프로젝트 설명: {description}";
+                + "- 프로젝트 이름: {projectName}<br>";
     public static final String PROJECT_CREATED =
             "새 프로젝트가 생성되었습니다! 버튼을 눌러 참여하세요!<br>"
                     + "- 프로젝트 이름: {projectName}<br>";
