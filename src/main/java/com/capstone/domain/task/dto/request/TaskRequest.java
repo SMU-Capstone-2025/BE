@@ -11,18 +11,18 @@ import java.util.List;
 
 public record TaskRequest(String id,
                           @NotNull
+                          String projectId,
+                          @NotNull
                           String title,
                           @NotNull
                           String modifiedBy,
                           @NotNull
                           String version,
                           @NotNull
-                          String summary,
-                          @NotNull
                           String content,
                           @Nullable
                           List<String> editors,
-                          @NotNull
+                          @Nullable
                           LocalDate deadline
                     ){
 
@@ -33,6 +33,7 @@ public record TaskRequest(String id,
         }
         return Task.builder()
                 .title(this.title())
+                .projectId(this.projectId)
                 .status(Status.IN_PROGRESS)
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
