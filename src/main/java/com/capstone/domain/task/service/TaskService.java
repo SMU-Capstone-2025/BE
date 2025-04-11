@@ -59,7 +59,7 @@ public class TaskService {
         log.info("userDetails: {}", userDetails.getEmail());
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
-        kafkaProducerService.sendTaskEvent("task.changed", "DELETE", task, userDetails.getEmail());
+        kafkaProducerService.sendTaskEvent("task.changed", "DELETE", TaskResponse.from(task), userDetails.getEmail());
         return task;
     }
 
@@ -68,7 +68,7 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(id);
         task.updateStatus(status);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", task, userDetails.getEmail());
+        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", TaskResponse.from(task), userDetails.getEmail());
 
         return task;
     }
