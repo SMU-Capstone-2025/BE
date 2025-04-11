@@ -1,5 +1,6 @@
 package com.capstone.domain.document.service;
 
+import com.capstone.domain.document.dto.DocumentCreateRequest;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.repository.DocumentRepository;
 import com.capstone.global.response.exception.GlobalException;
@@ -43,6 +44,10 @@ public class DocumentService {
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
         return document;
+    }
+
+    public Document createDocument(DocumentCreateRequest documentCreateRequest){
+        return documentRepository.save(documentCreateRequest.to());
     }
 
 
