@@ -1,6 +1,7 @@
 package com.capstone.domain.notification.entity;
 
 
+import com.capstone.global.entity.BaseDocument;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,7 +17,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notification {
+public class Notification extends BaseDocument {
     @Id
     private String id;
     private String content;
