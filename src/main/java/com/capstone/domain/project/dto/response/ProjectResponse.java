@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 @Builder
-public record ProjectListResponse(
+public record ProjectResponse(
         String name,
         String description,
-        Map<String,String> coworkers
+        List<String> coworkers
 ) {
-    public static ProjectListResponse from(Project project){
-        return ProjectListResponse.builder()
+    public static ProjectResponse from(Project project, List<String> emails){
+        return ProjectResponse.builder()
                 .name(project.getProjectName())
                 .description(project.getDescription())
-                .coworkers(project.getAuthorities())
+                .coworkers(emails)
                 .build();
     }
 }
