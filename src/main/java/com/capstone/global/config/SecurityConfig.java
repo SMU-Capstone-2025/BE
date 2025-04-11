@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,6 +36,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Slf4j
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -79,9 +82,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/register", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**").permitAll()
-                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
-//                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER")
+                                "/v3/api-docs/**","/csrf-token", "/project/**", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**").permitAll()
+                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER", "VIEWER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(configure ->
@@ -121,7 +123,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.addExposedHeader("access");
