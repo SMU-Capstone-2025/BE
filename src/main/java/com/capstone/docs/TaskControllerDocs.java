@@ -316,6 +316,46 @@ public interface TaskControllerDocs {
     ResponseEntity<com.capstone.global.response.ApiResponse<TaskResponse>> getVersionRollback(@RequestParam String taskId, @RequestParam String version);
 
 
+    @Operation(description = "로그 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "로그 반환 성공"),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "인증 실패 응답",
+                                    summary = "유효하지 않은 토큰 또는 로그인 필요",
+                                    value = """
+                        {
+                          "success": false,
+                          "code": "COMMON_401",
+                          "message": "인증이 필요합니다."
+                        }
+                        """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "서버 에러 응답",
+                                    summary = "예상치 못한 서버 에러",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_500",
+                  "message": "서버 에러, 관리자에게 문의 바랍니다."
+                }
+                """
+                            )
+                    )
+            )
+
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<LogEntity>>> getLogList(@RequestParam String taskId);
 
     @Operation(description = "작업을 deadline을 기준으로 정렬")
     @ApiResponses(value = {
