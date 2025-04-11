@@ -46,7 +46,6 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         Update update = new Update();
         update.set("versionHistory.$.modifiedBy", taskDto.modifiedBy());
         update.set("versionHistory.$.content", taskDto.content());
-        update.set("versionHistory.$.summary", taskDto.summary());
         update.set("versionHistory.$.modifiedDateTime", DateUtil.getCurrentFormattedDateTime());
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, Task.class);
