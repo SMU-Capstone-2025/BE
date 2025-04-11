@@ -21,7 +21,7 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-server: kafka:9092
+    bootstrap-server: "localhost:9092"
 
   security:
     oauth2:
