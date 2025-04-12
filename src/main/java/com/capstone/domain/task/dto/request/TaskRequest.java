@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public record TaskRequest(String id,
+public record TaskRequest(String taskId,
                           @NotNull
                           String projectId,
                           @NotNull

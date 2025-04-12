@@ -46,7 +46,7 @@ public class TaskService {
     @Transactional
     public Version saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
-        Task task = findTaskByIdOrThrow(taskDto.id());
+        Task task = findTaskByIdOrThrow(taskDto.taskId());
         task.addNewVersion(version);
         taskRepository.save(task);
 
