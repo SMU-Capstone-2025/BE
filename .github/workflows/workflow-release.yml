@@ -134,12 +134,11 @@ jobs:
             sudo docker run -d \
             --name kafka \
             --network app-network \
+            -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
+            -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092 \
+            -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
             -e KAFKA_BROKER_ID=1 \
-            -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
-            -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
-            -e KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 \
             -e ALLOW_PLAINTEXT_LISTENER=yes \
-            -e KAFKA_CFG_ENABLE_KRAFT=no \
             bitnami/kafka:latest
             
             sudo docker run -d \
