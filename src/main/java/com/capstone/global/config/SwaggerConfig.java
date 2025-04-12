@@ -40,6 +40,7 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("Doctalk API 명세서")
+                .description("최근 업데이트 : 2025.04.13 02:10")
                 .version("1.0.0");
     }
 
