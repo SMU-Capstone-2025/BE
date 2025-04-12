@@ -4,6 +4,7 @@ import com.capstone.docs.PaymentControllerDocs;
 import com.capstone.domain.payment.dto.PaymentRequestDto;
 import com.capstone.domain.payment.exception.InvaildPaymentException;
 import com.capstone.domain.payment.service.PaymentService;
+import com.capstone.global.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -46,7 +47,7 @@ public class PaymentController implements PaymentControllerDocs
 
 
     @PostMapping("/verify")
-    public ResponseEntity<?> validateIamport(@RequestHeader("Authorization") String token, @RequestBody PaymentRequestDto request) {
+    public ResponseEntity<ApiResponse<?>> validateIamport(@RequestHeader("Authorization") String token, @RequestBody PaymentRequestDto request) {
         try {
             IamportResponse<Payment> payment = iamportClient.paymentByImpUid(request.getImpUid());
 
@@ -60,14 +61,16 @@ public class PaymentController implements PaymentControllerDocs
 
             paymentService.processPayment(token,request.getImpUid());
 
-            return ResponseEntity.ok(payment);
+            return ResponseEntity.ok(ApiResponse.onSuccess(payment));
 
         } catch (IamportResponseException e) {
             log.error("아임포트 결제 검증 실패: {}", e.getMessage());
-            throw new InvaildPaymentException(IAMPORT_FAILDED + e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.onFailure("PAYMENT_FAILED", "아임포트 결제 검증 실패: " + e.getMessage(), null));
         } catch (IOException e) {
             log.error("JSON 변환 오류: {}", e.getMessage());
-            return ResponseEntity.internalServerError().body("서버 오류 발생: " + e.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body(ApiResponse.onFailure("INTERNAL_SERVER_ERROR", "서버 오류 발생: " + e.getMessage(),null));
         }
     }
 }

@@ -21,11 +21,10 @@ public record ProjectSaveRequest(
         @Nullable
         List<String> invitedEmails
 ){
-    public Project toProject(Map<String, String> defaultAuthorities){
+    public Project toProject(){
         return Project.builder()
                 .projectName(this.projectName())
                 .description(this.description())
-                .authorities(defaultAuthorities)
                 .taskIds(new ArrayList<>())
                 .documentIds(new ArrayList<>())
                 .build();

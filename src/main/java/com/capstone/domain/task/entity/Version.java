@@ -1,5 +1,6 @@
 package com.capstone.domain.task.entity;
 
+import com.capstone.global.entity.BaseDocument;
 import lombok.*;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Version {
+public class Version extends BaseDocument{
     private String taskId;
     private String version;
     private String modifiedDateTime;

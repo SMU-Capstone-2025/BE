@@ -3,7 +3,9 @@ package com.capstone.domain.auth.register.controller;
 import com.capstone.docs.RegisterControllerDocs;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.auth.register.service.RegisterService;
+import com.capstone.domain.user.entity.User;
 import com.capstone.global.mail.service.MailService;
+import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,24 +15,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/register")
 public class RegisterController implements RegisterControllerDocs {
     private final RegisterService registerService;
-    private final MailService mailService;
 
-
-    // TODO: 이 경로로 외부 요청을 보냈을 때 필터링 할 방법이 없어보임. 추가 필요.
     @PostMapping("/new")
-    public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest){
-        return ResponseEntity.ok(registerService.registerUser(registerRequest));
+    public ResponseEntity<ApiResponse<User>> registerUser(@RequestBody RegisterRequest registerRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(registerService.registerUser(registerRequest)));
     }
 
     //true -> 사용 가능, false -> 사용 불가.
     @GetMapping("/avail-check")
-    public ResponseEntity<Boolean> checkEmailAvailable(@RequestParam String email){
-        return ResponseEntity.ok(registerService.checkEmail(email));
+    public ResponseEntity<ApiResponse<Boolean>> checkEmailAvailable(@RequestParam String email){
+        return ResponseEntity.ok(ApiResponse.onSuccess(registerService.checkEmail(email)));
     }
 
-    @PostMapping("/mail-check")
-    public ResponseEntity<String> sendMailConfirm(@RequestParam String email) throws Exception {
-        return ResponseEntity.ok(mailService.sendSimpleMessage(email));
+    @GetMapping("/mail-check")
+    public ResponseEntity<ApiResponse<String>> sendMailConfirm(@RequestParam String email) throws Exception {
+        return ResponseEntity.ok(ApiResponse.onSuccess(registerService.validateAndSendMail(email)));
     }
 
 }

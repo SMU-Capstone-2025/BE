@@ -2,8 +2,11 @@ package com.capstone.global.security;
 
 
 import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.user.entity.User;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -13,10 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.*;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
-    private final List<Project> projects; // ✅ 프로젝트 목록을 생성자로 받음
 
     public String getEmail() {
         return user.getEmail();
@@ -26,21 +29,11 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        if (projects.isEmpty()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_VIEWER"));
-            return authorities;
-        }
-
-        for (Project project : projects) {
-            Map<String, String> projectAuthorities = project.getAuthorities();
-            if (projectAuthorities != null && projectAuthorities.containsKey(user.getEmail())) {
-                authorities.add(new SimpleGrantedAuthority(projectAuthorities.get(user.getEmail())));
-            }
-        }
 
         if (authorities.isEmpty()) {
             authorities.add(new SimpleGrantedAuthority("ROLE_VIEWER"));
         }
+
 
         return authorities;
     }

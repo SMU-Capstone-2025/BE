@@ -25,7 +25,6 @@ public class TaskUtil {
                     .version(taskDto.version())
                     .modifiedDateTime(DateUtil.getCurrentFormattedDateTime())
                     .modifiedBy(taskDto.modifiedBy())
-                    .summary(taskDto.summary())
                     .content(taskDto.content())
                     .attachmentList(attachmentList)
                     .build();

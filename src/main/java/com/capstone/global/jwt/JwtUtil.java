@@ -7,8 +7,10 @@ import com.capstone.domain.auth.token.message.TokenMessages;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class JwtUtil {
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000; // 30분
@@ -60,6 +63,7 @@ public class JwtUtil {
 
     public Boolean isExpired(String token) {
         try {
+
             Claims claims = extractClaims(token);
             Date expiration = claims.getExpiration();
 
@@ -68,13 +72,15 @@ public class JwtUtil {
             }
 
             return expiration.before(new Date());
+
+        } catch (ExpiredJwtException e) {
+            return true;
         } catch (Exception e) {
             throw new InvalidTokenException(TokenMessages.INVALID_TOKEN);
         }
     }
 
     public String createAccess(String email) {
-        System.out.println(email);
         return Jwts.builder()
                 .claim("category", "access")
                 .claim("email", email)

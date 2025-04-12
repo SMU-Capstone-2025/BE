@@ -1,6 +1,7 @@
 package com.capstone.global.security;
 
 import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,15 +27,11 @@ public class CustomUserDetailsService implements UserDetailsService{
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = userRepository.findUserByEmail(email);
+
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + email);
         }
 
-        List<Project> projects = mongoTemplate.find(
-                new Query(Criteria.where("_id").in(user.getProjectIds())),
-                Project.class
-        );
-
-        return new CustomUserDetails(user, projects);
+        return new CustomUserDetails(user);
     }
 }

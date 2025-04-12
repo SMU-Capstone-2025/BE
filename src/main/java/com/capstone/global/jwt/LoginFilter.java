@@ -47,6 +47,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             LoginRequest loginRequest = new ObjectMapper().readValue(messageBody, LoginRequest.class);
 
             User user = userRepository.findUserByEmail(loginRequest.getEmail());
+            log.info("");
 
             if (user.getSocial() != null){
                 throw new RuntimeException(user.getSocial() + "계정으로 가입된 회원입니다.");

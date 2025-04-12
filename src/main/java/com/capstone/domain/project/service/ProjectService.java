@@ -1,24 +1,29 @@
 package com.capstone.domain.project.service;
 
-import com.capstone.domain.project.exception.InvalidMemberException;
-import com.capstone.domain.project.exception.ProjectInvalidAccessException;
+import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
+import com.capstone.domain.project.dto.response.ProjectResponse;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
-import com.capstone.domain.project.exception.ProjectNotFoundException;
-import com.capstone.domain.project.message.ProjectMessages;
 import com.capstone.domain.project.repository.ProjectRepository;
+
+import com.capstone.domain.user.entity.ProjectUser;
+import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.service.UserService;
-import com.capstone.global.jwt.JwtUtil;
+
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -27,105 +32,83 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final UserService userService;
     private final KafkaProducerService kafkaProducerService;
+    private final ProjectUserRepository projectUserRepository;
+
 
     @Transactional
     public Project saveProject(ProjectSaveRequest projectSaveRequest){
-        return projectRepository.save(projectSaveRequest.toProject(createDefaultAuthorities(Objects.requireNonNull(projectSaveRequest.invitedEmails()))));
+        Project project = projectRepository.save(projectSaveRequest.toProject());
+        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
+            List<ProjectUser> projectUsers = projectSaveRequest.invitedEmails().stream()
+                    .map(email -> ProjectUser.builder()
+                            .projectId(project.getId())
+                            .userId(email) // userId 또는 email로 처리, 시스템 구조에 따라
+                            .role("ROLE_MEMBER") // 기본 권한 설정
+                            .status("INVITED")
+                            .joinedAt(LocalDate.now().toString())
+                            .build()
+                    ).toList();
+
+            projectUserRepository.saveAll(projectUsers);
+        }
+        return project;
     }
 
 
-    @Transactional
-    public void updateProject(ProjectSaveRequest projectSaveRequest){
-        Project project = findProjectByProjectIdOrThrow(projectSaveRequest.projectId());
-        project.updateProjectInfo(projectSaveRequest);
-        projectRepository.save(project);
+
+
+    public ProjectResponse getProjectContent(String projectId){
+        return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId), projectUserRepository.findUserIdByProjectId(projectId));
     }
 
-    public Project getProjectContent(String projectId, CustomUserDetails customUserDetails){
-        return checkUserInProject(projectId, customUserDetails);
-    }
-
-    public void sendInvitation(ProjectAuthorityRequest projectAuthorityRequest){
-        Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
-        userService.participateProcess(projectAuthorityRequest.getAuthorityKeysAsList(), projectAuthorityRequest.projectId());
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "INVITE",
-                projectAuthorityRequest.authorities(),
-                projectAuthorityRequest.getAuthorityKeysAsList()
-        );
-    }
-
-
-    public Map<String, String> createDefaultAuthorities(List<String> invitaionList){
-        return invitaionList.stream()
-                .collect(Collectors.toMap(email -> email, email-> "ROLE_USER"));
-    }
-
-    public void processRegister(ProjectSaveRequest projectSaveRequest){
+    public Project processRegister(ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
         kafkaProducerService.sendProjectChangedEvent(
                 "project.changed",
                 "CREATE",
-                null,
+                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
                 projectSaveRequest.invitedEmails()
         );
+        return project;
     }
+
+
 
     @Transactional
-    public void processAuth(ProjectAuthorityRequest projectAuthorityRequest){
-        Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
-        projectRepository.updateAuthority(projectAuthorityRequest);
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "AUTH",
-                project,
-                projectAuthorityRequest.getAuthorityKeysAsList()
-        );
-    }
-
-    public void processUpdate(ProjectSaveRequest projectSaveRequest){
-        updateProject(projectSaveRequest);
+    public Project processUpdate(ProjectUpdateRequest projectUpdateRequest){
+        Project project = findProjectByProjectIdOrThrow(projectUpdateRequest.projectId());
+        project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
         kafkaProducerService.sendProjectChangedEvent(
                 "project.changed",
                 "UPDATE",
-                null,
-                projectSaveRequest.invitedEmails()
+                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
+                projectUserRepository.findUserIdByProjectId(project.getId())
         );
-    }
-
-    public void processInvite(ProjectAuthorityRequest projectAuthorityRequest) {
-        Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
-        Map<String, String> existingAuthorities = project.getAuthorities();
-        Map<String, String> newInvites = projectAuthorityRequest.authorities().entrySet().stream()
-                .filter(entry -> !existingAuthorities.containsKey(entry.getKey())) // 기존 참여자가 아닌 사람만 남김
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (!newInvites.isEmpty()) {
-            project.addAuthorities(newInvites);
-            projectRepository.save(project);
-            sendInvitation(new ProjectAuthorityRequest(projectAuthorityRequest.projectId(), newInvites));
-        }
-
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "INVITE",
-                project,
-                projectAuthorityRequest.getAuthorityKeysAsList()
-        );
+        projectRepository.save(project);
+        return project;
     }
 
     public Project findProjectByProjectIdOrThrow(String projectId){
         return projectRepository.findById(projectId)
-                .orElseThrow(ProjectNotFoundException::new);
+                .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
     }
 
-    public Project checkUserInProject(String projectId, CustomUserDetails customUserDetails){
-        Project project = findProjectByProjectIdOrThrow(projectId);
-        if (!project.getAuthorities().containsKey(customUserDetails.getEmail())){
-            throw new ProjectInvalidAccessException();
-        }
-        return project;
+
+    public List<ProjectResponse> getProjectList(CustomUserDetails customUserDetails) {
+        List<String> projectIds = parseProjectIds(projectUserRepository.findByUserId(customUserDetails.getEmail()));
+        List<Project> projects = projectRepository.findAllById(projectIds);
+
+        return projects.stream()
+                .map(project -> {
+                    List<String> coworkers = projectUserRepository.findUserIdByProjectId(project.getId());
+                    return ProjectResponse.from(project, coworkers);
+                })
+                .toList();
+    }
+    public List<String> parseProjectIds(List<ProjectUser> projectUsers){
+        return projectUsers.stream()
+                .map(ProjectUser::getProjectId)
+                .toList();
     }
 }

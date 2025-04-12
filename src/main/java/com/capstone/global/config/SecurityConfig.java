@@ -11,9 +11,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -34,6 +36,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 @Slf4j
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
@@ -60,9 +63,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf
-                .ignoringRequestMatchers("/login", "/csrf-token", "/register/*", "/token/*", "/project/*", "/document/**", "/task/**", "/notification/**")
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        http.csrf(csrf -> csrf.disable()
         ); // csrf 공격 방지
 
         //WebMvcConfig 설정에 따름
@@ -81,9 +82,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/register", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**").permitAll()
-                        .requestMatchers("/project/update", "/project/auth", "/project/invite").hasRole("MANAGER")
-                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER")
+                                "/v3/api-docs/**","/csrf-token", "/project/**", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**").permitAll()
+                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER", "VIEWER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(configure ->
@@ -93,14 +93,25 @@ public class SecurityConfig {
                         .failureHandler(oAuth2AuthenticationFailureHandler)
         );
 
+//        http
+//                .addFilterAt(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class)
+//                .addFilterBefore(
+//                new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
+//                UsernamePasswordAuthenticationFilter.class);
+
+//        http
+//                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+
+
+
+
         http
-                .addFilterAt(
-                        new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository),
-                        UsernamePasswordAuthenticationFilter.class
-                )
-                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), LoginFilter.class);
-        http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class);
+
+        // 필터 알맞는 위치 일단 주석으로 추가
+
+
         //세션 관리 상태 없음 으로 설정, 서버가 클라이언트의 세션 상태를 유지하지 않음
         http.sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -112,9 +123,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:63342"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
+        configuration.addExposedHeader("access");
         configuration.setAllowCredentials(true); // 쿠키 허용
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

@@ -3,6 +3,8 @@ package com.capstone.domain.file.service;
 import com.capstone.domain.file.common.FileMessages;
 import com.capstone.domain.file.common.FileTypes;
 import com.capstone.domain.file.exception.InvalidFileException;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 import lombok.RequiredArgsConstructor;
@@ -30,11 +32,11 @@ public class FileService {
     public String upload(MultipartFile file) throws IOException {
         ObjectId objectId;
         if(!FileTypes.SUPPORTED_TYPES(file.getContentType())){
-            throw new InvalidFileException(FileMessages.FILE_NOT_SUPPORTED);
+            throw new GlobalException(ErrorStatus.FILE_NOT_SUPPORTED);
         }
 
         if(file.isEmpty()){
-            throw new InvalidFileException(FileMessages.FILE_EMPTY);
+            throw new GlobalException(ErrorStatus.FILE_EMPTY);
         }
 
         objectId = gridFsTemplate.store(
@@ -55,7 +57,7 @@ public class FileService {
         GridFsResource resource = gridFsTemplate.getResource(file);
 
         if (!resource.exists()){
-            throw new InvalidFileException(FileMessages.FILE_NOT_FOUND);
+            throw new GlobalException(ErrorStatus.FILE_NOT_FOUND);
         }
 
         String contentType = file.getMetadata() != null && file.getMetadata().containsKey("_contentType")
@@ -75,7 +77,11 @@ public class FileService {
                 .body(resource);
     }
 
-    public void delete(String fileId) {
+    public String delete(String fileId) {
+        GridFSFile file = gridFsTemplate.findOne(
+                new Query(Criteria.where("_id").is(fileId))
+        );
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
+        return file.getFilename();
     }
 }

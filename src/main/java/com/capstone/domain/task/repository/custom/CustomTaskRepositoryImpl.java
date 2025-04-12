@@ -8,6 +8,7 @@ import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.global.util.DateUtil;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -45,7 +46,6 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         Update update = new Update();
         update.set("versionHistory.$.modifiedBy", taskDto.modifiedBy());
         update.set("versionHistory.$.content", taskDto.content());
-        update.set("versionHistory.$.summary", taskDto.summary());
         update.set("versionHistory.$.modifiedDateTime", DateUtil.getCurrentFormattedDateTime());
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, Task.class);
@@ -62,4 +62,20 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         query.addCriteria(Criteria.where("_id").in(taskIds));
         return mongoTemplate.find(query, Task.class);
     }
+
+    @Override
+    public List<Task> findByUserEmailAndSortDeadLine(String email) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("editors").in(email));
+        query.with(Sort.by(Sort.Direction.ASC,"deadline"));
+        return mongoTemplate.find(query, Task.class);
+    }
+
+    @Override
+    public List<Task> findByUserEmail(String email) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("editors").in(email));
+        return mongoTemplate.find(query, Task.class);
+    }
+
 }

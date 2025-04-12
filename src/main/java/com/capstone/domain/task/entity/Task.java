@@ -1,5 +1,6 @@
 package com.capstone.domain.task.entity;
 
+import com.capstone.global.entity.BaseDocument;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,9 +14,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Task {
+public class Task extends BaseDocument {
     @Id
     private String id;
+    private String projectId;
     private String title;
     private String currentVersion;
     private String status;

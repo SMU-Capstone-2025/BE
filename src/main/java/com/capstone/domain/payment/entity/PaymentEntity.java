@@ -1,5 +1,6 @@
 package com.capstone.domain.payment.entity;
 
+import com.capstone.global.entity.BaseDocument;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @Document(collection = "payment")
-public class PaymentEntity {
+public class PaymentEntity extends BaseDocument {
     @Id
     private String id;
 

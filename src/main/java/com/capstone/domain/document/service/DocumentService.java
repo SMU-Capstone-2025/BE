@@ -1,7 +1,10 @@
 package com.capstone.domain.document.service;
 
+import com.capstone.domain.document.dto.DocumentCreateRequest;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.repository.DocumentRepository;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -27,12 +31,23 @@ public class DocumentService {
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
     public Document findDocumentCacheFirst(String key){
-        return documentRepository.findDocumentByDocumentId(key);
+        return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
+                .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
     }
 
     public void updateDocumentToCache(String key, String changes){
         Document updatedDocument = new Document(key, changes);
         redisTemplate.opsForValue().set("DOC:waited:" + key, updatedDocument, 1, TimeUnit.HOURS);
+    }
+
+    public Document deleteDocumentFromCacheAndDB(String key){
+        Document document = documentRepository.findDocumentByDocumentId(key);
+        redisTemplate.delete(key);
+        return document;
+    }
+
+    public Document createDocument(DocumentCreateRequest documentCreateRequest){
+        return documentRepository.save(documentCreateRequest.to());
     }
 
 
@@ -74,8 +89,7 @@ public class DocumentService {
                     }
                 }
             }
-        } else {
-            System.out.println("저장할 데이터 없음.");
         }
     }
+
 }

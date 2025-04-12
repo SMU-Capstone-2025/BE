@@ -1,12 +1,9 @@
 package com.capstone.domain.document.entity;
 
+import com.capstone.global.entity.BaseDocument;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Null;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.util.List;
@@ -14,14 +11,15 @@ import java.util.List;
 @org.springframework.data.mongodb.core.mapping.Document(collection = "document")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Document {
+public class Document extends BaseDocument {
     @Id
     private String id;
-    @Nullable
-    private String documentId; // 문서 조회 시 이용되는 값.
+
+    private String projectId;
     @Nullable
     private String content;
     @Nullable
@@ -33,4 +31,5 @@ public class Document {
         this.id = id;
         this.content = content;
     }
+
 }
