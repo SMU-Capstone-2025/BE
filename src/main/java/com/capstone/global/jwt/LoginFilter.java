@@ -72,6 +72,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String email = userDetails.getEmail();
         try {
             response.addHeader("access", jwtUtil.createAccess(email));
+            response.addHeader("refresh", jwtUtil.createRefresh(email));
         } catch (Exception e) {
             log.error("Error generating JWT: ", e);
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
