@@ -1,7 +1,6 @@
 package com.capstone.domain.task.dto.request;
 
 import com.capstone.domain.task.entity.Task;
-import com.capstone.domain.task.message.Status;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +11,8 @@ import java.util.List;
 public record TaskRequest(String taskId,
                           @NotNull
                           String projectId,
+                          @NotNull
+                          String status,
                           @NotNull
                           String title,
                           @NotNull
@@ -34,7 +35,7 @@ public record TaskRequest(String taskId,
         return Task.builder()
                 .title(this.title())
                 .projectId(this.projectId)
-                .status(Status.IN_PROGRESS)
+                .status(status)
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
                 .editors(editors)
