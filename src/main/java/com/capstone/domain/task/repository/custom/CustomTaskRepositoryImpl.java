@@ -40,7 +40,7 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     @Override
     public String modifyVersion(TaskRequest taskDto){
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(taskDto.id())
+        query.addCriteria(Criteria.where("id").is(taskDto.taskId())
                 .and("versionHistory.version").is(taskDto.version()));
 
         Update update = new Update();

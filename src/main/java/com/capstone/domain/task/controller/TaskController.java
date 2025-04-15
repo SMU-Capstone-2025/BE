@@ -52,13 +52,13 @@ public class TaskController implements TaskControllerDocs {
     @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Task>> putStatus(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestParam String id,
+            @RequestParam String taskId,
             @RequestParam String status){
-        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.updateStatus(id, status, userDetails)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.updateStatus(taskId, status, userDetails)));
     }
 
     @PostMapping("/version/save")
-    @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskDto.taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Version>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @Valid @RequestBody TaskRequest taskDto,
                                                             @RequestParam(value = "fileId", required = false) String fileId){
@@ -85,14 +85,12 @@ public class TaskController implements TaskControllerDocs {
 
 
     @GetMapping("/list/deadline")
-    @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Task>>> getDeadlineList(@AuthenticationPrincipal CustomUserDetails userDetails)
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listByDeadLine(userDetails)));
     }
 
     @GetMapping("/list/get")
-    @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails)
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(userDetails)));
