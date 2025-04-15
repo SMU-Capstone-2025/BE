@@ -1,6 +1,7 @@
 package com.capstone.domain.task.dto.request;
 
 import com.capstone.domain.task.entity.Task;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
@@ -12,6 +13,7 @@ public record TaskRequest(String taskId,
                           @NotNull
                           String projectId,
                           @NotNull
+                          @Schema(description = "영문 값으로 기입 <br> PENDING: 진행 전, PROGRESS: 진행 중, COMPLETED : 진행 완료")
                           String status,
                           @NotNull
                           String title,
