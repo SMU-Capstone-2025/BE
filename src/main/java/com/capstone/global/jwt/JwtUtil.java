@@ -6,6 +6,8 @@ import com.capstone.domain.auth.exception.InvalidTokenException;
 import com.capstone.domain.auth.token.message.TokenMessages;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -32,7 +34,7 @@ import java.util.Optional;
 public class JwtUtil {
 
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000; // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000; // 7일
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 60 * 60 * 1000; // 1시간
 
     //객체 키 생성
     private SecretKey secretKey;
@@ -134,12 +136,10 @@ public class JwtUtil {
         return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
     }
 
-    public String processToken(String accessToken, HttpServletRequest request){
-        String refreshToken = CookieUtil.findTokenOrThrow(request);
-        if (!isExpired(accessToken) && !isExpired(refreshToken)){
-            return createRefresh(getEmail(accessToken));
+    public String reIssueToken(String refreshToken, HttpServletRequest request){
+        if (!isExpired(refreshToken)){
+            return createAccess(getEmail(refreshToken));
         }
-
-        return null;
+        throw new GlobalException(ErrorStatus.INVALID_REFRESH);
     }
 }

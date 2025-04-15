@@ -18,7 +18,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Jwt
     EMPTY_JWT(HttpStatus.UNAUTHORIZED, "COMMON_404", "토큰이 비어있습니다."),
-    INVALID_JWT(HttpStatus.UNAUTHORIZED, "COMMON_405", "유효하지 않은 토큰입니다."),
+    INVALID_ACCESS(HttpStatus.UNAUTHORIZED, "COMMON_405", "유효하지 않은 액세스 토큰입니다."),
+    INVALID_REFRESH(HttpStatus.UNAUTHORIZED, "COMMON_406", "유효하지 않은 리프레쉬 토큰입니다."),
 
     // User
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "USER_001", "이미 존재하는 사용자이며, 비밀번호가 틀렸습니다."),
