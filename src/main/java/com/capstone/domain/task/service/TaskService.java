@@ -4,20 +4,17 @@ import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
-import com.capstone.domain.task.exception.TaskNotFoundException;
-import com.capstone.domain.task.message.TaskMessages;
+import com.capstone.domain.task.message.TaskStatus;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.log.repository.LogRepository;
-import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +31,7 @@ public class TaskService {
 
     @Transactional
     public Task saveTask(TaskRequest taskDto){
+        validateStatus(taskDto.status());
         return taskRepository.save(taskDto.toTask());
     }
 
@@ -65,6 +63,8 @@ public class TaskService {
 
     @Transactional
     public Task updateStatus(String id, String status, CustomUserDetails userDetails){
+        validateStatus(status);
+
         Task task = findTaskByIdOrThrow(id);
         task.updateStatus(status);
         taskRepository.save(task);
@@ -108,5 +108,11 @@ public class TaskService {
         String email = customUserDetails.getEmail();
         List<Task>taskList=taskRepository.findByUserEmail(email);
         return taskList;
+    }
+
+    public void validateStatus(String status){
+        if (!TaskStatus.isValid(status)){
+            throw new GlobalException(ErrorStatus.INVALID_STATUS);
+        }
     }
 }
