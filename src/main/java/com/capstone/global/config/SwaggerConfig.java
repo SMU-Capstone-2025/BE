@@ -40,7 +40,13 @@ public class SwaggerConfig {
     private Info apiInfo() {
         return new Info()
                 .title("Doctalk API 명세서")
-                .description("최근 업데이트 : 2025.04.13 02:10")
+                .description("최근 업데이트 : 2025.04.15 16:35 <br>" +
+                        "<b>task/post의 Request Body Schema 확인 할 것<b>"+
+                        "<ul><br>" +
+                        "  <li>PENDING: 진행 전</li><br>" +
+                        "  <li>PROGRESS: 진행 중</li><br>" +
+                        "  <li>COMPLETED: 진행 완료</li><br>" +
+                        "</ul>")
                 .version("1.0.0");
     }
 
