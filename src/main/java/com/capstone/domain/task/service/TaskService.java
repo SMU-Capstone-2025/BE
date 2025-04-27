@@ -2,6 +2,7 @@ package com.capstone.domain.task.service;
 
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
+import com.capstone.domain.task.dto.response.TaskSpecResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.message.TaskStatus;
@@ -35,10 +36,11 @@ public class TaskService {
         return taskRepository.save(taskDto.toTask());
     }
 
-    public Version loadVersionContent(String taskId) {
+    public TaskSpecResponse loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
         String currentVersion = task.getCurrentVersion();
-        return taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
+        Version version = taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
+        return TaskSpecResponse.from(task, version.getSummary(), version.getAttachmentList());
     }
 
     @Transactional
