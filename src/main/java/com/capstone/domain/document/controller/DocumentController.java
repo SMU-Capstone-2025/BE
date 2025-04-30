@@ -7,6 +7,7 @@ import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
 import com.capstone.global.response.ApiResponse;
+import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.shaded.com.google.protobuf.Api;
@@ -15,8 +16,10 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -51,5 +54,10 @@ public class DocumentController implements DocumentControllerDocs {
         DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
         messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
         documentService.updateDocumentToCache(params.documentId(), params.message());
+    }
+
+    @GetMapping("/load/list")
+    public ResponseEntity<ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId){
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentList(projectId)));
     }
 }

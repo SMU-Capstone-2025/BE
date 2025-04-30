@@ -3,8 +3,11 @@ package com.capstone.domain.document.service;
 import com.capstone.domain.document.dto.DocumentCreateRequest;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.repository.DocumentRepository;
+import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
+import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -27,12 +27,20 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DocumentService {
     private final DocumentRepository documentRepository;
+    private final ProjectRepository projectRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
     public Document findDocumentCacheFirst(String key){
         return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
+    }
+
+    public List<Document> findDocumentList(String projectId){
+        Project project = projectRepository.findById(projectId).get();
+        List<String> documentIds= project.getDocumentIds();
+        List<Document> documentList = documentRepository.findDocumentsByDocumentList(documentIds);
+        return documentList;
     }
 
     public void updateDocumentToCache(String key, String changes){

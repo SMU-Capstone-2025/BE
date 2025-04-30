@@ -15,6 +15,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Map;
 
 @Tag(name = "문서 관련 API")
@@ -144,4 +145,28 @@ public interface DocumentControllerDocs {
             )
     })
     void sendMessage(DocumentEditRequest params, @Header("simpSessionAttributes") Map<String, Object> sessionAttributes);
+
+
+    @Operation(description = "프로젝트의 문서 리스트 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "불러오기 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "서버 에러 응답",
+                                    summary = "예상치 못한 서버 에러",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_500",
+                  "message": "서버 에러, 관리자에게 문의 바랍니다."
+                }
+                """
+                            )
+                    )
+            )
+
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId);
 }
