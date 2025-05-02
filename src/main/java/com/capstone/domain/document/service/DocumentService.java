@@ -27,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DocumentService {
     private final DocumentRepository documentRepository;
-    private final ProjectRepository projectRepository;
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
@@ -37,10 +36,8 @@ public class DocumentService {
     }
 
     public List<Document> findDocumentList(String projectId){
-        Project project = projectRepository.findById(projectId).get();
-        List<String> documentIds= project.getDocumentIds();
-        List<Document> documentList = documentRepository.findDocumentsByDocumentList(documentIds);
-        return documentList;
+        return documentRepository.findDocumentsByProjectId(projectId);
+
     }
 
     public void updateDocumentToCache(String key, String changes){

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface CustomDocumentRepository {
     Document findDocumentByDocumentId(String documentId);
-    List<Document> findDocumentsByDocumentList(List<String> documentIds);
+    List<Document> findDocumentsByProjectId(String projectId);
 }

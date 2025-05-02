@@ -23,9 +23,8 @@ public class CustomDocumentRepositoryImpl implements CustomDocumentRepository {
     }
 
     @Override
-    public List<Document> findDocumentsByDocumentList(List<String> documentIds) {
-        Query query = new Query(Criteria.where("_id").in(documentIds));
+    public List<Document> findDocumentsByProjectId(String projectId) {
+        Query query = new Query(Criteria.where("projectId").is(projectId));
         return mongoTemplate.find(query, Document.class);
     }
-
 }
