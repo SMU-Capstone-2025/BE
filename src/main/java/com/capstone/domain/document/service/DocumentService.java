@@ -48,6 +48,7 @@ public class DocumentService {
     public Document deleteDocumentFromCacheAndDB(String key){
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
+        documentRepository.delete(document);
         return document;
     }
 
