@@ -20,6 +20,9 @@ public class Document extends BaseDocument {
     private String id;
 
     private String projectId;
+
+    @Nullable
+    private String title;
     @Nullable
     private String content;
     @Nullable

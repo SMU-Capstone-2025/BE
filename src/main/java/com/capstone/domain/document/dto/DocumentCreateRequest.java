@@ -11,6 +11,8 @@ import java.util.List;
 @Builder
 public record DocumentCreateRequest(
         @NotNull
+        String title,
+        @NotNull
         String projectId,
         @Nullable
         String content,
@@ -20,6 +22,7 @@ public record DocumentCreateRequest(
     public Document to(){
         return Document.builder()
                 .projectId(this.projectId)
+                .title(this.title)
                 .content(this.content)
                 .attachments(this.attachments)
                 .logs(new ArrayList<>())
