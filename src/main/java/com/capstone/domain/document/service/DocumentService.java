@@ -1,10 +1,16 @@
 package com.capstone.domain.document.service;
 
 import com.capstone.domain.document.dto.DocumentCreateRequest;
+import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
+import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.repository.ProjectRepository;
+import com.capstone.domain.task.dto.response.TaskResponse;
+import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.message.TaskStatus;
+import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -28,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 public class DocumentService {
     private final DocumentRepository documentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final KafkaProducerService kafkaProducerService;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
     public Document findDocumentCacheFirst(String key){
@@ -69,6 +76,25 @@ public class DocumentService {
             }
         }
         return null;
+    }
+    @Transactional
+    public Document updateStatus(String id, String status, CustomUserDetails userDetails){
+        validateStatus(status);
+
+        Document document = documentRepository.findDocumentByDocumentId(id);
+        if (document == null) {
+            throw new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND);
+        }
+        document.setStatus(status);
+        documentRepository.save(document);
+        kafkaProducerService.sendDocumentEvent("document.changed", "UPDATE", DocumentResponse.from(document), userDetails.getEmail());
+
+        return document;
+    }
+    public void validateStatus(String status){
+        if (!DocumentStatus.isValid(status)){
+            throw new GlobalException(ErrorStatus.INVALID_STATUS);
+        }
     }
 
     @Scheduled(fixedRate = 5000) // 5초마다 실행

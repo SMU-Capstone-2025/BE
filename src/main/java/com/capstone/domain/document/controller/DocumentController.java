@@ -6,6 +6,7 @@ import com.capstone.domain.document.dto.DocumentEditRequest;
 import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
+import com.capstone.domain.task.entity.Task;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
@@ -39,6 +40,15 @@ public class DocumentController implements DocumentControllerDocs {
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Document>> deleteDocument(@RequestParam("documentId") String documentId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.deleteDocumentFromCacheAndDB(documentId)));
+    }
+
+    @PutMapping("/status")
+    @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<Document>> putStatus(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam String documentId,
+            @RequestParam String status){
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.updateStatus(documentId, status, userDetails)));
     }
 
     @PostMapping("/post")
