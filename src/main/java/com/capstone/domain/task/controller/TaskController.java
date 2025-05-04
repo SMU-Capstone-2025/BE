@@ -89,7 +89,7 @@ public class TaskController implements TaskControllerDocs {
     }
 
     @GetMapping("/list/get")
-    public ResponseEntity<ApiResponse<List<Task>>> getList(@RequestParam String projectId)
+    public ResponseEntity<ApiResponse<List<TaskSpecResponse>>> getList(@RequestParam String projectId)
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(projectId)));
     }

@@ -442,5 +442,5 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getList(@RequestParam String projectId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<TaskSpecResponse>>> getList(@RequestParam String projectId);
 }

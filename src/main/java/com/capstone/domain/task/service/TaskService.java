@@ -106,13 +106,18 @@ public class TaskService {
 
     }
 
-    public List<Task> listTask(String projectId){
+    public List<TaskSpecResponse> listTask(String projectId){
 
         List<Task>taskList=taskRepository.findByProjectId(projectId);
         if (taskList.isEmpty()) {
             throw new GlobalException(ErrorStatus.TASK_NOT_FOUND);
         }
-        return taskList;
+        return taskList.stream()
+                .map(task -> {
+                    Version currentVersion = taskRepository.findByTaskIdAndVersion(task.getId(), task.getCurrentVersion());
+                    return TaskSpecResponse.from(task, currentVersion.getSummary(), currentVersion.getAttachmentList());
+                })
+                .toList();
     }
 
     public void validateStatus(String status){
