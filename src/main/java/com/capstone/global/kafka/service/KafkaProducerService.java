@@ -38,5 +38,18 @@ public class KafkaProducerService {
             e.printStackTrace();
         }
     }
+    public <T, U> void sendDocumentEvent(String topic, String action, T data, U email) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            RequestPayload<T, U> payload = new RequestPayload<>(email, "DOCUMENT", action, data);
+
+            String message = objectMapper.writeValueAsString(payload);
+            log.info("message: {}", message);
+            kafkaTemplate.send(topic, message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
