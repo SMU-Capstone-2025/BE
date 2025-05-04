@@ -71,7 +71,7 @@ public class NotificationService {
             JsonNode rootNode = objectMapper.readTree(message);
             String method = rootNode.get("method").asText();
             String topic = rootNode.get("topic").asText();
-
+            log.info("method: {}, topic: {}", method, topic);
 
             Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, method, topic);
             log.info("matched Handler: {}", matchedHandler);
