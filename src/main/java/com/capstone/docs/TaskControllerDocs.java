@@ -442,5 +442,5 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getList(@RequestParam String projectId);
 }

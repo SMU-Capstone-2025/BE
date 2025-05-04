@@ -106,9 +106,12 @@ public class TaskService {
 
     }
 
-    public List<Task> listTask(CustomUserDetails customUserDetails){
-        String email = customUserDetails.getEmail();
-        List<Task>taskList=taskRepository.findByUserEmail(email);
+    public List<Task> listTask(String projectId){
+
+        List<Task>taskList=taskRepository.findByProjectId(projectId);
+        if (taskList.isEmpty()) {
+            throw new GlobalException(ErrorStatus.TASK_NOT_FOUND);
+        }
         return taskList;
     }
 
