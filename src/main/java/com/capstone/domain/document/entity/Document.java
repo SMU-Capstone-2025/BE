@@ -21,8 +21,11 @@ public class Document extends BaseDocument {
 
     private String projectId;
 
+    private String status;
+
     @Nullable
     private String title;
+
     @Nullable
     private String content;
     @Nullable
