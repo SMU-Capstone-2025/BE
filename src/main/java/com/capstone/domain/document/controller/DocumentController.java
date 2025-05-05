@@ -4,6 +4,7 @@ import com.capstone.docs.DocumentControllerDocs;
 import com.capstone.domain.document.dto.DocumentCreateRequest;
 import com.capstone.domain.document.dto.DocumentEditRequest;
 import com.capstone.domain.document.dto.DocumentEditResponse;
+import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
 import com.capstone.domain.task.entity.Task;
@@ -32,7 +33,7 @@ public class DocumentController implements DocumentControllerDocs {
 
     @GetMapping("/load")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> getDocument(@RequestParam("documentId") String documentId){
+    public ResponseEntity<ApiResponse<DocumentResponse>> getDocument(@RequestParam("documentId") String documentId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentCacheFirst(documentId)));
     }
 

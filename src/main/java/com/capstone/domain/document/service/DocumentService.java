@@ -37,9 +37,10 @@ public class DocumentService {
     private final KafkaProducerService kafkaProducerService;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
-    public Document findDocumentCacheFirst(String key){
-        return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
+    public DocumentResponse findDocumentCacheFirst(String key){
+        Document doc = Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
+        return DocumentResponse.from(doc);
     }
 
     public List<Document> findDocumentList(String projectId){

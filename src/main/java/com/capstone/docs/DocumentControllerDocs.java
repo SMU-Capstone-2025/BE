@@ -2,6 +2,7 @@ package com.capstone.docs;
 
 import com.capstone.domain.document.dto.DocumentCreateRequest;
 import com.capstone.domain.document.dto.DocumentEditRequest;
+import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.global.security.CustomUserDetails;
@@ -44,7 +45,7 @@ public interface DocumentControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Document>> getDocument(@RequestParam("documentId") String documentId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<DocumentResponse>> getDocument(@RequestParam("documentId") String documentId);
 
     @Operation(description = "문서 Id로 문서 삭제")
     @ApiResponses(value = {
