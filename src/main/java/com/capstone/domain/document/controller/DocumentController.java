@@ -55,7 +55,12 @@ public class DocumentController implements DocumentControllerDocs {
     @PostMapping("/post")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Document>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
-        System.out.println("called");
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
+    }
+
+    @GetMapping("/list")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<Document>> getDocumentList(@RequestBody DocumentCreateRequest documentCreateRequest){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
     }
 
