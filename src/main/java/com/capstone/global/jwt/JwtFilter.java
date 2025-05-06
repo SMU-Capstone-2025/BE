@@ -43,6 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("token: {}", token);
         log.info("access: {}", accessToken);
+        log.info("role: {}", jwtUtil.getCategory(token));
 
 
         try {
