@@ -1,10 +1,19 @@
 package com.capstone.domain.document.service;
 
 import com.capstone.domain.document.dto.DocumentCreateRequest;
+import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
+import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
+import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.project.repository.ProjectRepository;
+import com.capstone.domain.task.dto.response.TaskResponse;
+import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.message.TaskStatus;
+import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
+import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +24,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -28,11 +34,18 @@ import java.util.concurrent.TimeUnit;
 public class DocumentService {
     private final DocumentRepository documentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final KafkaProducerService kafkaProducerService;
 
     @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
-    public Document findDocumentCacheFirst(String key){
-        return Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
+    public DocumentResponse findDocumentCacheFirst(String key){
+        Document doc = Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
+        return DocumentResponse.from(doc);
+    }
+
+    public List<Document> findDocumentList(String projectId){
+        return documentRepository.findDocumentsByProjectId(projectId);
+
     }
 
     public void updateDocumentToCache(String key, String changes){
@@ -43,6 +56,7 @@ public class DocumentService {
     public Document deleteDocumentFromCacheAndDB(String key){
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
+        documentRepository.delete(document);
         return document;
     }
 
@@ -63,6 +77,25 @@ public class DocumentService {
             }
         }
         return null;
+    }
+    @Transactional
+    public Document updateStatus(String id, String status, CustomUserDetails userDetails){
+        validateStatus(status);
+
+        Document document = documentRepository.findDocumentByDocumentId(id);
+        if (document == null) {
+            throw new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND);
+        }
+        document.setStatus(status);
+        documentRepository.save(document);
+        kafkaProducerService.sendDocumentEvent("document.changed", "UPDATE", DocumentResponse.from(document), userDetails.getEmail());
+
+        return document;
+    }
+    public void validateStatus(String status){
+        if (!DocumentStatus.isValid(status)){
+            throw new GlobalException(ErrorStatus.INVALID_STATUS);
+        }
     }
 
     @Scheduled(fixedRate = 5000) // 5초마다 실행

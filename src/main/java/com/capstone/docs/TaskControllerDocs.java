@@ -3,6 +3,7 @@ package com.capstone.docs;
 import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
+import com.capstone.domain.task.dto.response.TaskSpecResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.global.security.CustomUserDetails;
@@ -101,7 +102,7 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Version>> getTask(@RequestParam String taskId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<TaskSpecResponse>> getTask(@RequestParam String taskId);
 
     @Operation(description = "작업 삭제")
     @ApiResponses(value = {
@@ -441,5 +442,5 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<TaskSpecResponse>>> getList(@RequestParam String projectId);
 }

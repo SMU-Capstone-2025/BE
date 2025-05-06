@@ -3,6 +3,7 @@ package com.capstone.domain.task.controller;
 import com.capstone.docs.TaskControllerDocs;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
+import com.capstone.domain.task.dto.response.TaskSpecResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.service.TaskService;
@@ -11,8 +12,6 @@ import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,7 +23,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/task")
 @RequiredArgsConstructor
-
 public class TaskController implements TaskControllerDocs {
     private final TaskService taskService;
 
@@ -36,7 +34,7 @@ public class TaskController implements TaskControllerDocs {
 
     @GetMapping("/get")
     @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Version>> getTask(@RequestParam String taskId){
+    public ResponseEntity<ApiResponse<TaskSpecResponse>> getTask(@RequestParam String taskId){
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.loadVersionContent(taskId)));
     }
 
@@ -91,9 +89,9 @@ public class TaskController implements TaskControllerDocs {
     }
 
     @GetMapping("/list/get")
-    public ResponseEntity<ApiResponse<List<Task>>> getList(@AuthenticationPrincipal CustomUserDetails userDetails)
+    public ResponseEntity<ApiResponse<List<TaskSpecResponse>>> getList(@RequestParam String projectId)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(userDetails)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(projectId)));
     }
 
 }

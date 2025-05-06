@@ -78,4 +78,11 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         return mongoTemplate.find(query, Task.class);
     }
 
+    @Override
+    public List<Task> findByProjectId(String projectId) {
+        Query query= new Query();
+        query.addCriteria(Criteria.where("projectId").is(projectId));
+        return mongoTemplate.find(query, Task.class);
+    }
+
 }

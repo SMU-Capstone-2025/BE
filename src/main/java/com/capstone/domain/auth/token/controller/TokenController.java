@@ -21,7 +21,7 @@ public class TokenController implements TokenControllerDocs {
     public ResponseEntity<?> refreshAccessToken(@Parameter(description = "리프레쉬 토큰만 전달하면 됨") @RequestHeader("Authorization") String refreshToken, HttpServletRequest request) {
         return ResponseEntity.ok()
                 .header("refresh", refreshToken)
-                .header("access", jwtUtil.reIssueToken(refreshToken, request))
+                .header("access", jwtUtil.reIssueToken(refreshToken))
                 .build();
     }
 }
