@@ -32,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtUtil {
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000; // 30분
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 3 * 1000; // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 60 * 60 * 1000; // 1시
     //객체 키 생성
     private SecretKey secretKey;
