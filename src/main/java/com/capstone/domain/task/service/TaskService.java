@@ -110,9 +110,7 @@ public class TaskService {
     public List<TaskSpecResponse> listTask(String projectId){
 
         List<Task>taskList=taskRepository.findByProjectId(projectId);
-        if (taskList.isEmpty()) {
-            throw new GlobalException(ErrorStatus.TASK_NOT_FOUND);
-        }
+
         return taskList.stream()
                 .map(task -> {
                     Version currentVersion = taskRepository.findByTaskIdAndVersion(task.getId(), task.getCurrentVersion());
