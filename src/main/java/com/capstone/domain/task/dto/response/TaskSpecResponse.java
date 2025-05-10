@@ -8,7 +8,7 @@ import java.util.List;
 
 @Builder
 public record TaskSpecResponse(
-        String task_id,
+        String taskId,
         String title,
         String status,
         String summary,
@@ -18,7 +18,7 @@ public record TaskSpecResponse(
 ) {
     public static TaskSpecResponse from(Task task, String summary, List<String> attachments){
         return TaskSpecResponse.builder()
-                .task_id(task.getId())
+                .taskId(task.getId())
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .summary(summary)
