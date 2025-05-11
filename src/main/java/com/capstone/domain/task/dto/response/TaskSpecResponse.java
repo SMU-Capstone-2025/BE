@@ -3,6 +3,7 @@ package com.capstone.domain.task.dto.response;
 import com.capstone.domain.task.entity.Task;
 import lombok.Builder;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public record TaskSpecResponse(
         String title,
         String status,
         String summary,
-        String deadline,
+        LocalDate deadline,
         List<String> attachments,
         List<String> coworkers
 ) {
@@ -22,7 +23,7 @@ public record TaskSpecResponse(
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .summary(summary)
-                .deadline(task.getDeadline().format(DateTimeFormatter.ofPattern("YYYY-MM-DD")).toString())
+                .deadline(task.getDeadline())
                 .coworkers(task.getEditors())
                 .attachments(attachments)
                 .build();
