@@ -40,7 +40,7 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(taskId);
         String currentVersion = task.getCurrentVersion();
         Version version = taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
-        return TaskSpecResponse.from(task, version.getSummary(), version.getAttachmentList());
+        return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
     }
 
     @Transactional
@@ -114,7 +114,7 @@ public class TaskService {
         return taskList.stream()
                 .map(task -> {
                     Version currentVersion = taskRepository.findByTaskIdAndVersion(task.getId(), task.getCurrentVersion());
-                    return TaskSpecResponse.from(task, currentVersion.getSummary(), currentVersion.getAttachmentList());
+                    return TaskSpecResponse.from(task,currentVersion.getAttachmentList(),currentVersion.getContent());
                 })
                 .toList();
     }

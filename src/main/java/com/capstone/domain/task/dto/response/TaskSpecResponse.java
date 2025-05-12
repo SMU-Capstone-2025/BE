@@ -12,20 +12,20 @@ public record TaskSpecResponse(
         String taskId,
         String title,
         String status,
-        String summary,
+        String content,
         LocalDate deadline,
         List<String> attachments,
         List<String> coworkers
 ) {
-    public static TaskSpecResponse from(Task task, String summary, List<String> attachments){
+    public static TaskSpecResponse from(Task task, List<String> attachments,String content){
         return TaskSpecResponse.builder()
                 .taskId(task.getId())
                 .title(task.getTitle())
                 .status(task.getStatus())
-                .summary(summary)
                 .deadline(task.getDeadline())
                 .coworkers(task.getEditors())
                 .attachments(attachments)
+                .content(content)
                 .build();
     }
 }

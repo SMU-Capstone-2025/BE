@@ -15,7 +15,6 @@ public class Version extends BaseDocument{
     private String version;
     private String modifiedDateTime;
     private String modifiedBy;
-    private String summary;
     private String content;
     private List<String> attachmentList; // 사진, 표 등 첨부 파일 리스트.
 }
