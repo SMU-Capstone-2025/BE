@@ -35,4 +35,10 @@ public class Task extends BaseDocument {
     public void addNewVersion(Version version){
         this.versionHistory.add(version);
     }
+    public void updateInfo(String title, LocalDate deadline, String currentVersion)
+    {
+        this.title = title;
+        this.deadline = deadline;
+        this.currentVersion = currentVersion;
+    }
 }
