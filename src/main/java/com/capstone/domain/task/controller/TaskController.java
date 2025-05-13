@@ -58,7 +58,7 @@ public class TaskController implements TaskControllerDocs {
 
     @PostMapping("/version/save")
     @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskDto.taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Version>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public ResponseEntity<ApiResponse<TaskVersionResponse>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                             @Valid @RequestBody TaskRequest taskDto,
                                                             @RequestParam(value = "fileId", required = false) String fileId){
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.saveVersion(taskDto, fileId, userDetails)));

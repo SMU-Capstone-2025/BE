@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -231,9 +232,9 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Version>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                       @RequestBody TaskRequest taskDto,
-                                       @RequestParam(value = "fileId", required = false) String fileId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<TaskVersionResponse>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                                              @Valid @RequestBody TaskRequest taskDto,
+                                                                                              @RequestParam(value = "fileId", required = false) String fileId);
 
     @Operation(description = "작업 내 버전 목록 반환")
     @ApiResponses(value = {

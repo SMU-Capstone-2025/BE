@@ -45,15 +45,15 @@ public class TaskService {
     }
 
     @Transactional
-    public Version saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
+    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         task.addNewVersion(version);
         task.setCurrentVersion(taskDto.version());
         taskRepository.save(task);
-
         kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, customUserDetails.getEmail());
-        return version;
+        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
+
     }
 
     @Transactional
