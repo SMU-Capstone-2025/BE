@@ -4,6 +4,7 @@ import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
+import com.capstone.domain.task.dto.response.TaskVersionResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.global.security.CustomUserDetails;
@@ -273,7 +274,7 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<Version>>> getVersionLists(@RequestParam String taskId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<TaskVersionResponse>>> getVersionLists(@RequestParam String taskId);
 
     @Operation(description = "버전 롤백")
     @ApiResponses(value = {

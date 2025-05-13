@@ -3,6 +3,7 @@ package com.capstone.domain.task.service;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
+import com.capstone.domain.task.dto.response.TaskVersionResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.message.TaskStatus;
@@ -76,9 +77,16 @@ public class TaskService {
         return task;
     }
 
-    public List<Version> listVersions(String taskId){
+    public List<TaskVersionResponse> listVersions(String taskId){
         Task task = findTaskByIdOrThrow(taskId);
-        return task.getVersionHistory();
+        List<Version> versionList =task.getVersionHistory();
+        return versionList.stream()
+                .map(version ->
+                {
+                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline());
+                })
+                .toList();
+
     }
 
     @Transactional

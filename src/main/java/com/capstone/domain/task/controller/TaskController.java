@@ -4,6 +4,7 @@ import com.capstone.docs.TaskControllerDocs;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
+import com.capstone.domain.task.dto.response.TaskVersionResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.service.TaskService;
@@ -65,7 +66,7 @@ public class TaskController implements TaskControllerDocs {
 
     @GetMapping("/version/list")
     @PreAuthorize("@projectAuthorityEvaluator.hasTaskPermission(#taskId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<List<Version>>> getVersionLists(@RequestParam String taskId){
+    public ResponseEntity<ApiResponse<List<TaskVersionResponse>>> getVersionLists(@RequestParam String taskId){
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listVersions(taskId)));
     }
 
