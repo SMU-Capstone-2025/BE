@@ -52,7 +52,8 @@ public class TaskService {
         task.addNewVersion(version);
         task.updateInfo(taskDto.title(), LocalDate.parse(taskDto.deadline()),taskDto.version());
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, customUserDetails.getEmail());
+
+        kafkaProducerService.sendTaskEvent("task.changed", "ADD", TaskResponse.from(task), customUserDetails.getEmail());
         return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
 
     }
