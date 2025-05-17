@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -49,7 +50,7 @@ public class TaskService {
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         task.addNewVersion(version);
-        task.updateInfo(taskDto.title(),taskDto.deadline(),taskDto.version());
+        task.updateInfo(taskDto.title(), LocalDate.parse(taskDto.deadline()),taskDto.version());
         taskRepository.save(task);
         kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, customUserDetails.getEmail());
         return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());

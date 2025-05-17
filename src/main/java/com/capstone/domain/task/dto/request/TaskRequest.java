@@ -26,7 +26,7 @@ public record TaskRequest(String taskId,
                           @Nullable
                           List<String> editors,
                           @Nullable
-                          LocalDate deadline
+                          String deadline
                     ){
 
     public Task toTask() {
@@ -41,7 +41,7 @@ public record TaskRequest(String taskId,
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
                 .editors(editors)
-                .deadline(this.deadline)
+                .deadline(LocalDate.parse(this.deadline))
                 .build();
     }
 }
