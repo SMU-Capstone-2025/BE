@@ -20,6 +20,7 @@ public class LogEntity extends BaseDocument {
     private String method;
     private String log;
     private String timestamp;
+    private String taskId;
 
     public String toJson() {
         ObjectMapper objectMapper = new ObjectMapper();
