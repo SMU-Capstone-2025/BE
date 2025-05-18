@@ -18,6 +18,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -62,15 +63,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable()
-        ); // csrf 공격 방지
+        http.csrf(AbstractHttpConfigurer::disable); // csrf 공격 방지
 
         //WebMvcConfig 설정에 따름
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         //FormLogin, BasicHttp 비활성화
-        http.formLogin((auth) -> auth.disable());
-        http.httpBasic((auth) -> auth.disable());
+        http.formLogin(AbstractHttpConfigurer::disable);
+        http.httpBasic(AbstractHttpConfigurer::disable);
         http
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -82,7 +82,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
                                 "/v3/api-docs/**","/csrf-token", "/project/**", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**").permitAll()
-                        .requestMatchers("/task/**").hasAnyRole("MEMBER", "MANAGER", "VIEWER")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(configure ->
@@ -100,10 +99,6 @@ public class SecurityConfig {
 
 //        http
 //                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
-
-
-
-
         http
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil, userRepository), UsernamePasswordAuthenticationFilter.class);
