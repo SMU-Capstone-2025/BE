@@ -4,7 +4,6 @@ import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.global.entity.BaseDocument;
 import lombok.*;
-import org.apache.lucene.spatial3d.geom.Membership;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
