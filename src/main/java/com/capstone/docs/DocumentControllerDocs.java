@@ -217,4 +217,31 @@ public interface DocumentControllerDocs {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam String documentId,
             @RequestParam String status);
+
+
+
+
+    @Operation(description = "프로젝트의 문서 리스트 생성시간 기준 오름차순 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "불러오기 성공"),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "서버 에러 응답",
+                                    summary = "예상치 못한 서버 에러",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_500",
+                  "message": "서버 에러, 관리자에게 문의 바랍니다."
+                }
+                """
+                            )
+                    )
+            )
+
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<Document>>> getDocumentListSortedByCreateAt(
+            @RequestParam("projectId") String projectId);
 }

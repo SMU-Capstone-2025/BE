@@ -98,6 +98,11 @@ public class DocumentService {
         }
     }
 
+    public List<Document> findDocumentListSortedByDateAsc(String projectId)
+    {
+        return documentRepository.findDocumentsByProjectIdOrderByCreatedAt(projectId);
+    }
+
     @Scheduled(fixedRate = 5000) // 5초마다 실행
     @Transactional
     public void syncToMongoDB() {
