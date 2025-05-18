@@ -76,4 +76,13 @@ public class DocumentController implements DocumentControllerDocs {
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentList(projectId)));
     }
+
+    @GetMapping("/load/list/date-asc")
+    public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByDate(
+            @RequestParam("projectId") String projectId) {
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentListSortedByDateAsc(projectId)));
+    }
+
+
 }

@@ -7,4 +7,5 @@ import java.util.List;
 public interface CustomDocumentRepository {
     Document findDocumentByDocumentId(String documentId);
     List<Document> findDocumentsByProjectId(String projectId);
+    List<Document> findDocumentsByProjectIdOrderByCreatedAt(String projectId);
 }
