@@ -5,8 +5,8 @@ import com.capstone.domain.user.entity.Role;
 import com.capstone.domain.user.entity.User;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
 import java.util.Map;
