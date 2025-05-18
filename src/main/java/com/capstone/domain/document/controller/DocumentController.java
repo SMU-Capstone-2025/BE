@@ -7,12 +7,10 @@ import com.capstone.domain.document.dto.DocumentEditResponse;
 import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
-import com.capstone.domain.task.entity.Task;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -78,7 +76,7 @@ public class DocumentController implements DocumentControllerDocs {
     }
 
     @GetMapping("/load/list/date-asc")
-    public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByDate(
+    public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByCreateAt(
             @RequestParam("projectId") String projectId) {
 
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentListSortedByDateAsc(projectId)));
