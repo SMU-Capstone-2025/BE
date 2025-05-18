@@ -146,6 +146,7 @@ management:
     export:
       prometheus:
         enabled: true
+        enable-openmetrics: false
   endpoints:
     web:
       exposure:
