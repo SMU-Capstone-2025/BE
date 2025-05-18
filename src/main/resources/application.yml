@@ -141,7 +141,7 @@ management:
       enabled: true
   zipkin:
     tracing:
-      endpoint: http://35.202.85.190/:9411/api/v2/spans
+      endpoint: http://35.202.85.190:9411/api/v2/spans
   metrics:
     export:
       prometheus:
