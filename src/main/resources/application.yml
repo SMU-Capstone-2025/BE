@@ -21,7 +21,7 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
 
   security:
     oauth2:
@@ -131,3 +131,18 @@ IMP_API_SECRET: ${IMP_API_SECRET}
 springdoc:
   default-produces-media-type: application/json
   override-with-generic-response: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    annotations:
+      enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  endpoints:
+    web:
+      exposure:
+        include: health, httpexchanges, metrics, traces, prometheus
