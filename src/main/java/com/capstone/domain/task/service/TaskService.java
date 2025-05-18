@@ -15,6 +15,8 @@ import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.observation.annotation.Observed;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.util.List;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Observed
 public class TaskService {
     private final TaskRepository taskRepository;
     private final LogRepository logRepository;
@@ -79,6 +82,7 @@ public class TaskService {
         return task;
     }
 
+    @Observed(name = "version.list", contextualName = "List Version")
     public List<TaskVersionResponse> listVersions(String taskId){
         Task task = findTaskByIdOrThrow(taskId);
         List<Version> versionList =task.getVersionHistory();
@@ -117,6 +121,8 @@ public class TaskService {
 
     }
 
+    @Observed(name = "task.list", contextualName = "List Tasks")
+    @Timed(value = "task.list", description = "List Tasks by Project ID")
     public List<TaskSpecResponse> listTask(String projectId){
 
         List<Task>taskList=taskRepository.findByProjectId(projectId);
