@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.Optional;
 @Slf4j
 public class JwtUtil {
 
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 3 * 1000; // 30분
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 15 * 60 * 1000; // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 60 * 60 * 1000; // 1시
     //객체 키 생성
     private SecretKey secretKey;
@@ -60,6 +61,9 @@ public class JwtUtil {
 
             Claims claims = extractClaims(token);
             Date expiration = claims.getExpiration();
+            log.info("expiration: {}", expiration);
+            log.info("now: {}", LocalDateTime.now());
+            log.info("now: {}", expiration.before(new Date()));
 
             if (expiration == null) {
                 throw new InformationNotContainException(TokenMessages.INFORMATION_NOT_CONTAINED);
@@ -129,8 +133,9 @@ public class JwtUtil {
     }
 
     public String reIssueToken(String refreshToken){
-        if (!isExpired(refreshToken)){
-            return createAccess(getEmail(refreshToken));
+        String token = refreshToken.substring(7);
+        if (!isExpired(token)){
+            return createAccess(getEmail(token));
         }
         throw new GlobalException(ErrorStatus.INVALID_REFRESH);
     }

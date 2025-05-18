@@ -4,6 +4,7 @@ import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
+import com.capstone.domain.task.dto.response.TaskVersionResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.global.security.CustomUserDetails;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -230,9 +232,9 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Version>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                       @RequestBody TaskRequest taskDto,
-                                       @RequestParam(value = "fileId", required = false) String fileId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<TaskVersionResponse>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                                              @Valid @RequestBody TaskRequest taskDto,
+                                                                                              @RequestParam(value = "fileId", required = false) String fileId);
 
     @Operation(description = "작업 내 버전 목록 반환")
     @ApiResponses(value = {
@@ -273,7 +275,7 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<Version>>> getVersionLists(@RequestParam String taskId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<TaskVersionResponse>>> getVersionLists(@RequestParam String taskId);
 
     @Operation(description = "버전 롤백")
     @ApiResponses(value = {

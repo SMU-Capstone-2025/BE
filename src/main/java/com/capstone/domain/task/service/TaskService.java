@@ -3,6 +3,7 @@ package com.capstone.domain.task.service;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
+import com.capstone.domain.task.dto.response.TaskVersionResponse;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.message.TaskStatus;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -40,18 +42,20 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(taskId);
         String currentVersion = task.getCurrentVersion();
         Version version = taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
-        return TaskSpecResponse.from(task, version.getSummary(), version.getAttachmentList());
+        return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
     }
 
     @Transactional
-    public Version saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
+    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
         Version version = taskUtil.createOrGetVersion(taskDto, fileId);
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         task.addNewVersion(version);
+        task.updateInfo(taskDto.title(), LocalDate.parse(taskDto.deadline()),taskDto.version());
         taskRepository.save(task);
 
-        kafkaProducerService.sendTaskEvent("task.changed", "ADD", taskDto, customUserDetails.getEmail());
-        return version;
+        kafkaProducerService.sendTaskEvent("task.changed", "ADD", TaskResponse.from(task), customUserDetails.getEmail());
+        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
+
     }
 
     @Transactional
@@ -75,9 +79,16 @@ public class TaskService {
         return task;
     }
 
-    public List<Version> listVersions(String taskId){
+    public List<TaskVersionResponse> listVersions(String taskId){
         Task task = findTaskByIdOrThrow(taskId);
-        return task.getVersionHistory();
+        List<Version> versionList =task.getVersionHistory();
+        return versionList.stream()
+                .map(version ->
+                {
+                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline());
+                })
+                .toList();
+
     }
 
     @Transactional
@@ -109,13 +120,11 @@ public class TaskService {
     public List<TaskSpecResponse> listTask(String projectId){
 
         List<Task>taskList=taskRepository.findByProjectId(projectId);
-        if (taskList.isEmpty()) {
-            throw new GlobalException(ErrorStatus.TASK_NOT_FOUND);
-        }
+
         return taskList.stream()
                 .map(task -> {
                     Version currentVersion = taskRepository.findByTaskIdAndVersion(task.getId(), task.getCurrentVersion());
-                    return TaskSpecResponse.from(task, currentVersion.getSummary(), currentVersion.getAttachmentList());
+                    return TaskSpecResponse.from(task,currentVersion.getAttachmentList(),currentVersion.getContent());
                 })
                 .toList();
     }
