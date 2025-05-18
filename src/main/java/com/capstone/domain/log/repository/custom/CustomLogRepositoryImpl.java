@@ -1,11 +1,7 @@
 package com.capstone.domain.log.repository.custom;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
 import com.capstone.domain.log.entity.LogEntity;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.elasticsearch.client.elc.NativeQuery;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;

@@ -1,6 +1,5 @@
 package com.capstone.global.response.status;
 
-import co.elastic.clients.elasticsearch.nodes.Http;
 import com.capstone.global.response.BaseErrorCode;
 import com.capstone.global.response.ErrorInfoDto;
 import lombok.AllArgsConstructor;
