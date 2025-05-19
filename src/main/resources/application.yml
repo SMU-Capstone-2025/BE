@@ -21,7 +21,7 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
 
   security:
     oauth2:
@@ -118,6 +118,7 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: WARN
 
 
 openai:
@@ -131,3 +132,24 @@ IMP_API_SECRET: ${IMP_API_SECRET}
 springdoc:
   default-produces-media-type: application/json
   override-with-generic-response: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    annotations:
+      enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://35.202.85.190:9411/api/v2/spans
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        enable-openmetrics: false
+  endpoints:
+    web:
+      exposure:
+        include: health, httpexchanges, metrics, traces, prometheus
+

@@ -2,7 +2,6 @@ package com.capstone.domain.user.repository.custom;
 
 import com.capstone.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.common.recycler.Recycler;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
