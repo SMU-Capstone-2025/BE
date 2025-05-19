@@ -21,7 +21,7 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
 
   security:
     oauth2:
@@ -118,6 +118,7 @@ logging:
   level:
     root: INFO
     org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: WARN
 
 
 openai:
