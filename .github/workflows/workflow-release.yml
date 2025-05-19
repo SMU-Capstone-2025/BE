@@ -144,7 +144,6 @@ jobs:
             
             sudo docker run -d \
               --name $IMAGE_NAME \
-              --network app-network \
-              -p 8080:8080 \
+              --network host \
               --env-file ~/.env.production \
               us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
