@@ -38,7 +38,13 @@ public class TaskService {
 
     public Task saveTask(TaskRequest taskDto){
         validateStatus(taskDto.status());
-        return taskRepository.save(taskDto.toTask());
+
+        long start = System.currentTimeMillis();
+
+        Task saved = taskRepository.save(taskDto.toTask());
+
+        log.info("🔥 save took {}ms", System.currentTimeMillis() - start);
+        return saved;
     }
 
     public TaskSpecResponse loadVersionContent(String taskId) {
