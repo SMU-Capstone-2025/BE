@@ -35,7 +35,7 @@ public class TaskService {
     private final KafkaProducerService kafkaProducerService;
     private final TaskUtil taskUtil;
 
-    @Transactional
+
     public Task saveTask(TaskRequest taskDto){
         validateStatus(taskDto.status());
         return taskRepository.save(taskDto.toTask());
