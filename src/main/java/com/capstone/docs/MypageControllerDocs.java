@@ -4,6 +4,7 @@ package com.capstone.docs;
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.mypage.dto.CalendarTaskDto;
 import com.capstone.domain.mypage.dto.UserDto;
+import com.capstone.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,7 +61,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<UserDto.UserInfoDto>> loadUser(@RequestHeader("Authorization") String accessToken);
+    ResponseEntity<com.capstone.global.response.ApiResponse<UserDto.UserInfoDto>> loadUser(@AuthenticationPrincipal CustomUserDetails userDetails);
 
     @Operation(summary = "비밀번호 재설정", description = "현재비밀번호, 새로운 비밀번호, 검증 비밀번호(새로운 비밀번호와 일치하는지)를 입력해 변경")
     @ApiResponses(value = {

@@ -23,6 +23,7 @@ import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.mail.service.MailService;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,9 +54,10 @@ public class MypageService
     private final ProjectUserRepository projectUserRepository;
 
 
-    public UserDto.UserInfoDto getUser(String accessToken)
+    public UserDto.UserInfoDto getUser(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+
+        String email=userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {

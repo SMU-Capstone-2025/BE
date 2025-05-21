@@ -9,8 +9,10 @@ import com.capstone.domain.mypage.service.MypageService;
 
 import com.capstone.global.mail.service.MailService;
 import com.capstone.global.response.ApiResponse;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,9 +30,9 @@ public class MypageController implements MypageControllerDocs
 
     //유저 정보
     @GetMapping("/user")
-    public ResponseEntity<ApiResponse<UserDto.UserInfoDto>> loadUser(@RequestHeader("Authorization") String accessToken)
+    public ResponseEntity<ApiResponse<UserDto.UserInfoDto>> loadUser(@AuthenticationPrincipal CustomUserDetails userDetails)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.getUser(accessToken)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.getUser(userDetails)));
     }
 
     //비밀번호 변경

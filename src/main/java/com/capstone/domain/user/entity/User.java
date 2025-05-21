@@ -37,6 +37,7 @@ public class User extends BaseDocument {
                 .email(email)
                 .profileImage(profileImage)
                 .social(social)
+                .membership(membership)
                 .build();
     }
 
