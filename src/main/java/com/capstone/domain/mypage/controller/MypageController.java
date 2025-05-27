@@ -62,7 +62,7 @@ public class MypageController implements MypageControllerDocs
     @PostMapping("/email/check")
     public ResponseEntity<ApiResponse<String>> checkEmail(@RequestParam String email) throws Exception
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageForNewEmail(email)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageCheckEmail(email)));
     }
 
     //계정 삭제
