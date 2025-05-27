@@ -37,10 +37,10 @@ public class MypageController implements MypageControllerDocs
 
     //비밀번호 변경
     @PutMapping("/password/new")
-    public ResponseEntity<ApiResponse<String>> newPassword(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<ApiResponse<String>> newPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @RequestBody UserDto.UserPasswordDto userPasswordDto)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyPassword(accessToken, userPasswordDto)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyPassword(userDetails, userPasswordDto)));
     }
     //프로필 사진 변경
     @PutMapping("/profile/new")

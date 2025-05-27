@@ -101,7 +101,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newPassword(@RequestHeader("Authorization") String accessToken,
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                  @RequestBody UserDto.UserPasswordDto userPasswordDto);
 
     @Operation(summary = "프로필 사진 변경", description = "사용자 프로필 사진을 변경")
