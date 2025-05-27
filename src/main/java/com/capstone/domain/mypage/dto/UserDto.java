@@ -17,7 +17,6 @@ public class UserDto
     @NoArgsConstructor
     public static class UserPasswordDto
     {
-        private String currentPassword;
         private String newPassword;
         private String confirmPassword;
     }

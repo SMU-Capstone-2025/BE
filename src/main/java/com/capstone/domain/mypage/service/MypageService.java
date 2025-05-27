@@ -67,21 +67,13 @@ public class MypageService
     }
 
     @Transactional
-    public String modifyPassword(String accessToken, UserDto.UserPasswordDto userPasswordDto)
+    public String modifyPassword(CustomUserDetails userDetails, UserDto.UserPasswordDto userPasswordDto)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
             throw new UserNotFoundException(USER_NOT_FOUND);
-        }
-        String oldPassword=user.getPassword();
-
-        //현재 비번이랑 입력한 비번 같은지 확인
-        if(!bCryptPasswordEncoder.matches(userPasswordDto.getCurrentPassword(),oldPassword))
-        {
-
-            throw new InvalidPasswordException(PASSWORD_NOT_FOUND);
         }
 
         //새로 입력한 비번이랑 다시한번 입력하는 새로운 비번이랑 같은지 확인
