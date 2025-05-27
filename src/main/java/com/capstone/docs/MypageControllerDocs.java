@@ -63,7 +63,7 @@ public interface MypageControllerDocs
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<UserDto.UserInfoDto>> loadUser(@AuthenticationPrincipal CustomUserDetails userDetails);
 
-    @Operation(summary = "비밀번호 재설정", description = "새로운 비밀번호, 검증 비밀번호(새로운 비밀번호와 일치하는지)를 입력해 변경")
+    @Operation(summary = "비밀번호 재설정", description = "사용자 이메일, 새로운 비밀번호, 검증 비밀번호(새로운 비밀번호와 일치하는지)를 입력해 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "바밀번호 변경 성공"),
             @ApiResponse(
@@ -101,8 +101,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newPassword(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                                                                 @RequestBody UserDto.UserPasswordDto userPasswordDto);
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newPassword(@RequestBody UserDto.UserPasswordDto userPasswordDto);
 
     @Operation(summary = "프로필 사진 변경", description = "사용자 프로필 사진을 변경")
     @ApiResponses(value = {

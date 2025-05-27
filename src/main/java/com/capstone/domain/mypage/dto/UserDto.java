@@ -17,6 +17,7 @@ public class UserDto
     @NoArgsConstructor
     public static class UserPasswordDto
     {
+        private String email;
         private String newPassword;
         private String confirmPassword;
     }

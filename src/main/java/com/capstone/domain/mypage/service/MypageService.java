@@ -79,9 +79,9 @@ public class MypageService
 
 
     @Transactional
-    public String modifyPassword(CustomUserDetails userDetails, UserDto.UserPasswordDto userPasswordDto)
+    public String modifyPassword(UserDto.UserPasswordDto userPasswordDto)
     {
-        String email=userDetails.getEmail();
+        String email=userPasswordDto.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
