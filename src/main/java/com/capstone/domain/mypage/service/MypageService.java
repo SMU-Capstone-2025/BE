@@ -23,6 +23,8 @@ import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.mail.service.MailService;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +67,16 @@ public class MypageService
         }
         return user.toDto();
     }
+    public boolean checkEmail(String name, String email)
+    {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null || !user.getName().equals(name)) {
+            throw new GlobalException(ErrorStatus.USER_NOT_FOUND);
+        }
+        return true;
+    }
+
+
 
     @Transactional
     public String modifyPassword(CustomUserDetails userDetails, UserDto.UserPasswordDto userPasswordDto)

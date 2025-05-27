@@ -64,6 +64,11 @@ public class MypageController implements MypageControllerDocs
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageCheckEmail(email)));
     }
+    @GetMapping("/email/avail")
+    public ResponseEntity<ApiResponse<Boolean>> checkEmailAvailable(@RequestParam String name,
+                                                                    @RequestParam String email){
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.checkEmail(name,email)));
+    }
 
     //계정 삭제
     @DeleteMapping("/delete")

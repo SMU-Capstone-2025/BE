@@ -186,6 +186,47 @@ public interface MypageControllerDocs
     })
     public ResponseEntity<com.capstone.global.response.ApiResponse<String>> checkEmail(@RequestParam String email) throws Exception;
 
+    @Operation(summary = "이메일 유효한지 확인", description = "name,email을 입력 후 true false로 있는 계정인지 반환")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용자 계정 확인"),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "인증 실패 응답",
+                                    summary = "유효하지 않은 토큰 또는 로그인 필요",
+                                    value = """
+            {
+              "success": false,
+              "code": "COMMON_401",
+              "message": "인증이 필요합니다."
+            }
+            """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "500", description = "서버 에러",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "서버 에러 응답",
+                                    summary = "예상치 못한 서버 에러",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_500",
+                  "message": "서버 에러, 관리자에게 문의 바랍니다."
+                }
+                """
+                            )
+                    )
+            )
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<Boolean>> checkEmailAvailable(@RequestParam String name,
+                                                                                          @RequestParam String email);
+
     @Operation(summary = "이메일 변경", description = "현재 이메일, 새로운 이메일을 입력받아 이메일 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이메일 변경 성공"),
