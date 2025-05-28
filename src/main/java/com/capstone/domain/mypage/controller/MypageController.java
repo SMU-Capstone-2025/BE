@@ -44,18 +44,18 @@ public class MypageController implements MypageControllerDocs
     }
     //프로필 사진 변경
     @PutMapping("/profile/new")
-    public ResponseEntity<ApiResponse<String>> newProfile(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<ApiResponse<String>> newProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                           @RequestBody UserDto.UserProfileDto userProfileDto)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyProfile(accessToken, userProfileDto)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyProfile(userDetails, userProfileDto)));
     }
 
     //이메일 변경
     //이메일 변경 후에는 강제 로그아웃 시킨 뒤 다시 로그인하게 해야 토큰 동작함
     @PutMapping("/email/new")
-    public ResponseEntity<ApiResponse<String>> newEmail(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<ApiResponse<String>> newEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                         @RequestBody UserDto.UserEmailDto userEmailDto) throws Exception {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyEmail(accessToken,userEmailDto)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.modifyEmail(userDetails,userEmailDto)));
     }
 
     //이메일 변경 전 새로운 이메일 확인
@@ -72,15 +72,15 @@ public class MypageController implements MypageControllerDocs
 
     //계정 삭제
     @DeleteMapping("/delete")
-    public ResponseEntity<ApiResponse<String>> deleteUser(@RequestHeader("Authorization") String accessToken)
+    public ResponseEntity<ApiResponse<String>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.removeUser(accessToken)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.removeUser(userDetails)));
     }
 
     @GetMapping("/calendar/events/task")
-    public ResponseEntity<ApiResponse<List<CalendarTaskDto>>> getTasks(@RequestHeader("Authorization") String accessToken)
+    public ResponseEntity<ApiResponse<List<CalendarTaskDto>>> getTasks(@AuthenticationPrincipal CustomUserDetails userDetails)
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.getUserTask(accessToken)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mypageService.getUserTask(userDetails)));
     }
 
 

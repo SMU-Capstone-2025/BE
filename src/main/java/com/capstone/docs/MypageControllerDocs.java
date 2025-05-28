@@ -142,7 +142,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newProfile(@RequestHeader("Authorization") String accessToken,
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newProfile(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                 @RequestBody UserDto.UserProfileDto userProfileDto);
 
 
@@ -265,7 +265,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newEmail(@RequestHeader("Authorization") String accessToken,
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> newEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                               @RequestBody UserDto.UserEmailDto userEmailDto) throws Exception;
 
     @Operation(summary = "회원탈퇴", description = "사용자 계정 삭제 -> 연결된 프로젝트,작업에는 (알수없음)으로 표시 됨")
@@ -306,7 +306,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> deleteUser(@RequestHeader("Authorization") String accessToken);
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails);
 
     @Operation(summary = "사용자 작업 정보", description = "캘린더에 쓸 사용자 작업 정보")
     @ApiResponses(value = {
@@ -346,5 +346,5 @@ public interface MypageControllerDocs
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<List<CalendarTaskDto>>> getTasks(@RequestHeader("Authorization") String accessToken);
+    ResponseEntity<com.capstone.global.response.ApiResponse<List<CalendarTaskDto>>> getTasks(@AuthenticationPrincipal CustomUserDetails userDetails);
 }
