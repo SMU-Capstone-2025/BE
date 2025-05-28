@@ -3,6 +3,7 @@ package com.capstone.docs;
 
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.mypage.dto.CalendarTaskDto;
+import com.capstone.domain.mypage.dto.EmailDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -183,7 +184,7 @@ public interface MypageControllerDocs
                     )
             )
     })
-    public ResponseEntity<com.capstone.global.response.ApiResponse<String>> checkEmail(@RequestParam String email) throws Exception;
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> checkEmail(@RequestBody EmailDto emailDto) throws Exception;
 
     @Operation(summary = "이메일 유효한지 확인", description = "name,email을 입력 후 true false로 있는 계정인지 반환")
     @ApiResponses(value = {

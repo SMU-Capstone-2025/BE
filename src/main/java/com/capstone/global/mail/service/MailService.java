@@ -1,5 +1,6 @@
 package com.capstone.global.mail.service;
 
+import com.capstone.domain.mypage.dto.EmailDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -110,8 +111,8 @@ public class MailService {
                 }
         );
     }
-    public String sendSimpleMessageCheckEmail(String email) throws Exception {
-        MimeMessage message = createEmailChangeMessage(email);
+    public String sendSimpleMessageCheckEmail(EmailDto emailDto) throws Exception {
+        MimeMessage message = createEmailChangeMessage(emailDto.email());
         try{
             javaMailSender.send(message); // 메일 발송
         }catch(MailException es){

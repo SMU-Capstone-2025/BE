@@ -4,6 +4,7 @@ package com.capstone.domain.mypage.controller;
 
 import com.capstone.docs.MypageControllerDocs;
 import com.capstone.domain.mypage.dto.CalendarTaskDto;
+import com.capstone.domain.mypage.dto.EmailDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.service.MypageService;
 
@@ -59,9 +60,9 @@ public class MypageController implements MypageControllerDocs
 
     //이메일 변경 전 새로운 이메일 확인
     @PostMapping("/email/check")
-    public ResponseEntity<ApiResponse<String>> checkEmail(@RequestParam String email) throws Exception
+    public ResponseEntity<ApiResponse<String>> checkEmail(@RequestBody EmailDto emailDto) throws Exception
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageCheckEmail(email)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageCheckEmail(emailDto)));
     }
     @GetMapping("/email/avail")
     public ResponseEntity<ApiResponse<Boolean>> checkEmailAvailable(@RequestParam String name,
