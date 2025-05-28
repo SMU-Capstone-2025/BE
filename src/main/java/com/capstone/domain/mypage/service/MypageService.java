@@ -99,9 +99,9 @@ public class MypageService
         return email;
     }
 
-    public String modifyProfile(String accessToken, UserDto.UserProfileDto userProfileDto)
+    public String modifyProfile(CustomUserDetails userDetails, UserDto.UserProfileDto userProfileDto)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
@@ -113,8 +113,8 @@ public class MypageService
     }
 
     @Transactional
-    public String modifyEmail(String accessToken, UserDto.UserEmailDto userEmailDto) throws Exception {
-        String email=jwtUtil.getEmail(accessToken);
+    public String modifyEmail(CustomUserDetails userDetails, UserDto.UserEmailDto userEmailDto) throws Exception {
+        String email=userDetails.getEmail();
         log.info("email {}",email);
         User user=userRepository.findUserByEmail(email);
         if(user==null)
@@ -168,9 +168,9 @@ public class MypageService
         return userEmailDto.getNewEmail();
     }
     @Transactional
-    public String removeUser(String accessToken)
+    public String removeUser(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email= userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
 
         if(user==null)
@@ -198,25 +198,22 @@ public class MypageService
                 }
             }
         }
-        List<ProjectUser> projectUserList=projectUserRepository.findByUserId(user.getId());
+        List<ProjectUser> projectUserList=projectUserRepository.findByUserId(email);
         projectUserRepository.deleteAll(projectUserList);
         userRepository.delete(user);
+
         return email;
     }
 
     public List<Project> getUserProject(User user)
     {
-        List<String> projectIds= user.getProjectIds();
-        log.info("projectIds {}",projectIds.get(0));
-        if (projectIds == null || projectIds.isEmpty()) {
-            return new ArrayList<>(); //비어있ㅅ는 리스트 반환
-        }
-        return projectRepository.findAllById(projectIds);
+        return projectUserRepository.findProjectsByUserId(user.getEmail());
     }
 
-    public List<CalendarTaskDto> getUserTask(String accessToken)
+    public List<CalendarTaskDto> getUserTask(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userDetails.getEmail();
+        log.info(email);
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
@@ -224,6 +221,7 @@ public class MypageService
         }
 
         List<Project> projectList=getUserProject(user);
+        log.info("projectList {}",projectList.get(0).getProjectName());
         List<CalendarTaskDto> calendarTaskDtoList=new ArrayList<>();
         for(Project project:projectList)
         {
@@ -231,7 +229,8 @@ public class MypageService
             if(taskIds == null || taskIds.isEmpty()) {
                 continue;
             }
-            List<Task> tasks = taskRepository.findByIds(taskIds);
+            log.info("taskIds: {}", taskIds);
+            List<Task> tasks = taskRepository.findByProjectId(project.getId());
             for (Task task : tasks) {
                 CalendarTaskDto calendarTaskDto=CalendarTaskDto.from(task);
                 calendarTaskDtoList.add(calendarTaskDto);
