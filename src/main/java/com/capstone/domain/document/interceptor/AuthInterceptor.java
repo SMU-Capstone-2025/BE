@@ -27,7 +27,9 @@ public class AuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         StompCommand command = headerAccessor.getCommand();
 
-        if (command != null && command != StompCommand.DISCONNECT)
+        if (StompCommand.CONNECT.equals(command) ||
+                StompCommand.SEND.equals(command) ||
+                StompCommand.SUBSCRIBE.equals(command))
         {
             List<String> authHeaders = headerAccessor.getNativeHeader("Authorization");
             String authorizationHeader = (authHeaders != null && !authHeaders.isEmpty()) ? authHeaders.get(0) : null;
