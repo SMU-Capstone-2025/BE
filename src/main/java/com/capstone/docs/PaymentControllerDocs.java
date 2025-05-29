@@ -1,6 +1,7 @@
 package com.capstone.docs;
 
 import com.capstone.domain.payment.dto.PaymentRequestDto;
+import com.capstone.global.security.CustomUserDetails;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.siot.IamportRestClient.response.Payment;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -54,5 +56,5 @@ public interface PaymentControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<?>> validateIamport(@RequestHeader("Authorization") String token, @RequestBody PaymentRequestDto request);
+    ResponseEntity<com.capstone.global.response.ApiResponse<?>> validateIamport(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody PaymentRequestDto request);
 }
