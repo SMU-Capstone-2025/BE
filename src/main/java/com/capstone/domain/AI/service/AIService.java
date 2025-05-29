@@ -9,6 +9,7 @@ import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -84,10 +85,10 @@ public class AIService
         }
 
     }
-    public String correctGrammar(AIRequest aiRequest, String token)
+    public String correctGrammar(AIRequest aiRequest, CustomUserDetails userDetails)
     {
 
-        String userEmail= jwtUtil.getEmail(token);
+        String userEmail= userDetails.getEmail();
         checkUserMembership(userEmail);
 
         String request= aiRequest.getRequest();
@@ -96,9 +97,9 @@ public class AIService
         return askGemini(prompt).block();
     }
 
-    public String sumUpDocument(AIRequest aiRequest,String token)
+    public String sumUpDocument(AIRequest aiRequest,CustomUserDetails userDetails)
     {
-        String userEmail= jwtUtil.getEmail(token);
+        String userEmail= userDetails.getEmail();
         checkUserMembership(userEmail);
 
         String request= aiRequest.getRequest();
@@ -107,9 +108,9 @@ public class AIService
         return askGemini(prompt).block();
     }
 
-    public String reviseSummary(AIReviseRequest aiReviseRequest, String token)
+    public String reviseSummary(AIReviseRequest aiReviseRequest, CustomUserDetails userDetails)
     {
-        String userEmail= jwtUtil.getEmail(token);
+        String userEmail= userDetails.getEmail();
         checkUserMembership(userEmail);
         String originalSummary=aiReviseRequest.getAiResponse();
         String feedback =aiReviseRequest.getReviseRequest();
