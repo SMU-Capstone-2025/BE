@@ -1,14 +1,12 @@
 package com.capstone.domain.document.controller;
 
 import com.capstone.docs.DocumentControllerDocs;
-import com.capstone.domain.document.dto.DocumentCreateRequest;
-import com.capstone.domain.document.dto.DocumentEditRequest;
-import com.capstone.domain.document.dto.DocumentEditResponse;
-import com.capstone.domain.document.dto.DocumentResponse;
+import com.capstone.domain.document.dto.*;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +26,7 @@ import java.util.Map;
 public class DocumentController implements DocumentControllerDocs {
     private final SimpMessageSendingOperations messagingTemplate;
     private final DocumentService documentService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/load")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
@@ -65,9 +64,17 @@ public class DocumentController implements DocumentControllerDocs {
     @MessageMapping("/editing")
     public void sendMessage(@Valid DocumentEditRequest params,
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
-        DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
-        messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
-        documentService.updateDocumentToCache(params.documentId(), params.message());
+
+        try {
+            DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
+
+            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
+            messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
+            documentService.updateDocumentToCache(params.documentId(), documentEditVo);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/load/list")
