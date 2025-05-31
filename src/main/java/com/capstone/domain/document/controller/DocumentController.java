@@ -36,8 +36,9 @@ public class DocumentController implements DocumentControllerDocs {
 
     @DeleteMapping("/delete")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> deleteDocument(@RequestParam("documentId") String documentId){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.deleteDocumentFromCacheAndDB(documentId)));
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(@RequestParam("documentId") String documentId){
+        documentService.deleteDocumentFromCacheAndDB(documentId);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @PutMapping("/status")
@@ -51,14 +52,9 @@ public class DocumentController implements DocumentControllerDocs {
 
     @PostMapping("/post")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
-    }
-
-    @GetMapping("/list")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> getDocumentList(@RequestBody DocumentCreateRequest documentCreateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
+    public ResponseEntity<ApiResponse<Void>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
+        documentService.createDocument(documentCreateRequest);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @MessageMapping("/editing")
@@ -78,11 +74,13 @@ public class DocumentController implements DocumentControllerDocs {
     }
 
     @GetMapping("/load/list")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentList(projectId)));
     }
 
     @GetMapping("/load/list/date-asc")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByCreateAt(
             @RequestParam("projectId") String projectId) {
 

@@ -57,15 +57,14 @@ public class DocumentService {
         redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 1, TimeUnit.HOURS);
     }
 
-    public Document deleteDocumentFromCacheAndDB(String key){
+    public void deleteDocumentFromCacheAndDB(String key){
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
         documentRepository.delete(document);
-        return document;
     }
 
-    public Document createDocument(DocumentCreateRequest documentCreateRequest){
-        return documentRepository.save(documentCreateRequest.to());
+    public void createDocument(DocumentCreateRequest documentCreateRequest){
+        documentRepository.save(documentCreateRequest.to());
     }
 
 
@@ -84,6 +83,7 @@ public class DocumentService {
         }
         return null;
     }
+
     @Transactional
     public Document updateStatus(String id, String status, CustomUserDetails userDetails){
         validateStatus(status);
@@ -114,7 +114,7 @@ public class DocumentService {
     public void syncToMongoDB() {
         Set<String> keys = redisTemplate.keys("DOC:waited:*");
 
-        if (keys != null && !keys.isEmpty()) {
+        if (!keys.isEmpty()) {
             for (String key : keys) {
                 Object data = redisTemplate.opsForValue().get(key);
 
@@ -125,7 +125,6 @@ public class DocumentService {
                     if (document != null) {
                         documentRepository.save(document);
 
-                        // 3. 저장 후 Redis에서 키 이름 변경 (waited → loaded)
                         String newKey = key.replace("DOC:waited:", "DOC:loaded:");
                         redisTemplate.rename(key, newKey);
 
