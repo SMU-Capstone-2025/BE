@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>STOMP WebSocket 테스트</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -22,8 +22,14 @@
 <button onclick="unsubscribe()">🚫 구독 취소</button>
 <br><br>
 
-<label>메시지 입력:</label>
-<input type="text" id="messageInput" placeholder="보낼 메시지 입력">
+<button onclick="loadDocument()">📄 문서 불러오기</button>
+<br><br>
+
+<label>문서 편집:</label>
+<div id="editor"
+     contenteditable="true"
+     style="border: 1px solid #ccc; width: 400px; height: 200px; padding: 10px; overflow-y: auto;">
+</div>
 <button onclick="sendMessage()">📩 메시지 전송</button>
 
 <h3>📩 메시지 로그:</h3>
@@ -33,82 +39,107 @@
   let stompClient = null;
   let subscription = null;
 
-  // ✅ JWT 토큰 (직접 하드코딩)
-  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoia2FtaWxsY3JlYW0xQGdtYWlsLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDE3NzE0NzcsImV4cCI6MTc0MTc3MzI3N30.mNIDZZX0GNiFne481nlvDLFFtwtWgU0xhQh-h6S_HPE";
+  // ✅ JWT 토큰
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDg2Nzg4NzYsImV4cCI6MTc0ODY3OTc3Nn0.k0n9zfYHlnytU9EZyrVItKs-3g0yM6NUmishSz0-YFg";
 
   function logMessage(message) {
-      const logDiv = document.getElementById("messageLog");
-      logDiv.innerHTML += `<p>${message}</p>`;
-      logDiv.scrollTop = logDiv.scrollHeight; // 자동 스크롤
+    const logDiv = document.getElementById("messageLog");
+    logDiv.innerHTML += `<p>${message}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
   }
 
   function connect() {
-      const socket = new SockJS("http://localhost:8080/doc/ws"); // WebSocket 엔드포인트
-      stompClient = Stomp.over(socket);
+    const socket = new SockJS("http://localhost:8080/doc/ws");
+    stompClient = Stomp.over(socket);
 
-      // ✅ STOMP 연결 시 토큰 포함
-      stompClient.connect(
-          { Authorization: `${token}` },
-          function(frame) {
-              logMessage("✅ STOMP 연결 성공: " + frame);
-          },
-          function(error) {
-              logMessage("❌ 연결 실패: " + error);
-          }
-      );
+    stompClient.connect(
+      { Authorization: token },
+      function (frame) {
+        logMessage("✅ STOMP 연결 성공: " + frame);
+      },
+      function (error) {
+        logMessage("❌ 연결 실패: " + error);
+      }
+    );
   }
 
   function disconnect() {
-      if (stompClient !== null) {
-          stompClient.disconnect();
-          logMessage("🔌 연결 종료");
-      }
+    if (stompClient !== null) {
+      stompClient.disconnect();
+      logMessage("🔌 연결 종료");
+    }
   }
 
   function subscribe() {
-      const documentId = document.getElementById("documentId").value;
-      if (!stompClient || !stompClient.connected) {
-          logMessage("🚨 먼저 STOMP에 연결하세요!");
-          return;
-      }
+    const documentId = document.getElementById("documentId").value;
+    if (!stompClient || !stompClient.connected) {
+      logMessage("🚨 먼저 STOMP에 연결하세요!");
+      return;
+    }
 
-      // ✅ 구독 요청
-      subscription = stompClient.subscribe(
-        `/sub/document/${documentId}`,
-        function(message) {
-            logMessage("📨 받은 메시지: " + message.body);
-        },
-        { Authorization: `${token}` } // 헤더 추가
+    subscription = stompClient.subscribe(
+      `/sub/document/${documentId}`,
+      function (message) {
+        logMessage("📨 받은 메시지: " + message.body);
+      },
+      { Authorization: token }
     );
 
-      logMessage(`👀 /sub/document/${documentId} 구독 시작`);
+    logMessage(`👀 /sub/document/${documentId} 구독 시작`);
   }
 
   function unsubscribe() {
-      if (subscription) {
-          subscription.unsubscribe();
-          logMessage("🚫 구독 취소 완료");
-      }
+    if (subscription) {
+      subscription.unsubscribe();
+      logMessage("🚫 구독 취소 완료");
+    }
   }
 
   function sendMessage() {
-      const documentId = document.getElementById("documentId").value;
-      const message = document.getElementById("messageInput").value;
+  const documentId = document.getElementById("documentId").value;
 
-      if (!stompClient || !stompClient.connected) {
-          logMessage("🚨 먼저 STOMP에 연결하세요!");
-          return;
-      }
+  const payload = {
+  documentId: documentId,
+  message: JSON.stringify({
+    documentId: documentId,
+    status: "COMPLETED",
+    title: "임시 제목2",
+    content: "임시 컨텐츠2",
+    logs: [],
+    attachments: []
+  })
+};
 
-      const payload = {
-          documentId: documentId,
-          message: message
-      };
+  stompClient.send("/pub/editing", { Authorization: token }, JSON.stringify(payload));
+  logMessage(`📩 메시지 전송: ${JSON.stringify(payload)}`);
+}
+  function loadDocument() {
+    const documentId = document.getElementById("documentId").value;
 
-      // ✅ 메시지 전송 시에도 토큰 포함
-      stompClient.send("/pub/editing", { Authorization: `${token}` }, JSON.stringify(payload));
-      logMessage(`📩 메시지 전송: ${JSON.stringify(payload)}`);
-  }
+    fetch(`http://localhost:8080/document/load?documentId=${documentId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+    if (data.status === "SUCCESS") {
+        const doc = data.data;
+        logMessage(`📄 문서 불러오기 성공: ${JSON.stringify(doc)}`);
+
+        // ✅ 불러온 HTML content를 textarea에 넣기
+        const editor = document.getElementById("messageInput");
+        editor.value = doc.content || "";
+    } else {
+        logMessage(`⚠️ 문서 불러오기 실패: ${data.message || '오류 발생'}`);
+    }
+})
+    .catch(error => {
+        logMessage(`❌ 문서 불러오기 에러: ${error}`);
+    });
+}
 </script>
 </body>
 </html>
