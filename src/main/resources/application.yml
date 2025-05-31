@@ -153,3 +153,23 @@ management:
       exposure:
         include: health, httpexchanges, metrics, traces, prometheus
 
+
+blank_issues_enabled: false
+contact_links: []
+
+issue_templates:
+  - name: 🐞 버그 리포트
+    description: 발생한 버그를 보고합니다.
+    file: bug_report.md
+
+  - name: ✨ 새로운 기능
+    description: 새 기능을 제안하거나 작업을 시작합니다.
+    file: feature_template.md
+
+  - name: 🛠 버그 수정
+    description: 기존 기능의 오류를 수정합니다.
+    file: fix_template.md
+
+  - name: 🔧 코드 리팩터링
+    description: 동작은 그대로, 구조를 개선합니다.
+    file: refactor_template.md
