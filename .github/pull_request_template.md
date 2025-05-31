@@ -1,12 +1,3 @@
----
-name: PR Template
-about: Use when create PR
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ## 📌 PR 개요
 <!-- 이 PR이 어떤 내용을 담고 있는지 한 줄로 요약해주세요. -->
 
