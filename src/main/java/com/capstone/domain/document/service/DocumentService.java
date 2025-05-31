@@ -1,6 +1,7 @@
 package com.capstone.domain.document.service;
 
 import com.capstone.domain.document.dto.DocumentCreateRequest;
+import com.capstone.domain.document.dto.DocumentEditVo;
 import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
@@ -15,6 +16,8 @@ import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
@@ -48,9 +51,10 @@ public class DocumentService {
 
     }
 
-    public void updateDocumentToCache(String key, String changes){
-        Document updatedDocument = new Document(key, changes);
-        redisTemplate.opsForValue().set("DOC:waited:" + key, updatedDocument, 1, TimeUnit.HOURS);
+    public void updateDocumentToCache(String key, DocumentEditVo changes){
+        Document doc = documentRepository.findDocumentByDocumentId(key);
+        doc.update(key, doc.getProjectId(), changes);
+        redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 1, TimeUnit.HOURS);
     }
 
     public Document deleteDocumentFromCacheAndDB(String key){
@@ -70,6 +74,8 @@ public class DocumentService {
         if (data instanceof Map) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 String json = objectMapper.writeValueAsString(data);
                 return objectMapper.readValue(json, Document.class);
             } catch (Exception e) {
@@ -115,9 +121,8 @@ public class DocumentService {
                 if (data != null) {
                     Document document = mapToDocument(data);
 
+
                     if (document != null) {
-                        // 2. 문서에 UUID 할당 후 MongoDB 저장
-                        document.setId(UUID.randomUUID().toString());
                         documentRepository.save(document);
 
                         // 3. 저장 후 Redis에서 키 이름 변경 (waited → loaded)
