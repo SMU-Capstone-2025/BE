@@ -1,14 +1,12 @@
 package com.capstone.domain.document.controller;
 
 import com.capstone.docs.DocumentControllerDocs;
-import com.capstone.domain.document.dto.DocumentCreateRequest;
-import com.capstone.domain.document.dto.DocumentEditRequest;
-import com.capstone.domain.document.dto.DocumentEditResponse;
-import com.capstone.domain.document.dto.DocumentResponse;
+import com.capstone.domain.document.dto.*;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +26,7 @@ import java.util.Map;
 public class DocumentController implements DocumentControllerDocs {
     private final SimpMessageSendingOperations messagingTemplate;
     private final DocumentService documentService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/load")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
@@ -37,8 +36,9 @@ public class DocumentController implements DocumentControllerDocs {
 
     @DeleteMapping("/delete")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> deleteDocument(@RequestParam("documentId") String documentId){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.deleteDocumentFromCacheAndDB(documentId)));
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(@RequestParam("documentId") String documentId){
+        documentService.deleteDocumentFromCacheAndDB(documentId);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @PutMapping("/status")
@@ -52,30 +52,35 @@ public class DocumentController implements DocumentControllerDocs {
 
     @PostMapping("/post")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
-    }
-
-    @GetMapping("/list")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Document>> getDocumentList(@RequestBody DocumentCreateRequest documentCreateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.createDocument(documentCreateRequest)));
+    public ResponseEntity<ApiResponse<Void>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
+        documentService.createDocument(documentCreateRequest);
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @MessageMapping("/editing")
     public void sendMessage(@Valid DocumentEditRequest params,
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
-        DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
-        messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
-        documentService.updateDocumentToCache(params.documentId(), params.message());
+
+        try {
+            DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
+
+            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
+            messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
+            documentService.updateDocumentToCache(params.documentId(), documentEditVo);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("/load/list")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentList(projectId)));
     }
 
     @GetMapping("/load/list/date-asc")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByCreateAt(
             @RequestParam("projectId") String projectId) {
 
