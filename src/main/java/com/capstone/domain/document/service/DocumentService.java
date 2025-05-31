@@ -6,21 +6,19 @@ import com.capstone.domain.document.dto.DocumentResponse;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
-import com.capstone.domain.project.entity.Project;
-import com.capstone.domain.project.repository.ProjectRepository;
-import com.capstone.domain.task.dto.response.TaskResponse;
-import com.capstone.domain.task.entity.Task;
-import com.capstone.domain.task.message.TaskStatus;
+
 import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CachePut;
+
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -51,10 +49,10 @@ public class DocumentService {
 
     }
 
-    public void updateDocumentToCache(String key, DocumentEditVo changes){
+    public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
         Document doc = documentRepository.findDocumentByDocumentId(key);
-        doc.update(key, doc.getProjectId(), changes);
-        redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 1, TimeUnit.HOURS);
+        doc.update(email, key, doc.getProjectId(), changes);
+        redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 10, TimeUnit.SECONDS);
     }
 
     public void deleteDocumentFromCacheAndDB(String key){
@@ -63,8 +61,9 @@ public class DocumentService {
         documentRepository.delete(document);
     }
 
-    public void createDocument(DocumentCreateRequest documentCreateRequest){
-        documentRepository.save(documentCreateRequest.to());
+    public void createDocument(CustomUserDetails customUserDetails, DocumentCreateRequest documentCreateRequest){
+        String editorId = customUserDetails.getEmail();
+        documentRepository.save(documentCreateRequest.to(editorId));
     }
 
 
@@ -117,9 +116,11 @@ public class DocumentService {
         if (!keys.isEmpty()) {
             for (String key : keys) {
                 Object data = redisTemplate.opsForValue().get(key);
+                System.out.println(data.toString());
 
                 if (data != null) {
                     Document document = mapToDocument(data);
+
 
 
                     if (document != null) {

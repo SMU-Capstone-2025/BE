@@ -123,7 +123,8 @@ public interface DocumentControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Void>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Void>> postDocument(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                                                                @RequestBody DocumentCreateRequest documentCreateRequest);
 
 
     @Operation(description = "프론트 단에서 /pub/editing 으로 send 하면, MessageMapping이 동작함.")
@@ -146,7 +147,7 @@ public interface DocumentControllerDocs {
                     )
             )
     })
-    void sendMessage(DocumentEditRequest params, @Header("simpSessionAttributes") Map<String, Object> sessionAttributes);
+    void sendMessage(@AuthenticationPrincipal CustomUserDetails customUserDetails,  DocumentEditRequest params, @Header("simpSessionAttributes") Map<String, Object> sessionAttributes);
 
 
     @Operation(description = "프로젝트의 문서 리스트 반환")

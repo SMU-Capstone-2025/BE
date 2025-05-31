@@ -22,7 +22,10 @@ public record DocumentCreateRequest(
         @Schema(description = "영문 값으로 기입 <br> PENDING: 진행 전, PROGRESS: 진행 중, COMPLETED : 진행 완료")
         String status
 ) {
-    public Document to(){
+    public Document to(String editorId){
+        List<String> editors = new ArrayList<>();
+        editors.add(editorId);
+
         return Document.builder()
                 .projectId(this.projectId)
                 .title(this.title)
@@ -30,6 +33,7 @@ public record DocumentCreateRequest(
                 .attachments(this.attachments)
                 .logs(new ArrayList<>())
                 .status(this.status)
+                .editors(editors)
                 .build();
     }
 }

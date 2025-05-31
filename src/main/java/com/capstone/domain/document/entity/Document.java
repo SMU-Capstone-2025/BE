@@ -8,6 +8,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @org.springframework.data.mongodb.core.mapping.Document(collection = "document")
@@ -25,17 +26,18 @@ public class Document extends BaseDocument {
 
     private String status;
 
-    @Nullable
     private String title;
 
-    @Nullable
     private String content;
-    @Nullable
+
     private List<String> logs;
-    @Nullable
+
     private List<String> attachments;
 
-    public void update(String key, String projectId, DocumentEditVo vo){
+    private List<String> editors;
+
+
+    public void update(String email, String key, String projectId, DocumentEditVo vo){
         this.id = key;
         this.projectId = projectId;
         if (vo.getTitle() != null) this.title = vo.getTitle();
@@ -43,6 +45,13 @@ public class Document extends BaseDocument {
         if (vo.getLogs() != null) this.logs = vo.getLogs();
         if (vo.getAttachments() != null) this.attachments = vo.getAttachments();
         if (vo.getContent() != null) this.content = vo.getContent();
+
+        if (this.editors == null) {
+            this.editors = new ArrayList<>();
+        }
+
+        this.editors.add(email);
+
         this.updatedAt = LocalDateTime.now();
     }
 

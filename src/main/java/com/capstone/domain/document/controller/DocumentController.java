@@ -9,6 +9,7 @@ import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/document")
@@ -52,21 +54,25 @@ public class DocumentController implements DocumentControllerDocs {
 
     @PostMapping("/post")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Void>> postDocument(@RequestBody DocumentCreateRequest documentCreateRequest){
-        documentService.createDocument(documentCreateRequest);
+    public ResponseEntity<ApiResponse<Void>> postDocument(@AuthenticationPrincipal CustomUserDetails customUserDetails, @RequestBody DocumentCreateRequest documentCreateRequest){
+        documentService.createDocument(customUserDetails, documentCreateRequest);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
     @MessageMapping("/editing")
-    public void sendMessage(@Valid DocumentEditRequest params,
+    public void sendMessage(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                            @Valid DocumentEditRequest params,
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
 
         try {
+
+            String email = (String) sessionAttributes.get("email");
+            log.info(email);
             DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
 
             DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
             messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
-            documentService.updateDocumentToCache(params.documentId(), documentEditVo);
+            documentService.updateDocumentToCache(email, params.documentId(), documentEditVo);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
