@@ -5,6 +5,7 @@ import com.capstone.domain.file.service.FileService;
 import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ import java.io.IOException;
 public class FileController implements FileControllerDocs {
     private final FileService fileService;
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<String>> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
         return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(file)));
     }

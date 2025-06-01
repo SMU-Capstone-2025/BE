@@ -5,6 +5,7 @@ import com.capstone.domain.payment.dto.PaymentRequestDto;
 import com.capstone.domain.payment.exception.InvaildPaymentException;
 import com.capstone.domain.payment.service.PaymentService;
 import com.capstone.global.response.ApiResponse;
+import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -47,7 +49,7 @@ public class PaymentController implements PaymentControllerDocs
 
 
     @PostMapping("/verify")
-    public ResponseEntity<ApiResponse<?>> validateIamport(@RequestHeader("Authorization") String token, @RequestBody PaymentRequestDto request) {
+    public ResponseEntity<ApiResponse<?>> validateIamport(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody PaymentRequestDto request) {
         try {
             IamportResponse<Payment> payment = iamportClient.paymentByImpUid(request.getImpUid());
 
@@ -59,7 +61,7 @@ public class PaymentController implements PaymentControllerDocs
             String jsonResponse = objectMapper.writeValueAsString(payment.getResponse());
             log.info("아임포트 응답: {}", jsonResponse);
 
-            paymentService.processPayment(token,request.getImpUid());
+            paymentService.processPayment(userDetails,request.getImpUid());
 
             return ResponseEntity.ok(ApiResponse.onSuccess(payment));
 

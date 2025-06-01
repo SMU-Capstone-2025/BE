@@ -1,6 +1,7 @@
 package com.capstone.domain.mypage.dto;
 
 
+import com.capstone.domain.user.entity.MembershipType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class UserDto
     @NoArgsConstructor
     public static class UserPasswordDto
     {
-        private String currentPassword;
+        private String email;
         private String newPassword;
         private String confirmPassword;
     }
@@ -32,6 +33,7 @@ public class UserDto
         private String email;
         private String profileImage;
         private String social;
+        private MembershipType membership;
     }
     @Getter
     @AllArgsConstructor

@@ -7,6 +7,7 @@ import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,9 +28,9 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public PaymentEntity processPayment(String token,String impUid)
+    public PaymentEntity processPayment(CustomUserDetails userDetails, String impUid)
     {
-        String email =jwtUtil.getEmail(token);
+        String email =userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user == null)
         {
