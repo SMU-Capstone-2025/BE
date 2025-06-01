@@ -30,8 +30,11 @@ public class ProjectController implements ProjectControllerDocs {
     private final ProjectUserService projectUserService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<Project>> registerProject(@Valid @RequestBody ProjectSaveRequest projectSaveRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processRegister(projectSaveRequest)));
+    public ResponseEntity<ApiResponse<Project>> registerProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @Valid @RequestBody ProjectSaveRequest projectSaveRequest){
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processRegister(customUserDetails, projectSaveRequest)));
     }
 
 
