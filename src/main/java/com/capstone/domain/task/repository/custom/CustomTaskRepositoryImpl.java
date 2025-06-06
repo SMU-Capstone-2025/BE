@@ -1,22 +1,21 @@
 package com.capstone.domain.task.repository.custom;
 
-import com.capstone.domain.task.dto.TaskDto;
+import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.VersionNotFoundException;
-import com.capstone.domain.task.message.ResponseMessages;
+import com.capstone.domain.task.message.TaskMessages;
 import com.capstone.global.util.DateUtil;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
-import javax.swing.text.Document;
 import java.util.List;
+
 
 @RequiredArgsConstructor
 public class CustomTaskRepositoryImpl implements CustomTaskRepository{
@@ -39,25 +38,51 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     }
 
     @Override
-    public String modifyVersion(TaskDto taskDto){
+    public String modifyVersion(TaskRequest taskDto){
         Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(taskDto.getId())
-                .and("versionHistory.version").is(taskDto.getVersion()));
+        query.addCriteria(Criteria.where("id").is(taskDto.taskId())
+                .and("versionHistory.version").is(taskDto.version()));
 
         Update update = new Update();
-        update.set("versionHistory.$.modifiedBy", taskDto.getModifiedBy());
-        update.set("versionHistory.$.content", taskDto.getContent());
-        update.set("versionHistory.$.summary", taskDto.getSummary());
+        update.set("versionHistory.$.modifiedBy", taskDto.modifiedBy());
+        update.set("versionHistory.$.content", taskDto.content());
         update.set("versionHistory.$.modifiedDateTime", DateUtil.getCurrentFormattedDateTime());
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, Task.class);
 
         if (result.getMatchedCount() == 0) {
-            throw new VersionNotFoundException(ResponseMessages.VERSION_NOT_FOUND);
+            throw new VersionNotFoundException(TaskMessages.VERSION_NOT_FOUND);
         }
 
-        return ResponseMessages.VERSION_MODIFIED;
+        return TaskMessages.VERSION_MODIFIED;
+    }
+    @Override
+    public List<Task> findByIds(List<String> taskIds) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").in(taskIds));
+        return mongoTemplate.find(query, Task.class);
     }
 
+    @Override
+    public List<Task> findByUserEmailAndSortDeadLine(String email) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("editors").in(email));
+        query.with(Sort.by(Sort.Direction.ASC,"deadline"));
+        return mongoTemplate.find(query, Task.class);
+    }
+
+    @Override
+    public List<Task> findByUserEmail(String email) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("editors").in(email));
+        return mongoTemplate.find(query, Task.class);
+    }
+
+    @Override
+    public List<Task> findByProjectId(String projectId) {
+        Query query= new Query();
+        query.addCriteria(Criteria.where("projectId").is(projectId));
+        return mongoTemplate.find(query, Task.class);
+    }
 
 }

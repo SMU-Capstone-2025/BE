@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STOMP WebSocket 테스트</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h2>STOMP WebSocket 테스트</h2>
+
+<label>채널 ID:</label>
+<input type="text" id="documentId" value="room1">
+<br><br>
+
+<button onclick="connect()">🔗 STOMP 연결</button>
+<button onclick="disconnect()">❌ 연결 종료</button>
+<br><br>
+
+<button onclick="subscribe()">👀 채널 구독</button>
+<button onclick="unsubscribe()">🚫 구독 취소</button>
+<br><br>
+
+<button onclick="loadDocument()">📄 문서 불러오기</button>
+<br><br>
+
+<label>문서 편집:</label>
+<div id="editor"
+     contenteditable="true"
+     style="border: 1px solid #ccc; width: 400px; height: 200px; padding: 10px; overflow-y: auto;">
+</div>
+<button onclick="sendMessage()">📩 메시지 전송</button>
+
+<h3>📩 메시지 로그:</h3>
+<div id="messageLog" style="border: 1px solid #ccc; padding: 10px; width: 400px; height: 200px; overflow-y: scroll;"></div>
+
+<script>
+  let stompClient = null;
+  let subscription = null;
+
+  // ✅ JWT 토큰
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDg2OTM0NzEsImV4cCI6MTc0ODY5NDM3MX0.ZndvXXGLfIPUwlot1qTkODmz9tarECtMYuhVHsgyuiQ";
+
+  function logMessage(message) {
+    const logDiv = document.getElementById("messageLog");
+    logDiv.innerHTML += `<p>${message}</p>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  function connect() {
+    const socket = new SockJS("http://localhost:8080/doc/ws");
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect(
+      { Authorization: token },
+      function (frame) {
+        logMessage("✅ STOMP 연결 성공: " + frame);
+      },
+      function (error) {
+        logMessage("❌ 연결 실패: " + error);
+      }
+    );
+  }
+
+  function disconnect() {
+    if (stompClient !== null) {
+      stompClient.disconnect();
+      logMessage("🔌 연결 종료");
+    }
+  }
+
+  function subscribe() {
+    const documentId = document.getElementById("documentId").value;
+    if (!stompClient || !stompClient.connected) {
+      logMessage("🚨 먼저 STOMP에 연결하세요!");
+      return;
+    }
+
+    subscription = stompClient.subscribe(
+      `/sub/document/${documentId}`,
+      function (message) {
+        logMessage("📨 받은 메시지: " + message.body);
+      },
+      { Authorization: token }
+    );
+
+    logMessage(`👀 /sub/document/${documentId} 구독 시작`);
+  }
+
+  function unsubscribe() {
+    if (subscription) {
+      subscription.unsubscribe();
+      logMessage("🚫 구독 취소 완료");
+    }
+  }
+
+  function sendMessage() {
+  const documentId = document.getElementById("documentId").value;
+
+  const payload = {
+  documentId: documentId,
+  message: JSON.stringify({
+    documentId: documentId,
+    status: "COMPLETED",
+    title: "임시 제목23212",
+    content: "임시 컨텐츠23123",
+    logs: [],
+    attachments: []
+  })
+};
+
+  stompClient.send("/pub/editing", { Authorization: token }, JSON.stringify(payload));
+  logMessage(`📩 메시지 전송: ${JSON.stringify(payload)}`);
+}
+  function loadDocument() {
+    const documentId = document.getElementById("documentId").value;
+
+    fetch(`http://localhost:8080/document/load?documentId=${documentId}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+    if (data.status === "SUCCESS") {
+        const doc = data.data;
+        logMessage(`📄 문서 불러오기 성공: ${JSON.stringify(doc)}`);
+
+        // ✅ 불러온 HTML content를 textarea에 넣기
+        const editor = document.getElementById("messageInput");
+        editor.value = doc.content || "";
+    } else {
+        logMessage(`⚠️ 문서 불러오기 실패: ${data.message || '오류 발생'}`);
+    }
+})
+    .catch(error => {
+        logMessage(`❌ 문서 불러오기 에러: ${error}`);
+    });
+}
+</script>
+</body>
+</html>
