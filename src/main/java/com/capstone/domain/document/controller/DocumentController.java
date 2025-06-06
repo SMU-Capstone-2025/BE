@@ -65,9 +65,8 @@ public class DocumentController implements DocumentControllerDocs {
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
 
         try {
-
             String email = (String) sessionAttributes.get("email");
-            log.info(email);
+
             DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
 
             DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
