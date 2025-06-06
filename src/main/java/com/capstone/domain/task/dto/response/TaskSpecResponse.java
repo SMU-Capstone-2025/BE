@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Builder
-public record TaskSpecResponse(
+public record  TaskSpecResponse(
         String taskId,
         String title,
         String status,
