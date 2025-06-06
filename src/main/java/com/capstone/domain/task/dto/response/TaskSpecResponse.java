@@ -8,13 +8,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Builder
-public record TaskSpecResponse(
+public record  TaskSpecResponse(
         String taskId,
         String title,
         String status,
         String content,
         LocalDate deadline,
-        List<String> attachments,
+        List<String> attachmentList,
         List<String> coworkers
 ) {
     public static TaskSpecResponse from(Task task, List<String> attachments,String content){
@@ -24,7 +24,7 @@ public record TaskSpecResponse(
                 .status(task.getStatus())
                 .deadline(task.getDeadline())
                 .coworkers(task.getEditors())
-                .attachments(attachments)
+                .attachmentList(attachments)
                 .content(content)
                 .build();
     }

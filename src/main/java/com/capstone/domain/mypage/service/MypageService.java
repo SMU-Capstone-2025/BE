@@ -23,6 +23,9 @@ import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
 import com.capstone.global.mail.service.MailService;
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
+import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -53,9 +56,10 @@ public class MypageService
     private final ProjectUserRepository projectUserRepository;
 
 
-    public UserDto.UserInfoDto getUser(String accessToken)
+    public UserDto.UserInfoDto getUser(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+
+        String email=userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
@@ -63,23 +67,25 @@ public class MypageService
         }
         return user.toDto();
     }
+    public boolean checkEmail(String name, String email)
+    {
+        User user = userRepository.findUserByEmail(email);
+        if (user == null || !user.getName().equals(name)) {
+            throw new GlobalException(ErrorStatus.USER_NOT_FOUND);
+        }
+        return true;
+    }
+
+
 
     @Transactional
-    public String modifyPassword(String accessToken, UserDto.UserPasswordDto userPasswordDto)
+    public String modifyPassword(UserDto.UserPasswordDto userPasswordDto)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userPasswordDto.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
             throw new UserNotFoundException(USER_NOT_FOUND);
-        }
-        String oldPassword=user.getPassword();
-
-        //현재 비번이랑 입력한 비번 같은지 확인
-        if(!bCryptPasswordEncoder.matches(userPasswordDto.getCurrentPassword(),oldPassword))
-        {
-
-            throw new InvalidPasswordException(PASSWORD_NOT_FOUND);
         }
 
         //새로 입력한 비번이랑 다시한번 입력하는 새로운 비번이랑 같은지 확인
@@ -93,9 +99,9 @@ public class MypageService
         return email;
     }
 
-    public String modifyProfile(String accessToken, UserDto.UserProfileDto userProfileDto)
+    public String modifyProfile(CustomUserDetails userDetails, UserDto.UserProfileDto userProfileDto)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
@@ -107,8 +113,8 @@ public class MypageService
     }
 
     @Transactional
-    public String modifyEmail(String accessToken, UserDto.UserEmailDto userEmailDto) throws Exception {
-        String email=jwtUtil.getEmail(accessToken);
+    public String modifyEmail(CustomUserDetails userDetails, UserDto.UserEmailDto userEmailDto) throws Exception {
+        String email=userDetails.getEmail();
         log.info("email {}",email);
         User user=userRepository.findUserByEmail(email);
         if(user==null)
@@ -162,9 +168,9 @@ public class MypageService
         return userEmailDto.getNewEmail();
     }
     @Transactional
-    public String removeUser(String accessToken)
+    public String removeUser(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email= userDetails.getEmail();
         User user=userRepository.findUserByEmail(email);
 
         if(user==null)
@@ -192,25 +198,22 @@ public class MypageService
                 }
             }
         }
-        List<ProjectUser> projectUserList=projectUserRepository.findByUserId(user.getId());
+        List<ProjectUser> projectUserList=projectUserRepository.findByUserId(email);
         projectUserRepository.deleteAll(projectUserList);
         userRepository.delete(user);
+
         return email;
     }
 
     public List<Project> getUserProject(User user)
     {
-        List<String> projectIds= user.getProjectIds();
-        log.info("projectIds {}",projectIds.get(0));
-        if (projectIds == null || projectIds.isEmpty()) {
-            return new ArrayList<>(); //비어있ㅅ는 리스트 반환
-        }
-        return projectRepository.findAllById(projectIds);
+        return projectUserRepository.findProjectsByUserId(user.getEmail());
     }
 
-    public List<CalendarTaskDto> getUserTask(String accessToken)
+    public List<CalendarTaskDto> getUserTask(CustomUserDetails userDetails)
     {
-        String email=jwtUtil.getEmail(accessToken);
+        String email=userDetails.getEmail();
+        log.info(email);
         User user=userRepository.findUserByEmail(email);
         if(user==null)
         {
@@ -218,6 +221,7 @@ public class MypageService
         }
 
         List<Project> projectList=getUserProject(user);
+        log.info("projectList {}",projectList.get(0).getProjectName());
         List<CalendarTaskDto> calendarTaskDtoList=new ArrayList<>();
         for(Project project:projectList)
         {
@@ -225,7 +229,8 @@ public class MypageService
             if(taskIds == null || taskIds.isEmpty()) {
                 continue;
             }
-            List<Task> tasks = taskRepository.findByIds(taskIds);
+            log.info("taskIds: {}", taskIds);
+            List<Task> tasks = taskRepository.findByProjectId(project.getId());
             for (Task task : tasks) {
                 CalendarTaskDto calendarTaskDto=CalendarTaskDto.from(task);
                 calendarTaskDtoList.add(calendarTaskDto);

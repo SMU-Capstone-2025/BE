@@ -8,12 +8,14 @@ import java.util.Map;
 
 @Builder
 public record ProjectResponse(
+        String projectId,
         String name,
         String description,
         List<String> coworkers
 ) {
     public static ProjectResponse from(Project project, List<String> emails){
         return ProjectResponse.builder()
+                .projectId(project.getId())
                 .name(project.getProjectName())
                 .description(project.getDescription())
                 .coworkers(emails)

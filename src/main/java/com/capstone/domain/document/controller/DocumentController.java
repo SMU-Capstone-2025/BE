@@ -65,9 +65,8 @@ public class DocumentController implements DocumentControllerDocs {
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
 
         try {
-
             String email = (String) sessionAttributes.get("email");
-            log.info(email);
+
             DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
 
             DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
@@ -80,13 +79,11 @@ public class DocumentController implements DocumentControllerDocs {
     }
 
     @GetMapping("/load/list")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentList(@RequestParam("projectId") String projectId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentList(projectId)));
     }
 
     @GetMapping("/load/list/date-asc")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#documentCreateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<Document>>> getDocumentListSortedByCreateAt(
             @RequestParam("projectId") String projectId) {
 

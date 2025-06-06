@@ -36,10 +36,10 @@ public class ProjectService {
 
 
     @Transactional
-    public Project saveProject(ProjectSaveRequest projectSaveRequest){
+    public Project saveProject(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
         Project project = projectRepository.save(projectSaveRequest.toProject());
         if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
-            List<ProjectUser> projectUsers = projectSaveRequest.invitedEmails().stream()
+            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
                     .map(email -> ProjectUser.builder()
                             .projectId(project.getId())
                             .userId(email) // userId 또는 email로 처리, 시스템 구조에 따라
@@ -47,7 +47,18 @@ public class ProjectService {
                             .status("INVITED")
                             .joinedAt(LocalDate.now().toString())
                             .build()
-                    ).toList();
+                    ).toList());
+
+
+            ProjectUser inviteUser = ProjectUser.builder()
+                    .projectId(project.getId())
+                    .userId(customUserDetails.getEmail())
+                    .role("ROLE_MEMBER")
+                    .status("ACCEPTED")
+                    .joinedAt(LocalDate.now().toString())
+                    .build();
+
+            projectUsers.add(inviteUser);
 
             projectUserRepository.saveAll(projectUsers);
         }
@@ -61,8 +72,8 @@ public class ProjectService {
         return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId), projectUserRepository.findUserIdByProjectId(projectId));
     }
 
-    public Project processRegister(ProjectSaveRequest projectSaveRequest){
-        Project project = saveProject(projectSaveRequest);
+    public Project processRegister(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
+        Project project = saveProject(customUserDetails, projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
         kafkaProducerService.sendProjectChangedEvent(
                 "project.changed",

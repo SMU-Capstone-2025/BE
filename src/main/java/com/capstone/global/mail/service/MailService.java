@@ -1,5 +1,6 @@
 package com.capstone.global.mail.service;
 
+import com.capstone.domain.mypage.dto.EmailDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -59,7 +60,7 @@ public class MailService {
         MimeMessage message = javaMailSender.createMimeMessage();
         ePw = createKey();
         message.addRecipients(MimeMessage.RecipientType.TO, to); // to 보내는 대상
-        message.setSubject("[Doctalk] 이메일 변경 인증 코드"); //메일 제목
+        message.setSubject("[Doctalk] 인증 코드"); //메일 제목
 
         String msg = "<div style=\"width: 100%; font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;\">"
                 + "<div style=\"max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; text-align: center;\">"
@@ -77,6 +78,8 @@ public class MailService {
 
         return message;
     }
+
+
     public String createKey() {
         StringBuilder key = new StringBuilder();
         SecureRandom rnd = new SecureRandom();
@@ -108,8 +111,8 @@ public class MailService {
                 }
         );
     }
-    public String sendSimpleMessageForNewEmail(String email) throws Exception {
-        MimeMessage message = createEmailChangeMessage(email);
+    public String sendSimpleMessageCheckEmail(EmailDto emailDto) throws Exception {
+        MimeMessage message = createEmailChangeMessage(emailDto.email());
         try{
             javaMailSender.send(message); // 메일 발송
         }catch(MailException es){
@@ -118,6 +121,7 @@ public class MailService {
         }
         return ePw;
     }
+
 
     public void processSendMessages(String message) {
         try {

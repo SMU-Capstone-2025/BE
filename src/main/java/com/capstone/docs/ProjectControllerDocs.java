@@ -44,7 +44,9 @@ public interface ProjectControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> registerProject(@RequestBody ProjectSaveRequest projectSaveRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> registerProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectSaveRequest projectSaveRequest);
 
     @Operation(description = "프로젝트 업데이트")
     @ApiResponses(value = {

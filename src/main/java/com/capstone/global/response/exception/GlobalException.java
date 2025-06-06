@@ -18,4 +18,5 @@ public class GlobalException extends RuntimeException {
         return this.code.getReasonHttpStatus();
     }
 
+
 }
