@@ -21,7 +21,17 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
+    topics:
+      task-created: task.created
+      task-updated: task.updated
+      task-deleted: task.deleted
+      project-created: project.created
+      project-updated: project.updated
+      project-deleted: project.deleted
+      document-created: document.created
+      document-updated: document.updated
+      document-deleted: document.deleted
 
   security:
     oauth2:
@@ -133,24 +143,24 @@ springdoc:
   default-produces-media-type: application/json
   override-with-generic-response: false
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-  observations:
-    annotations:
-      enabled: true
-  zipkin:
-    tracing:
-      endpoint: http://35.202.85.190:9411/api/v2/spans
-  metrics:
-    export:
-      prometheus:
-        enabled: true
-        enable-openmetrics: false
-  endpoints:
-    web:
-      exposure:
-        include: health, httpexchanges, metrics, traces, prometheus
-
-
+#management:
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#  observations:
+#    annotations:
+#      enabled: true
+#  zipkin:
+#    tracing:
+#      endpoint: http://localhost:9411/api/v2/spans
+#  metrics:
+#    export:
+#      prometheus:
+#        enabled: true
+#        enable-openmetrics: false
+#  endpoints:
+#    web:
+#      exposure:
+#        include: health, httpexchanges, metrics, traces, prometheus
+#
+#
