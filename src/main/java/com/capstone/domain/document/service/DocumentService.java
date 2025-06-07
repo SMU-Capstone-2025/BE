@@ -93,7 +93,7 @@ public class DocumentService {
         }
         document.setStatus(status);
         documentRepository.save(document);
-        kafkaProducerService.sendDocumentEvent("document.changed", "UPDATE", DocumentResponse.from(document), userDetails.getEmail());
+        //kafkaProducerService.sendEvent("document.changed", "UPDATE", DocumentResponse.from(document), userDetails.getEmail());
 
         return document;
     }

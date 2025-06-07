@@ -20,9 +20,9 @@ public class ProjectConsumer {
         mailService.processSendMessages(message);
     }
 
-    @KafkaListener(topics = "project.changed", groupId = "notification-service")
-    public void sendChangeNotification(String message) throws JsonProcessingException {
-        notificationService.processUpdateNotification(message);
-    }
+//    @KafkaListener(topics = "project.changed", groupId = "notification-service")
+//    public void sendChangeNotification(String message) throws JsonProcessingException {
+//        notificationService.processUpdateNotification(message);
+//    }
 
 }

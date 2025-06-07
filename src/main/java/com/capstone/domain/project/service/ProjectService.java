@@ -75,12 +75,12 @@ public class ProjectService {
     public Project processRegister(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(customUserDetails, projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "CREATE",
-                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
-                projectSaveRequest.invitedEmails()
-        );
+//        kafkaProducerService.sendEvent(
+//                "project.changed",
+//                "CREATE",
+//                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
+//                projectSaveRequest.invitedEmails()
+//        );
         return project;
     }
 
@@ -90,12 +90,12 @@ public class ProjectService {
     public Project processUpdate(ProjectUpdateRequest projectUpdateRequest){
         Project project = findProjectByProjectIdOrThrow(projectUpdateRequest.projectId());
         project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "UPDATE",
-                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
-                projectUserRepository.findUserIdByProjectId(project.getId())
-        );
+//        kafkaProducerService.sendEvent(
+//                "project.changed",
+//                "UPDATE",
+//                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
+//                projectUserRepository.findUserIdByProjectId(project.getId())
+//        );
         projectRepository.save(project);
         return project;
     }

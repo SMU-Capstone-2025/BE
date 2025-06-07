@@ -65,36 +65,36 @@ public class NotificationService {
         });
     }
 
-    @Transactional
-    public void processUpdateNotification(String message) {
-        try {
-            JsonNode rootNode = objectMapper.readTree(message);
-            String method = rootNode.get("method").asText();
-            String topic = rootNode.get("topic").asText();
-            log.info("method: {}, topic: {}", method, topic);
-
-            Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, method, topic);
-            log.info("matched Handler: {}", matchedHandler);
-
-            matchedHandler.ifPresent(handler -> {
-                String notificationContent = handler.generateMessage(rootNode);
-                log.info("notification content: {}", notificationContent);
-                List<String> coworkers = handler.findCoworkers(rootNode);
-
-                Notification notification = createNotification(notificationContent, coworkers);
-                saveNotification(notification);
-                sendNotificationByOwnersId(coworkers, notificationContent);
-            });
-
-            // 핸들러 못 찾은 경우 로그 남기기
-            if (matchedHandler.isEmpty()) {
-                log.warn("No matching handler found for method: {}, topic: {}", method, topic);
-            }
-        } catch (JsonProcessingException e) {
-            log.error("Failed to parse notification message: {}", message, e);
-            throw new RuntimeException("Invalid notification message format", e);
-        }
-    }
+//    @Transactional
+//    public void processUpdateNotification(String message) {
+//        try {
+//            JsonNode rootNode = objectMapper.readTree(message);
+//            String method = rootNode.get("method").asText();
+//            String topic = rootNode.get("topic").asText();
+//            log.info("method: {}, topic: {}", method, topic);
+//
+//            Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, method, topic);
+//            log.info("matched Handler: {}", matchedHandler);
+//
+//            matchedHandler.ifPresent(handler -> {
+//                String notificationContent = handler.generateMessage(rootNode);
+//                log.info("notification content: {}", notificationContent);
+//                List<String> coworkers = handler.findCoworkers(rootNode);
+//
+//                Notification notification = createNotification(notificationContent, coworkers);
+//                saveNotification(notification);
+//                sendNotificationByOwnersId(coworkers, notificationContent);
+//            });
+//
+//            // 핸들러 못 찾은 경우 로그 남기기
+//            if (matchedHandler.isEmpty()) {
+//                log.warn("No matching handler found for method: {}, topic: {}", method, topic);
+//            }
+//        } catch (JsonProcessingException e) {
+//            log.error("Failed to parse notification message: {}", message, e);
+//            throw new RuntimeException("Invalid notification message format", e);
+//        }
+//    }
 
     public Optional<NotificationHandler> findProperHandler(List<NotificationHandler> handlers, String method, String topic){
         return handlers.stream()
