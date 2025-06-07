@@ -11,7 +11,9 @@ import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.log.repository.LogRepository;
+import com.capstone.global.kafka.dto.TaskChangePayload;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -36,14 +39,12 @@ public class TaskService {
     private final TaskUtil taskUtil;
 
 
-    public Task saveTask(TaskRequest taskDto){
+    public Task saveTask(TaskRequest taskDto, CustomUserDetails userDetails){
         validateStatus(taskDto.status());
 
-        long start = System.currentTimeMillis();
-
         Task saved = taskRepository.save(taskDto.toTask());
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED,TaskChangePayload.from(saved, null, null, userDetails.getEmail()));
 
-        log.info("🔥 save took {}ms", System.currentTimeMillis() - start);
         return saved;
     }
 
@@ -60,9 +61,17 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         task.addNewVersion(version);
         task.updateInfo(taskDto.title(), LocalDate.parse(taskDto.deadline()),taskDto.version());
+
+        String oldContent = version.getContent();
+        String newContent = taskDto.content();
+
         taskRepository.save(task);
 
-        kafkaProducerService.sendTaskEvent("task.changed", "ADD", TaskResponse.from(task), customUserDetails.getEmail());
+        TaskChangePayload payload = TaskChangePayload.from(task, oldContent, newContent, customUserDetails.getEmail());
+        log.info("payload: {}", payload.getNewContent());
+
+        // TODO: 버전 enum으로 변경
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED,TaskChangePayload.from(task, oldContent, newContent, customUserDetails.getEmail()));
         return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
 
     }
@@ -72,7 +81,9 @@ public class TaskService {
         log.info("userDetails: {}", userDetails.getEmail());
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
-        kafkaProducerService.sendTaskEvent("task.changed", "DELETE", TaskResponse.from(task), userDetails.getEmail());
+
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_DELETED,TaskChangePayload.from(task, null, null, userDetails.getEmail()));
+
         return task;
     }
 
@@ -81,9 +92,12 @@ public class TaskService {
         validateStatus(status);
 
         Task task = findTaskByIdOrThrow(id);
+        String oldContent = task.getStatus();
+
         task.updateStatus(status);
         taskRepository.save(task);
-        kafkaProducerService.sendTaskEvent("task.changed", "UPDATE", TaskResponse.from(task), userDetails.getEmail());
+
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_UPDATED,TaskChangePayload.from(task, oldContent, status, userDetails.getEmail()));
 
         return task;
     }

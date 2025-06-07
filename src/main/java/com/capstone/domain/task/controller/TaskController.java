@@ -29,8 +29,9 @@ public class TaskController implements TaskControllerDocs {
 
     @PostMapping("/post")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#taskDto.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Task>> postTask(@Valid @RequestBody TaskRequest taskDto) {
-        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.saveTask(taskDto)));
+    public ResponseEntity<ApiResponse<Task>> postTask(@Valid @RequestBody TaskRequest taskDto,
+                                                      @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.onSuccess(taskService.saveTask(taskDto, userDetails)));
     }
 
     @GetMapping("/get")
