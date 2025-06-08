@@ -1,14 +1,13 @@
 package com.capstone.domain.notification.repository.custom;
 
 import com.capstone.domain.notification.entity.Notification;
-import com.capstone.global.util.DateUtil;
+import com.capstone.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -26,7 +25,7 @@ public class CustomNotificationRepositoryImpl implements CustomNotificationRepos
         // 시간 형식 변환
         notifications.forEach(notification -> {
             if (notification.getExpiredDate() != null) {
-                notification.setExpiredDate(DateUtil.formatLocalDateTime(notification.getExpiredDate()));
+                notification.setExpiredDate(DateTimeUtil.formatLocalDateTime(notification.getExpiredDate()));
             }
         });
 
