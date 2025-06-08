@@ -1,7 +1,7 @@
 package com.capstone.domain.task.util;
 
 import com.capstone.domain.task.repository.TaskRepository;
-import com.capstone.global.util.DateUtil;
+import com.capstone.global.util.DateTimeUtil;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.entity.Version;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class TaskUtil {
             return Version.builder()
                     .taskId(taskDto.taskId())
                     .version(taskDto.version())
-                    .modifiedDateTime(DateUtil.getCurrentFormattedDateTime())
+                    .modifiedDateTime(DateTimeUtil.getCurrentFormattedDateTime())
                     .modifiedBy(taskDto.modifiedBy())
                     .content(taskDto.content())
                     .attachmentList(attachmentList)

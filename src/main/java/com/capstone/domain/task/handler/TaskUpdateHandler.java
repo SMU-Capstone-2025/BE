@@ -18,9 +18,10 @@ import static com.capstone.domain.notification.entity.Notification.createNotific
 @Slf4j
 public class TaskUpdateHandler implements NotificationHandler {
 
+    // TODO: 수정 필요
     @Override
     public boolean canHandle(String method, String topic) {
-        return "UPDATE".equals(method) && "TASK".equals(topic);
+        return !"UPDATE".equals(method) && !"TASK".equals(topic);
     }
 
     @Override

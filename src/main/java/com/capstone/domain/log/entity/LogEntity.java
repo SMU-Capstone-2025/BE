@@ -18,16 +18,8 @@ public class LogEntity extends BaseDocument {
     private String id;
     private String email;
     private String method;
-    private String log;
+    private String oldContent;
+    private String newContent;
     private String timestamp;
     private String taskId;
-
-    public String toJson() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to convert object to JSON", e);
-        }
-    }
 }

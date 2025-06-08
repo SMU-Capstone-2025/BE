@@ -5,7 +5,7 @@ import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.exception.VersionNotFoundException;
 import com.capstone.domain.task.message.TaskMessages;
-import com.capstone.global.util.DateUtil;
+import com.capstone.global.util.DateTimeUtil;
 import com.mongodb.client.result.UpdateResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -46,7 +46,7 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
         Update update = new Update();
         update.set("versionHistory.$.modifiedBy", taskDto.modifiedBy());
         update.set("versionHistory.$.content", taskDto.content());
-        update.set("versionHistory.$.modifiedDateTime", DateUtil.getCurrentFormattedDateTime());
+        update.set("versionHistory.$.modifiedDateTime", DateTimeUtil.getCurrentFormattedDateTime());
 
         UpdateResult result = mongoTemplate.updateFirst(query, update, Task.class);
 

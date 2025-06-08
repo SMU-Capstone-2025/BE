@@ -1,17 +1,29 @@
 package com.capstone.global.kafka.dto;
 
-import jakarta.annotation.Nullable;
+import com.capstone.domain.task.entity.Task;
+import lombok.*;
 
-import java.util.List;
-import java.util.Map;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class TaskChangePayload {
+    private String id;
+    private String title;
+    private String modifiedBy;
+    private String version;
+    private String oldContent;
+    private String newContent;
 
-public record TaskChangePayload(String id,
-                                String title,
-                                String modifiedBy,
-                                String version,
-                                String summary,
-                                String content,
-                                @Nullable
-                                List<String> editors
-                                ) {
+    public static TaskChangePayload from(Task task, String oldContent, String newContent, String email) {
+        return TaskChangePayload.builder()
+                .id(task.getId())
+                .title(task.getTitle())
+                .modifiedBy(email)
+                .version(task.getCurrentVersion())
+                .oldContent(oldContent)
+                .newContent(newContent)
+                .build();
+    }
 }

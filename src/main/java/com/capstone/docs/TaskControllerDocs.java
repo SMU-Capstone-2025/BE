@@ -63,7 +63,7 @@ public interface TaskControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Task>> postTask(@RequestBody TaskRequest taskDto);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Task>> postTask(@RequestBody TaskRequest taskDto,@AuthenticationPrincipal CustomUserDetails userDetails);
 
     @Operation(description = "작업의 세부 내용 불러오기")
     @ApiResponses(value = {

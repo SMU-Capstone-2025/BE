@@ -41,12 +41,12 @@ public class ProjectUserService {
                 (projectUserRepository::save)
         );
         userService.participateProcess(projectAuthorityRequest.getAuthorityKeysAsList(), projectAuthorityRequest.projectId());
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "INVITE",
-                project,
-                projectAuthorityRequest.getAuthorityKeysAsList()
-        );
+//        kafkaProducerService.sendEvent(
+//                "project.changed",
+//                "INVITE",
+//                project,
+//                projectAuthorityRequest.getAuthorityKeysAsList()
+//        );
         return project;
     }
 
@@ -72,12 +72,12 @@ public class ProjectUserService {
     public Project processAuth(ProjectAuthorityRequest projectAuthorityRequest){
         Project project = findProjectByProjectIdOrThrow(projectAuthorityRequest.projectId());
         updateProjectUserAuthorities(projectAuthorityRequest);
-        kafkaProducerService.sendProjectChangedEvent(
-                "project.changed",
-                "AUTH",
-                project,
-                projectAuthorityRequest.getAuthorityKeysAsList()
-        );
+//        kafkaProducerService.sendEvent(
+//                "project.changed",
+//                "AUTH",
+//                project,
+//                projectAuthorityRequest.getAuthorityKeysAsList()
+//        );
         return project;
     }
 
