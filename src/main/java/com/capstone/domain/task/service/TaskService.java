@@ -92,12 +92,12 @@ public class TaskService {
         validateStatus(status);
 
         Task task = findTaskByIdOrThrow(id);
-        String oldContent = task.getStatus();
+        String oldStatus = task.getStatus();
 
         task.updateStatus(status);
         taskRepository.save(task);
 
-        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_UPDATED,TaskChangePayload.from(task, oldContent, status, userDetails.getEmail()));
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_UPDATED,TaskChangePayload.from(task, oldStatus, status, userDetails.getEmail()));
 
         return task;
     }

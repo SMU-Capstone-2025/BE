@@ -4,9 +4,10 @@ import com.capstone.domain.log.service.TaskLogService;
 import com.capstone.domain.notification.service.NotificationService;
 
 import com.capstone.global.kafka.dto.TaskChangePayload;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.kafka.annotation.KafkaListener;
 
 import org.springframework.messaging.handler.annotation.Header;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Slf4j
 public class TaskConsumer {
-    private final ObjectMapper objectMapper;
     private final TaskLogService logService;
     private final NotificationService notificationService;
 
@@ -29,7 +29,7 @@ public class TaskConsumer {
         try {
             logService.saveLogEntityFromPayload(kafkaTopic, payload);
         } catch (Exception e) {
-            System.err.println("메시지 처리 실패: " + e.getMessage());
+            log.error("Failed to process Kafka message – topic={}, payload={}", kafkaTopic, payload, e);
         }
     }
     @KafkaListener(topics = "task.updated", groupId = "log-service", containerFactory = "taskKafkaListenerContainerFactory")
@@ -38,7 +38,7 @@ public class TaskConsumer {
         try {
             logService.saveLogEntityFromPayload(kafkaTopic, payload);
         } catch (Exception e) {
-            System.err.println("메시지 처리 실패: " + e.getMessage());
+            log.error("Failed to process Kafka message – topic={}, payload={}", kafkaTopic, payload, e);
         }
     }
     @KafkaListener(topics = "task.deleted", groupId = "log-service", containerFactory = "taskKafkaListenerContainerFactory")
@@ -47,7 +47,7 @@ public class TaskConsumer {
         try {
             logService.saveLogEntityFromPayload(kafkaTopic, payload);
         } catch (Exception e) {
-            System.err.println("메시지 처리 실패: " + e.getMessage());
+            log.error("Failed to process Kafka message – topic={}, payload={}", kafkaTopic, payload, e);
         }
     }
 
