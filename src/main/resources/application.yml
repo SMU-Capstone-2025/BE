@@ -29,6 +29,8 @@ spring:
       project-created: project.created
       project-updated: project.updated
       project-deleted: project.deleted
+      project-invited: project.invited
+      project-authenticated: project.authenticated
       document-created: document.created
       document-updated: document.updated
       document-deleted: document.deleted

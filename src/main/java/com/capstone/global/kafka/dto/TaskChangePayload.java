@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TaskChangePayload {
+public class TaskChangePayload extends CommonChangePayload{
     private String id;
     private String title;
     private String modifiedBy;

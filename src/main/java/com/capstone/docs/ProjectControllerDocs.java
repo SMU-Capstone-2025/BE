@@ -87,7 +87,9 @@ public interface ProjectControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateProject(@RequestBody ProjectUpdateRequest projectUpdateRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectUpdateRequest projectUpdateRequest);
 
     @Operation(description = "프로젝트 내 권한 변경")
     @ApiResponses(value = {

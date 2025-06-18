@@ -20,6 +20,8 @@ public class KafkaTopicProperties {
     private String projectCreated;
     private String projectUpdated;
     private String projectDeleted;
+    private String projectInvited;
+    private String projectAuthenticated;
 
     private final Map<KafkaEventTopic, String> topicMap = new EnumMap<>(KafkaEventTopic.class);
 
@@ -31,6 +33,8 @@ public class KafkaTopicProperties {
         topicMap.put(KafkaEventTopic.PROJECT_CREATED, projectCreated);
         topicMap.put(KafkaEventTopic.PROJECT_UPDATED, projectUpdated);
         topicMap.put(KafkaEventTopic.PROJECT_DELETED, projectDeleted);
+        topicMap.put(KafkaEventTopic.PROJECT_INVITED, projectInvited);
+        topicMap.put(KafkaEventTopic.PROJECT_AUTHENTICATED, projectAuthenticated);
     }
 
     public String resolve(KafkaEventTopic topic) {

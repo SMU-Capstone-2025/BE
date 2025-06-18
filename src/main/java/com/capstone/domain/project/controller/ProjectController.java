@@ -40,8 +40,10 @@ public class ProjectController implements ProjectControllerDocs {
 
     @PutMapping("/update")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectUpdateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Project>> updateProject(@Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest)));
+    public ResponseEntity<ApiResponse<Project>> updateProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest, customUserDetails)));
     }
 
     @PutMapping("/auth")

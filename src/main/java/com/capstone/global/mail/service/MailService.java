@@ -1,6 +1,7 @@
 package com.capstone.global.mail.service;
 
 import com.capstone.domain.mypage.dto.EmailDto;
+import com.capstone.global.kafka.dto.ProjectChangePayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +28,6 @@ public class MailService {
 
     private final JavaMailSender javaMailSender;
     private String ePw;
-    private final ObjectMapper objectMapper;
 
     @Value("${spring.mail.username}")
     private String id;
@@ -120,24 +120,5 @@ public class MailService {
             throw new IllegalArgumentException();
         }
         return ePw;
-    }
-
-
-    public void processSendMessages(String message) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            Map<String, Object> map = objectMapper.readValue(
-                    message, new TypeReference<Map<String, Object>>() {}
-            );
-
-            Map<String, Object> data = (Map<String, Object>) map.get("data");
-
-            List<String> emails = (List<String>) map.get("email");
-
-            sendMultipleMessages(emails);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
     }
 }
