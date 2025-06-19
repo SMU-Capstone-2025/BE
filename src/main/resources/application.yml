@@ -145,6 +145,7 @@ springdoc:
   default-produces-media-type: application/json
   override-with-generic-response: false
 
+
 #management:
 #  tracing:
 #    sampling:
