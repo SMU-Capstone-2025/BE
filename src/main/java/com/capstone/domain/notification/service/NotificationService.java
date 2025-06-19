@@ -68,15 +68,12 @@ public class NotificationService {
 
     @Transactional
     public <T extends CommonChangePayload> void processUpdateNotification(String kafkaTopic, T payload) {
-        log.info("kafkaTopic: {}", kafkaTopic);
 
         try {
             Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, kafkaTopic);
-            log.info("matched Handler: {}", matchedHandler);
 
             matchedHandler.ifPresent(handler -> {
                 String notificationContent = handler.generateMessage(payload);
-                log.info("notification content: {}", notificationContent);
 
 
                 Notification notification = createNotification(notificationContent, payload.getCoworkers());
