@@ -130,7 +130,9 @@ public interface ProjectControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateAuthority(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectAuthorityRequest projectAuthorityRequest);
 
     @Operation(description = "프로젝트에 신규 인원 추가")
     @ApiResponses(value = {
@@ -171,7 +173,9 @@ public interface ProjectControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> inviteProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectAuthorityRequest projectAuthorityRequest);
 
     @Operation(description = "프로젝트의 세부 내용 불러오기")
     @ApiResponses(value = {
