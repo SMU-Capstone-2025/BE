@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -19,11 +18,12 @@ public class TaskLogService implements LogService<TaskChangePayload> {
 
     @Override
     public void saveLogEntityFromPayload(String kafkaTopic, TaskChangePayload payload){
+
         LogEntity logEntity = LogEntity.builder()
                 .email(payload.getModifiedBy())
-//                .method(kafkaTopic)
-//                .oldContent(payload.getOldContent())
-//                .newContent(payload.getNewContent())
+                .method(kafkaTopic)
+                .oldContent(payload.getOldContent())
+                .newContent(payload.getNewContent())
                 .targetType(LogType.TASK.getType())
                 .targetId(payload.getId())
                 .timestamp(DateTimeUtil.formatIsoDateTime(LocalDateTime.now()))
