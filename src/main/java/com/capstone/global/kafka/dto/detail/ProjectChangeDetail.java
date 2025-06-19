@@ -5,15 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Getter
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProjectChangeDetail extends ChangeDetail{
-    private String title;
     private String description;
     private List<String> taskIds;
     private List<String> documentIds;
@@ -24,6 +24,13 @@ public class ProjectChangeDetail extends ChangeDetail{
                 .description(project.getDescription())
                 .taskIds(project.getTaskIds())
                 .documentIds(project.getDocumentIds())
+                .build();
+    }
+
+    // 권한 조정 및 초대 시 사용.
+    public static ProjectChangeDetail from(Object coworkers){
+        return ProjectChangeDetail.builder()
+                .coworkers(coworkers)
                 .build();
     }
 
