@@ -6,13 +6,14 @@ import com.capstone.global.kafka.dto.ProjectChangePayload;
 import com.capstone.global.mail.service.MailService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ProjectConsumer {
@@ -22,8 +23,8 @@ public class ProjectConsumer {
 
 
     @KafkaListener(
-            topics = {"project.updated", "project.deleted", "project.created"},
-            groupId = "notification-service",
+            topics = {"project.updated", "project.deleted", "project.created", "project.invited", "project.authenticated"},
+            groupId = "log-service",
             containerFactory = "projectKafkaListenerContainerFactory"
     )
     public void processCreateLogSave(
@@ -34,7 +35,7 @@ public class ProjectConsumer {
     }
 
     @KafkaListener(
-            topics = {"project.updated", "project.deleted", "project.created"},
+            topics = {"project.updated", "project.deleted", "project.created", "project.invited", "project.authenticated"},
             groupId = "mail-service",
             containerFactory = "projectKafkaListenerContainerFactory"
     )
@@ -44,7 +45,7 @@ public class ProjectConsumer {
     }
 
     @KafkaListener(
-            topics = {"project.updated", "project.deleted", "project.created"},
+            topics = {"project.updated", "project.deleted", "project.created", "project.invited", "project.authenticated"},
             groupId = "notification-service",
             containerFactory = "projectKafkaListenerContainerFactory"
     )
