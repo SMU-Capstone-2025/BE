@@ -22,6 +22,9 @@ public class KafkaTopicProperties {
     private String projectDeleted;
     private String projectInvited;
     private String projectAuthenticated;
+    private String documentCreated;
+    private String documentUpdated;
+    private String documentDeleted;
 
     private final Map<KafkaEventTopic, String> topicMap = new EnumMap<>(KafkaEventTopic.class);
 
@@ -35,6 +38,9 @@ public class KafkaTopicProperties {
         topicMap.put(KafkaEventTopic.PROJECT_DELETED, projectDeleted);
         topicMap.put(KafkaEventTopic.PROJECT_INVITED, projectInvited);
         topicMap.put(KafkaEventTopic.PROJECT_AUTHENTICATED, projectAuthenticated);
+        topicMap.put(KafkaEventTopic.DOCUMENT_CREATED, documentCreated);
+        topicMap.put(KafkaEventTopic.DOCUMENT_UPDATED, documentUpdated);
+        topicMap.put(KafkaEventTopic.DOCUMENT_DELETED, documentDeleted);
     }
 
     public String resolve(KafkaEventTopic topic) {

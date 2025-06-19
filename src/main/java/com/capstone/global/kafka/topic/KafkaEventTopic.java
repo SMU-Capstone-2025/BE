@@ -11,7 +11,10 @@ public enum KafkaEventTopic {
     PROJECT_UPDATED("project.updated"),
     PROJECT_DELETED("project.deleted"),
     PROJECT_INVITED("project.invited"),
-    PROJECT_AUTHENTICATED("project.authenticated");
+    PROJECT_AUTHENTICATED("project.authenticated"),
+    DOCUMENT_CREATED("document.created"),
+    DOCUMENT_UPDATED("document.updated"),
+    DOCUMENT_DELETED("document.deleted");
 
     private final String value;
 
