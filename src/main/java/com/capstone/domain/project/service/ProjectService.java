@@ -40,37 +40,10 @@ public class ProjectService {
 
     @Transactional
     public Project saveProject(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
-        System.out.println(projectSaveRequest.projectName());
         Project project = projectRepository.save(projectSaveRequest.toProject());
-        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
-            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
-                    .map(email -> ProjectUser.builder()
-                            .projectId(project.getId())
-                            .userId(email) // userId 또는 email로 처리, 시스템 구조에 따라
-                            .role("ROLE_MEMBER") // 기본 권한 설정
-                            .status("INVITED")
-                            .joinedAt(LocalDate.now().toString())
-                            .build()
-                    ).toList());
-
-
-            ProjectUser inviteUser = ProjectUser.builder()
-                    .projectId(project.getId())
-                    .userId(customUserDetails.getEmail())
-                    .role("ROLE_MEMBER")
-                    .status("ACCEPTED")
-                    .joinedAt(LocalDate.now().toString())
-                    .build();
-
-            projectUsers.add(inviteUser);
-
-            projectUserRepository.saveAll(projectUsers);
-        }
+        saveProjectUsers(projectSaveRequest, project, customUserDetails.getEmail());
         return project;
     }
-
-
-
 
     public ProjectResponse getProjectContent(String projectId){
         return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId), projectUserRepository.findUserIdByProjectId(projectId));
@@ -94,7 +67,9 @@ public class ProjectService {
         ProjectChangeDetail afterUpdate = ProjectChangeDetail.from(project);
 
         List<String> coworkers = projectUserRepository.findUserIdByProjectId(project.getId());
+
         kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_UPDATED, ProjectChangePayload.from(project, beforeUpdate, afterUpdate, customUserDetails.getEmail(), coworkers));
+
         projectRepository.save(project);
         return project;
     }
@@ -123,4 +98,30 @@ public class ProjectService {
                 .toList();
     }
 
+    public void saveProjectUsers(ProjectSaveRequest projectSaveRequest, Project project, String inviterEmail){
+        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
+            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
+                    .map(email -> ProjectUser.builder()
+                            .projectId(project.getId())
+                            .userId(email)
+                            .role("ROLE_MEMBER") // 기본 권한 설정
+                            .status("INVITED")
+                            .joinedAt(LocalDate.now().toString())
+                            .build()
+                    ).toList());
+
+
+            ProjectUser inviteUser = ProjectUser.builder()
+                    .projectId(project.getId())
+                    .userId(inviterEmail)
+                    .role("ROLE_MEMBER")
+                    .status("ACCEPTED")
+                    .joinedAt(LocalDate.now().toString())
+                    .build();
+
+            projectUsers.add(inviteUser);
+
+            projectUserRepository.saveAll(projectUsers);
+        }
+    }
 }
