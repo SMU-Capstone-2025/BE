@@ -26,7 +26,7 @@ public class ProjectUpdateHandler implements NotificationHandler<ProjectChangePa
     @Override
     public String generateMessage(ProjectChangePayload payload) {
         Map<String, Object> merged = Map.of(
-                "projectName", payload.getProjectName()
+                "projectName", payload.getTitle()
         );
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_UPDATED, merged);

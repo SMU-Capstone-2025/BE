@@ -27,7 +27,7 @@ public class ProjectAuthHandler implements NotificationHandler<ProjectChangePayl
 
         Map<String, Object> merged = Map.of(
                 "email", payload.getCoworkers(),
-                "title", payload.getProjectName()
+                "title", payload.getTitle()
         );
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_AUTHENTICATED, merged);

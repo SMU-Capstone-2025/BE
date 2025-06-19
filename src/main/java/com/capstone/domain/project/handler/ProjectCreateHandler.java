@@ -26,7 +26,7 @@ public class ProjectCreateHandler implements NotificationHandler<ProjectChangePa
     public String generateMessage(ProjectChangePayload payload) {
         Map<String, Object> merged = Map.of(
                 "email", payload.getCoworkers(),
-                "projectName", payload.getProjectName()
+                "projectName", payload.getTitle()
         );
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_CREATED, merged);

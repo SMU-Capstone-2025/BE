@@ -27,7 +27,7 @@ public class ProjectInviteHandler implements NotificationHandler<ProjectChangePa
     public String generateMessage(ProjectChangePayload payload) {
         Map<String, Object> merged = Map.of(
                 "email", payload.getCoworkers(),
-                "title", payload.getProjectName()
+                "title", payload.getTitle()
         );
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_INVITED, merged);
