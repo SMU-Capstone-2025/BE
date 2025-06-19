@@ -16,7 +16,7 @@ import java.util.*;
 public class DocumentUpdateHandler implements NotificationHandler<TaskChangePayload> {
     @Override
     public boolean canHandle(String kafkaTopic) {
-        return KafkaEventTopic.TASK_UPDATED.equals(kafkaTopic);
+        return KafkaEventTopic.DOCUMENT_UPDATED.getValue().equals(kafkaTopic);
     }
 
     @Override
