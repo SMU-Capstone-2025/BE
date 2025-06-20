@@ -8,5 +8,4 @@ import java.util.List;
 public interface NotificationHandler<T extends CommonChangePayload> {
     boolean canHandle(String kafkaTopic);
     String generateMessage(T payload);
-    List<String> findCoworkers(JsonNode rootNode);
 }

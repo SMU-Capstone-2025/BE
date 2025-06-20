@@ -13,7 +13,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocumentChangeDetail extends ChangeDetail{
+public class DocumentChangeDetail extends ChangeDetail<List<String>>{
     private String status;
     private List<String> logs;
     private List<String> attachments;

@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class ChangeDetail {
+public abstract class ChangeDetail<T> {
     private String title;
-    private Object coworkers;
+    private T coworkers;
 }

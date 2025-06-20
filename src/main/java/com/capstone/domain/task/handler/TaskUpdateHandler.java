@@ -30,8 +30,6 @@ public class TaskUpdateHandler implements NotificationHandler<TaskChangePayload>
 
     @Override
     public String generateMessage(TaskChangePayload payload) {
-
-
         Map<String, Object> merged = new HashMap<>();
         merged.put("email", payload.getModifiedBy());
         merged.put("title", payload.getTitle());
@@ -39,18 +37,5 @@ public class TaskUpdateHandler implements NotificationHandler<TaskChangePayload>
         log.info("merged: {}", merged);
 
         return MessageGenerator.generateFromDto(MessageGenerator.TASK_UPDATED, merged);
-    }
-
-    @Override
-    public List<String> findCoworkers(JsonNode rootNode) {
-        List<String> coworkers = new ArrayList<>();
-        JsonNode editorsNode = rootNode.get("data").get("editors");
-
-        if (editorsNode != null && editorsNode.isArray()) {
-            editorsNode.forEach(
-                    jsonNode -> coworkers.add(jsonNode.asText())
-            );
-        }
-        return coworkers;
     }
 }

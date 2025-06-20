@@ -32,9 +32,4 @@ public class ProjectAuthHandler implements NotificationHandler<ProjectChangePayl
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_AUTHENTICATED, merged);
     }
-
-    @Override
-    public List<String> findCoworkers(JsonNode rootNode) {
-        return Collections.singletonList(rootNode.get("email").asText());
-    }
 }

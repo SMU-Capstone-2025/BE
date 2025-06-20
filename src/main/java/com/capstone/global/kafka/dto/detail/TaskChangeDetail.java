@@ -16,7 +16,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskChangeDetail extends ChangeDetail{
+public class TaskChangeDetail extends ChangeDetail<List<String>>{
     private String version;
     private String status;
     private LocalDate deadline;

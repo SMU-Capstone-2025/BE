@@ -31,18 +31,4 @@ public class TaskDeleteHandler implements NotificationHandler<TaskChangePayload>
 
         return MessageGenerator.generateFromDto(MessageGenerator.TASK_DELETED, merged);
     }
-
-    @Override
-    public List<String> findCoworkers(JsonNode rootNode) {
-        List<String> coworkers = new ArrayList<>();
-        JsonNode editorsNode = rootNode.get("data").get("editors");
-
-        if (editorsNode != null && editorsNode.isArray()) {
-            editorsNode.forEach(
-                    jsonNode -> coworkers.add(jsonNode.asText())
-            );
-        }
-
-        return coworkers;
-    }
 }

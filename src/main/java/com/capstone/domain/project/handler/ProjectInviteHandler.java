@@ -32,9 +32,4 @@ public class ProjectInviteHandler implements NotificationHandler<ProjectChangePa
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_INVITED, merged);
     }
-
-    @Override
-    public List<String> findCoworkers(JsonNode rootNode) {
-        return Collections.singletonList(rootNode.get("email").asText());
-    }
 }

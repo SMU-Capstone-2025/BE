@@ -49,7 +49,7 @@ public class ProjectUserService {
         );
 
 
-        ProjectChangeDetail afterChange = ProjectChangeDetail.from(projectAuthorityRequest.getAuthorityKeysAsList());
+        ProjectChangeDetail afterChange = ProjectChangeDetail.from(projectAuthorityRequest.authorities());
         userService.participateProcess(projectAuthorityRequest.getAuthorityKeysAsList(), projectAuthorityRequest.projectId());
         kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_INVITED, ProjectChangePayload.from(project, null, afterChange, customUserDetails.getEmail(), projectAuthorityRequest.getAuthorityKeysAsList()));
         return project;
@@ -62,12 +62,11 @@ public class ProjectUserService {
 
     public void updateProjectUserAuthorities(ProjectAuthorityRequest request) {
         String projectId = request.projectId();
-        Map<String, String> newAuthorities = request.authorities();
 
         List<ProjectUser> projectUsers = projectUserRepository.findByProjectId(projectId);
 
         projectUsers.forEach(projectUser -> {
-            String newRole = newAuthorities.get(projectUser.getUserId());
+            String newRole = request.getRoleByUserId(projectUser.getUserId());
             if (newRole != null) {
                 projectUser.setRole(newRole); // 권한 업데이트
             }

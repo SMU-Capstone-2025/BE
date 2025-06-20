@@ -1,5 +1,6 @@
 package com.capstone.domain.project.dto.request;
 
+import com.capstone.domain.project.dto.query.ProjectUserAuthority;
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.Role;
 import com.capstone.global.response.exception.GlobalException;
@@ -14,32 +15,45 @@ import java.util.stream.Collectors;
 
 public record ProjectAuthorityRequest(
         String projectId,
-        Map<String, String> authorities
-)
-{
+        List<ProjectUserAuthority> authorities
+) {
     public List<String> getAuthorityKeysAsList() {
-        return authorities == null ? List.of() : new ArrayList<>(authorities.keySet());
+        return authorities == null ? List.of() :
+                authorities.stream()
+                        .map(ProjectUserAuthority::getUserId)
+                        .toList();
     }
 
     public List<ProjectUser> from() {
-        return authorities.entrySet().stream()
-                .map(entry -> ProjectUser.builder()
-                        .projectId(projectId)
-                        .userId(entry.getKey())
-                        .role(entry.getValue())
-                        .status("ACCEPTED")
-                        .joinedAt(LocalDate.now().toString())
-                        .build())
-                .toList();
+        return authorities == null ? List.of() :
+                authorities.stream()
+                        .map(auth -> ProjectUser.builder()
+                                .projectId(projectId)
+                                .userId(auth.getUserId())
+                                .role(auth.getRole())
+                                .status("ACCEPTED")
+                                .joinedAt(LocalDate.now().toString())
+                                .build())
+                        .toList();
     }
 
     public void validateRoles() {
         if (authorities == null) return;
 
-        for (Map.Entry<String, String> entry : authorities.entrySet()) {
-            if (!Role.isValid(entry.getValue())) {
+        for (ProjectUserAuthority auth : authorities) {
+            if (!Role.isValid(auth.getRole())) {
                 throw new GlobalException(ErrorStatus.INVALID_ROLE);
             }
         }
+    }
+
+    public String getRoleByUserId(String userId) {
+        if (authorities == null) return null;
+
+        return authorities.stream()
+                .filter(auth -> auth.getUserId().equals(userId))
+                .map(ProjectUserAuthority::getRole)
+                .findFirst()
+                .orElse(null);
     }
 }
