@@ -40,22 +40,28 @@ public class ProjectController implements ProjectControllerDocs {
 
     @PutMapping("/update")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectUpdateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Project>> updateProject(@Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest)));
+    public ResponseEntity<ApiResponse<Project>> updateProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest, customUserDetails)));
     }
 
     @PutMapping("/auth")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Project>> updateAuthority(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+    public ResponseEntity<ApiResponse<Project>> updateAuthority(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectAuthorityRequest projectAuthorityRequest){
         projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(projectAuthorityRequest)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(customUserDetails, projectAuthorityRequest)));
     }
 
     @PutMapping("/invite")
     @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Project>> inviteProject(@RequestBody ProjectAuthorityRequest projectAuthorityRequest){
+    public ResponseEntity<ApiResponse<Project>> inviteProject(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestBody ProjectAuthorityRequest projectAuthorityRequest){
         projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processInvite(projectAuthorityRequest)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processInvite(customUserDetails, projectAuthorityRequest)));
     }
 
     @GetMapping("/load")

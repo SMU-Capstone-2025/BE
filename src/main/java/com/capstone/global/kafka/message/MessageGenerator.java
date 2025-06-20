@@ -26,7 +26,7 @@ public class MessageGenerator {
             "프로젝트에 초대되었습니다! 버튼을 눌러 참여하세요!<br>"
                     + "- 프로젝트 이름: {projectName}<br>";
 
-    public static final String AUTH_UPDATED = "프로젝트 내 권한이 변경되었습니다.<br>"
+    public static final String PROJECT_AUTHENTICATED = "프로젝트 내 권한이 변경되었습니다.<br>"
             + "- 프로젝트명: {projectName} <br>"
             + "- 대상: {names} <br>"
             + "- 권한: {authorities}";

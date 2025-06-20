@@ -11,7 +11,10 @@ import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.service.UserService;
 
+import com.capstone.global.kafka.dto.ProjectChangePayload;
+import com.capstone.global.kafka.dto.detail.ProjectChangeDetail;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -38,35 +41,9 @@ public class ProjectService {
     @Transactional
     public Project saveProject(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
         Project project = projectRepository.save(projectSaveRequest.toProject());
-        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
-            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
-                    .map(email -> ProjectUser.builder()
-                            .projectId(project.getId())
-                            .userId(email) // userId 또는 email로 처리, 시스템 구조에 따라
-                            .role("ROLE_MEMBER") // 기본 권한 설정
-                            .status("INVITED")
-                            .joinedAt(LocalDate.now().toString())
-                            .build()
-                    ).toList());
-
-
-            ProjectUser inviteUser = ProjectUser.builder()
-                    .projectId(project.getId())
-                    .userId(customUserDetails.getEmail())
-                    .role("ROLE_MEMBER")
-                    .status("ACCEPTED")
-                    .joinedAt(LocalDate.now().toString())
-                    .build();
-
-            projectUsers.add(inviteUser);
-
-            projectUserRepository.saveAll(projectUsers);
-        }
+        saveProjectUsers(projectSaveRequest, project, customUserDetails.getEmail());
         return project;
     }
-
-
-
 
     public ProjectResponse getProjectContent(String projectId){
         return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId), projectUserRepository.findUserIdByProjectId(projectId));
@@ -75,27 +52,24 @@ public class ProjectService {
     public Project processRegister(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(customUserDetails, projectSaveRequest);
         userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
-//        kafkaProducerService.sendEvent(
-//                "project.changed",
-//                "CREATE",
-//                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
-//                projectSaveRequest.invitedEmails()
-//        );
+        kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_CREATED, ProjectChangePayload.from(project, null, null, customUserDetails.getEmail(), projectSaveRequest.invitedEmails()));
         return project;
     }
 
 
 
     @Transactional
-    public Project processUpdate(ProjectUpdateRequest projectUpdateRequest){
+    public Project processUpdate(ProjectUpdateRequest projectUpdateRequest, CustomUserDetails customUserDetails){
         Project project = findProjectByProjectIdOrThrow(projectUpdateRequest.projectId());
+        ProjectChangeDetail beforeUpdate = ProjectChangeDetail.from(project);
+
         project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
-//        kafkaProducerService.sendEvent(
-//                "project.changed",
-//                "UPDATE",
-//                ProjectResponse.from(project, projectUserRepository.findUserIdByProjectId(project.getId())),
-//                projectUserRepository.findUserIdByProjectId(project.getId())
-//        );
+        ProjectChangeDetail afterUpdate = ProjectChangeDetail.from(project);
+
+        List<String> coworkers = projectUserRepository.findUserIdByProjectId(project.getId());
+
+        kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_UPDATED, ProjectChangePayload.from(project, beforeUpdate, afterUpdate, customUserDetails.getEmail(), coworkers));
+
         projectRepository.save(project);
         return project;
     }
@@ -117,9 +91,37 @@ public class ProjectService {
                 })
                 .toList();
     }
+
     public List<String> parseProjectIds(List<ProjectUser> projectUsers){
         return projectUsers.stream()
                 .map(ProjectUser::getProjectId)
                 .toList();
+    }
+
+    public void saveProjectUsers(ProjectSaveRequest projectSaveRequest, Project project, String inviterEmail){
+        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
+            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
+                    .map(email -> ProjectUser.builder()
+                            .projectId(project.getId())
+                            .userId(email)
+                            .role("ROLE_MEMBER") // 기본 권한 설정
+                            .status("INVITED")
+                            .joinedAt(LocalDate.now().toString())
+                            .build()
+                    ).toList());
+
+
+            ProjectUser inviteUser = ProjectUser.builder()
+                    .projectId(project.getId())
+                    .userId(inviterEmail)
+                    .role("ROLE_MEMBER")
+                    .status("ACCEPTED")
+                    .joinedAt(LocalDate.now().toString())
+                    .build();
+
+            projectUsers.add(inviteUser);
+
+            projectUserRepository.saveAll(projectUsers);
+        }
     }
 }
