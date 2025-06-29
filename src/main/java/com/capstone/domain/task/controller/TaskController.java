@@ -91,6 +91,7 @@ public class TaskController implements TaskControllerDocs {
     }
 
     @GetMapping("/list/get")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<List<TaskSpecResponse>>> getList(@RequestParam String projectId)
     {
         return ResponseEntity.ok(ApiResponse.onSuccess(taskService.listTask(projectId)));
