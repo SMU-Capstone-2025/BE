@@ -7,6 +7,7 @@ import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.service.TaskService;
+import com.capstone.domain.task.util.VersionUtil;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -44,10 +45,7 @@ public class FileService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.TASK_NOT_FOUND));
 
         // 현재 버전에 해당하는 Version 객체를 versionHistory 안에서 직접 가져옴
-        Version targetVersion = task.getVersionHistory().stream()
-                .filter(v -> v.getVersion().equals(task.getCurrentVersion()))
-                .findFirst()
-                .orElseThrow(() -> new GlobalException(ErrorStatus.VERSION_NOT_FOUND));
+        Version targetVersion = VersionUtil.getCurrentVersionEntity(task);
 
         if (!FileTypes.SUPPORTED_TYPES(file.getContentType())) {
             throw new GlobalException(ErrorStatus.FILE_NOT_SUPPORTED);
