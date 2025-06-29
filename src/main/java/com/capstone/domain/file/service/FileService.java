@@ -3,11 +3,16 @@ package com.capstone.domain.file.service;
 import com.capstone.domain.file.common.FileMessages;
 import com.capstone.domain.file.common.FileTypes;
 import com.capstone.domain.file.exception.InvalidFileException;
+import com.capstone.domain.task.entity.Task;
+import com.capstone.domain.task.entity.Version;
+import com.capstone.domain.task.repository.TaskRepository;
+import com.capstone.domain.task.service.TaskService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,29 +26,49 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FileService {
-    public final GridFsTemplate gridFsTemplate;
+    private final GridFsTemplate gridFsTemplate;
+    private final TaskRepository taskRepository;
 
-    public String upload(MultipartFile file) throws IOException {
-        ObjectId objectId;
-        if(!FileTypes.SUPPORTED_TYPES(file.getContentType())){
+    public String upload(String taskId, MultipartFile file) throws IOException {
+        // Task 전체를 기준으로 가져옴
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.TASK_NOT_FOUND));
+
+        // 현재 버전에 해당하는 Version 객체를 versionHistory 안에서 직접 가져옴
+        Version targetVersion = task.getVersionHistory().stream()
+                .filter(v -> v.getVersion().equals(task.getCurrentVersion()))
+                .findFirst()
+                .orElseThrow(() -> new GlobalException(ErrorStatus.VERSION_NOT_FOUND));
+
+        if (!FileTypes.SUPPORTED_TYPES(file.getContentType())) {
             throw new GlobalException(ErrorStatus.FILE_NOT_SUPPORTED);
         }
 
-        if(file.isEmpty()){
+        if (file.isEmpty()) {
             throw new GlobalException(ErrorStatus.FILE_EMPTY);
         }
 
-        objectId = gridFsTemplate.store(
+        // GridFS에 파일 저장
+        ObjectId objectId = gridFsTemplate.store(
                 file.getInputStream(),
                 file.getOriginalFilename(),
                 file.getContentType()
         );
+
+        // Version 안에 attachment 추가
+        targetVersion.addAttachment(objectId.toHexString());
+
+        // 전체 Task 저장 (MongoDB는 embedded document만 직접 저장 불가)
+        taskRepository.save(task);
 
         return objectId.toHexString();
     }
