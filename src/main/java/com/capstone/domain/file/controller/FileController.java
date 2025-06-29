@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,9 +20,12 @@ import java.io.IOException;
 public class FileController implements FileControllerDocs {
     private final FileService fileService;
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<String>> uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
-        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(file)));
+
+    @PostMapping(value = "/upload/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<String>> uploadFile(
+            @PathVariable("taskId") String taskId,
+            @RequestParam("file") MultipartFile file) throws Exception {
+        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(taskId, file)));
     }
 
     @GetMapping("/download")
