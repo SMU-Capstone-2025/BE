@@ -21,21 +21,6 @@ import java.util.List;
 public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     private final MongoTemplate mongoTemplate;
 
-    @Override
-    public Version findByTaskIdAndVersion(String taskId, String version) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(taskId)); // Task ID 조건
-        Task task = mongoTemplate.findOne(query, Task.class);
-
-        if (task != null && task.getVersionHistory() != null) {
-            return task.getVersionHistory().stream()
-                    .filter(v -> v.getVersion().equals(version))
-                    .findFirst()
-                    .orElse(null);
-        }
-
-        return null;
-    }
 
     @Override
     public String modifyVersion(TaskRequest taskDto){

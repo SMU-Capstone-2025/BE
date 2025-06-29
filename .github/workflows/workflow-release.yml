@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [feat/#58]
+    branches: [main]
 
 jobs:
   CI:

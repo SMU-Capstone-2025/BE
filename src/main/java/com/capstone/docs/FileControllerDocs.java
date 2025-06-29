@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,7 +37,9 @@ public interface FileControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> uploadFile(@RequestParam("file") MultipartFile file) throws Exception;
+    ResponseEntity<com.capstone.global.response.ApiResponse<String>> uploadFile(
+            @PathVariable("taskId") String taskId,
+            @RequestParam("file") MultipartFile file) throws Exception;
 
     @Operation(description = "파일 다운로드")
     @ApiResponses(value = {

@@ -11,6 +11,7 @@ import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.domain.task.util.TaskUtil;
 import com.capstone.domain.log.entity.LogEntity;
 import com.capstone.domain.log.repository.LogRepository;
+import com.capstone.domain.task.util.VersionUtil;
 import com.capstone.global.kafka.dto.TaskChangePayload;
 import com.capstone.global.kafka.dto.detail.TaskChangeDetail;
 import com.capstone.global.kafka.service.KafkaProducerService;
@@ -52,8 +53,7 @@ public class TaskService {
 
     public TaskSpecResponse loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
-        String currentVersion = task.getCurrentVersion();
-        Version version = taskRepository.findByTaskIdAndVersion(taskId, currentVersion);
+        Version version = VersionUtil.getCurrentVersionEntity(task);
         return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
     }
 
@@ -145,12 +145,12 @@ public class TaskService {
     @Timed(value = "task.list", description = "List Tasks by Project ID")
     public List<TaskSpecResponse> listTask(String projectId){
 
-        List<Task>taskList=taskRepository.findByProjectId(projectId);
+        List<Task> taskList = taskRepository.findByProjectId(projectId);
 
         return taskList.stream()
                 .map(task -> {
-                    Version currentVersion = taskRepository.findByTaskIdAndVersion(task.getId(), task.getCurrentVersion());
-                    return TaskSpecResponse.from(task,currentVersion.getAttachmentList(),currentVersion.getContent());
+                    Version version = VersionUtil.getCurrentVersionEntity(task);
+                    return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
                 })
                 .toList();
     }
