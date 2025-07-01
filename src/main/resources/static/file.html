@@ -52,6 +52,11 @@
 <input type="file" id="fileInput">
 <button onclick="uploadFile()">Upload</button>
 
+<div id="fileListContainer">
+  <h4>업로드된 파일 목록</h4>
+  <div id="fileList"></div>
+</div>
+
 <script>
   const socket = new WebSocket("ws://localhost:8080/ws/task");
   const serverUrl = "http://localhost:8080/file"; // 서버 URL
@@ -84,7 +89,7 @@
       formData.append("file", fileInput.files[0]);
 
       try {
-          const response = await fetch(`${serverUrl}/upload`, {
+          const response = await fetch(`${serverUrl}/upload/685e24b0acf4d132668862c7`, {
               method: "POST",
               body: formData
           });
@@ -107,6 +112,33 @@
       editor.appendChild(fileButton);
       socket.send(editor.innerHTML);
   }
+
+  // 기존 스크립트 내에 이 부분 추가
+  async function loadFileList() {
+      try {
+          const response = await fetch(`${serverUrl}`);
+          if (!response.ok) throw new Error("서버 응답 실패");
+
+          const files = await response.json(); // 서버가 List<ResourceDto> 등을 JSON으로 반환한다고 가정
+          const fileListDiv = document.getElementById("fileList");
+          fileListDiv.innerHTML = ""; // 초기화
+
+          files.forEach(file => {
+              const fileLink = document.createElement("a");
+              fileLink.href = `${serverUrl}/download?fileId=${file.id}`;
+              fileLink.className = "file-button";
+              fileLink.textContent = file.originalName || file.fileName || `파일(${file.id})`;
+              fileLink.target = "_blank";
+              fileListDiv.appendChild(fileLink);
+          });
+      } catch (err) {
+          console.error("파일 목록을 불러오는 중 오류 발생:", err);
+      }
+  }
+
+  // 페이지 로드 시 자동 호출
+  window.addEventListener("DOMContentLoaded", loadFileList);
+</script>
 </script>
 
 </body>
