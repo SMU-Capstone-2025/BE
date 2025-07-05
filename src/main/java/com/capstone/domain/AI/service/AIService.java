@@ -103,7 +103,7 @@ public class AIService
     {
         String userEmail= userDetails.getEmail();
         checkUserMembership(userEmail);
-        String originalSummary=aiReviseRequest.getAiResponse();
+        String originalSummary=aiReviseRequest.getRequest();
         String feedback =aiReviseRequest.getReviseRequest();
 
         String prompt=AiPromptBuilder.revisePrompt(originalSummary,feedback);
@@ -148,7 +148,10 @@ public class AIService
                     }
                     return "no result";
                 })
-                .onErrorResume(e->Mono.just(e.getMessage()));
+                .onErrorResume(e -> {
+                    ///
+                    return Mono.error(new AIException("AI 응답 처리 중 오류가 발생했습니다."));
+                });
 
 
 
