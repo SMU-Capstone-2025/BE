@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AIReviseRequest
 {
-    private String aiResponse;
+    private String request;
     private String reviseRequest;
 }

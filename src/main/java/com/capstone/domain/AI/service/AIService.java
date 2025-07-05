@@ -3,32 +3,23 @@ package com.capstone.domain.AI.service;
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.AI.dto.AIReviseRequest;
 import com.capstone.domain.AI.exception.AIException;
-import com.capstone.domain.AI.message.AIMessages;
+import com.capstone.domain.AI.prompt.AiPromptBuilder;
 import com.capstone.domain.user.entity.MembershipType;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.repository.UserRepository;
-import com.capstone.global.jwt.JwtUtil;
+
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.capstone.domain.AI.message.AIMessages.AI_LIMIT_EXCEEDED;
 import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
@@ -44,8 +35,6 @@ public class AIService
 
     //24시간마다 리셋
     private static final int EXPIRATION_TIME = 24;
-
-    private final JwtUtil jwtUtil;
 
     private final WebClient webClient;
 
@@ -93,8 +82,9 @@ public class AIService
 
         String request= aiRequest.getRequest();
 
-        String prompt = "다음 문서의 맞춤법을 수정하고 문단 구조를 개선해줘:\n\n" + request + "\n\n수정된 문서만 반환해줘.";
-        return askGemini(prompt).block();
+        String prompt = AiPromptBuilder.correctPrompt(request);
+        String response= askGemini(prompt).block();
+        return response;
     }
 
     public String sumUpDocument(AIRequest aiRequest,CustomUserDetails userDetails)
@@ -104,22 +94,21 @@ public class AIService
 
         String request= aiRequest.getRequest();
 
-        String prompt = "다음 문서를 간결하게 요약해줘:\n\n" + request + "\n\n요약된 내용만을 반환해줘.";
-        return askGemini(prompt).block();
+        String prompt = AiPromptBuilder.summarizePrompt(request);
+        String response= askGemini(prompt).block();
+        return response;
     }
 
     public String reviseSummary(AIReviseRequest aiReviseRequest, CustomUserDetails userDetails)
     {
         String userEmail= userDetails.getEmail();
         checkUserMembership(userEmail);
-        String originalSummary=aiReviseRequest.getAiResponse();
+        String originalSummary=aiReviseRequest.getRequest();
         String feedback =aiReviseRequest.getReviseRequest();
 
-        String prompt = "다음은 기존 요약이야:\n\n" + originalSummary +
-                "\n\n사용자가 다음 피드백을 제공했어:\n" + feedback +
-                "\n\n이를 반영하여 개선된 요약본만을 반환해줘";
-
-        return askGemini(prompt).block();
+        String prompt=AiPromptBuilder.revisePrompt(originalSummary,feedback);
+        String response= askGemini(prompt).block();
+        return response;
     }
 
 
@@ -159,7 +148,10 @@ public class AIService
                     }
                     return "no result";
                 })
-                .onErrorResume(e->Mono.just(e.getMessage()));
+                .onErrorResume(e -> {
+                    ///
+                    return Mono.error(new AIException("AI 응답 처리 중 오류가 발생했습니다."));
+                });
 
 
 
