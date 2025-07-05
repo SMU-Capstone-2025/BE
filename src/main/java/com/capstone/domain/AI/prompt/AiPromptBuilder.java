@@ -15,5 +15,33 @@ public class AiPromptBuilder
                 
                 """.formatted(request);
     }
+    public static String summarizePrompt(String request)
+    {
+        return """
+                아래 HTML 문장에서 태그는 절대 변경하지 말고, 태그 안의 텍스트만 요약 정리해줘.
+                
+                HTML 태그 구조나 속성, 줄바꿈은 원본 그대로 유지해.
+                
+                %s
+                
+                출력은 수정된 HTML 전체만 그대로 출력하고, 그 외 어떤 설명도 하지 마.
+                
+                """.formatted(request);
+    }
+    public static String revisePrompt(String request,String reviseRequest)
+    {
+        return """
+                아래 HTML 문장에서 태그는 절대 변경하지 말고, 태그 안의 텍스트를 요청에 맞게 수정.
+                단어 선택이나 문장 구조는 바꾸지 마.
+                
+                HTML 태그 구조나 속성, 줄바꿈은 원본 그대로 유지해.
+                
+                원본문장: %s
+                수정 요청 텍스트:%s
+                
+                출력은 수정된 HTML 전체만 그대로 출력하고, 그 외 어떤 설명도 하지 마.
+                
+                """.formatted(request,reviseRequest);
+    }
 
 }
