@@ -18,13 +18,14 @@ public class AiPromptBuilder
     public static String summarizePrompt(String request)
     {
         return """
-                아래 HTML 문장에서 태그는 절대 변경하지 말고, 태그 안의 텍스트만 요약 정리해줘.
+                아래 HTML 문장에서 태그 구조는 그대로 유지하고,
+                태그 안의 텍스트 내용을 간결하게 요약해 주세요.
+                - HTML 태그 이름, 구조, 줄바꿈, 속성은 변경하지 말 것
+                - 단, 태그 내부의 텍스트는 핵심만 남기고 요약할 것
+                - 출력은 요약된 HTML 전체만 반환 (설명 없이)
                 
-                HTML 태그 구조나 속성, 줄바꿈은 원본 그대로 유지해.
-                
+                요약 대상 HTML:
                 %s
-                
-                출력은 수정된 HTML 전체만 그대로 출력하고, 그 외 어떤 설명도 하지 마.
                 
                 """.formatted(request);
     }
@@ -37,8 +38,8 @@ public class AiPromptBuilder
                 HTML 태그 구조나 속성, 줄바꿈은 원본 그대로 유지해.
                 
                 원본문장: %s
-                수정 요청 텍스트:%s
-                
+                수정 요청:%s
+                원본문장을 수정 요청에 맞춰서 원본을 수정해줘
                 출력은 수정된 HTML 전체만 그대로 출력하고, 그 외 어떤 설명도 하지 마.
                 
                 """.formatted(request,reviseRequest);
