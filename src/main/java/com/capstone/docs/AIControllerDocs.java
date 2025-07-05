@@ -1,6 +1,7 @@
 package com.capstone.docs;
 
 import com.capstone.domain.AI.dto.AIRequest;
+import com.capstone.domain.AI.dto.AIResponse;
 import com.capstone.domain.AI.dto.AIReviseRequest;
 import com.capstone.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +59,7 @@ public interface AIControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Map<String, Object>>>ModifyGrammar (@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIRequest aiRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<AIResponse>>ModifyGrammar (@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIRequest aiRequest);
 
     @Operation(summary = "문서 요약", description = "입력된 문서를 요약하여 반환")
     @ApiResponses(value = {
@@ -98,7 +99,7 @@ public interface AIControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Map<String, Object>>>ModifyDocument (@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIRequest aiRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<AIResponse>>ModifyDocument (@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIRequest aiRequest);
 
     @Operation(summary = "요약 미리보기", description = "입력된 문서의 요약을 미리보기로 반환")
     @ApiResponses(value = {
@@ -138,7 +139,7 @@ public interface AIControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Map<String, Object>>> previewSummary(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam AIRequest aiRequest);
+    ResponseEntity<com.capstone.global.response.ApiResponse<AIResponse>> previewSummary(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam AIRequest aiRequest);
 
     @Operation(summary = "요약 재수정", description = "AI가 응답해준 내용이 마음에 들지 않으면 응답내용과 피드백을 보내 다시 수정해줌")
     @ApiResponses(value = {
@@ -178,6 +179,6 @@ public interface AIControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Map<String, Object>>> reviseSummary(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIReviseRequest request);
+    ResponseEntity<com.capstone.global.response.ApiResponse<AIResponse>> reviseSummary(@AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody AIReviseRequest request);
 }
 
