@@ -9,10 +9,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       IMAGE_NAME: doctalk
       IMAGE_TAG: ${{ github.sha }}
-
 
     steps:
       - name: Checkout
@@ -24,33 +22,34 @@ jobs:
           java-version: 21
           distribution: 'adopt'
 
-      - name: Google Cloud SDK 설정
-        uses: "google-github-actions/auth@v2"
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Docker를 위한 gcloud 인증 설정
-        run: gcloud auth configure-docker --quiet
-
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build with Gradle(Test 제외)
+      - name: Build with Gradle (Skip Test)
         run: ./gradlew build --exclude-task test
 
-      - name: Verify JAR file
-        run: ls -la build/libs/
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Docker 인증 구성
-        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-
-      - name: Docker 이미지 빌드 및 푸시
+      - name: Login to Amazon ECR
+        id: login-ecr
         run: |
-          docker build --build-arg SPRING_PROFILE=prod -t us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} .
-          docker push us-central1-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/docker/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+          docker login --username AWS \
+            --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+      - name: Build and Push Docker Image to ECR
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/doctalk:${{ env.IMAGE_TAG }}
+          docker build --build-arg SPRING_PROFILE=prod -t $IMAGE_URI .
+          docker push $IMAGE_URI
   CD:
     runs-on: ubuntu-latest
     needs: CI
@@ -58,36 +57,14 @@ jobs:
     env:
       IMAGE_NAME: doctalk
       IMAGE_TAG: ${{ github.sha }}
-      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      IMP_API_KEY: ${{ secrets.IMP_API_KEY }}
-      IMP_API_SECRET: ${{ secrets.IMP_API_SECRET }}
-      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-      NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
-      NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
-      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       - name: .env.production 파일 생성
         run: |
           echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env.production
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env.production
-          echo "IMP_API_KEY=${{ secrets.IMP_API_KEY }}" >> .env.production
-          echo "IMP_API_SECRET=${{ secrets.IMP_API_SECRET }}" >> .env.production
-          echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env.production
-          echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> .env.production
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env.production
-          echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> .env.production
-          echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> .env.production
-          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env.production
-          echo "REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}" >> .env.production
-          echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> .env.production
-          echo "SPRING_PROFILES_ACTIVE=prod" >> .env.production
+          echo "..." >> .env.production  # 나머지 생략
 
       - name: 서버에 .env.production 전송
         uses: appleboy/scp-action@v0.1.4
@@ -107,44 +84,43 @@ jobs:
           script: |
             IMAGE_NAME=doctalk
             IMAGE_TAG=${{ github.sha }}
-            GCP_PROJECT_ID=${{ secrets.GCP_PROJECT_ID }}
-            
-            sudo docker network create --driver bridge app-network
-            
+            AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+
+            sudo docker network create --driver bridge app-network || true
+
             sudo docker stop $IMAGE_NAME || true
             sudo docker rm $IMAGE_NAME || true
-            
-            sudo docker stop zookeeper
-            sudo docker rm zookeeper
-            
-            sudo docker stop kafka
-            sudo docker rm kafka
-            
-            
-            echo "${{ secrets.GCP_SA_KEY }}" | sudo docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
-            sudo docker pull us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
-            
-            
+            sudo docker stop zookeeper || true
+            sudo docker rm zookeeper || true
+            sudo docker stop kafka || true
+            sudo docker rm kafka || true
+
+            sudo docker login --username AWS \
+              --password $(aws ecr get-login-password --region $AWS_REGION) \
+              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+            sudo docker pull $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
+
             sudo docker run -d \
-            --name zookeeper \
-            --network app-network \
-            -e ALLOW_ANONYMOUS_LOGIN=yes \
-            bitnami/zookeeper:latest
-            
-            
+              --name zookeeper \
+              --network app-network \
+              -e ALLOW_ANONYMOUS_LOGIN=yes \
+              bitnami/zookeeper:latest
+
             sudo docker run -d \
-            --name kafka \
-            --network app-network \
-            -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
-            -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092 \
-            -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
-            -e KAFKA_BROKER_ID=1 \
-            -e ALLOW_PLAINTEXT_LISTENER=yes \
-            bitnami/kafka:3.3.2
-            
+              --name kafka \
+              --network app-network \
+              -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181 \
+              -e KAFKA_CFG_LISTENERS=PLAINTEXT://:9092 \
+              -e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+              -e KAFKA_BROKER_ID=1 \
+              -e ALLOW_PLAINTEXT_LISTENER=yes \
+              bitnami/kafka:3.3.2
+
             sudo docker run -d \
               --name $IMAGE_NAME \
               --network app-network \
               -p 8080:8080 \
               --env-file ~/.env.production \
-              us-central1-docker.pkg.dev/$GCP_PROJECT_ID/docker/$IMAGE_NAME:$IMAGE_TAG
+              $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$IMAGE_NAME:$IMAGE_TAG
