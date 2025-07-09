@@ -9,8 +9,8 @@ spring:
       uri: mongodb+srv://admin:admin@cluster0.edjo3.mongodb.net/
       database: capstone
     redis:
-      host: redis-19739.c1.us-central1-2.gce.redns.redis-cloud.com
-      port: 19739
+      host: redis-18447.c9.us-east-1-4.ec2.redns.redis-cloud.com
+      port: 18447
       username: ${REDIS_USERNAME}
       password: ${REDIS_PASSWORD}
       timeout: 6000ms

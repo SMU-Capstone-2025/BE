@@ -63,8 +63,21 @@ jobs:
     steps:
       - name: .env.production 파일 생성
         run: |
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env.production
-          echo "..." >> .env.production  # 나머지 생략
+          cat <<EOF > .env.production
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          IMP_API_KEY=${{ secrets.IMP_API_KEY }}
+          IMP_API_SECRET=${{ secrets.IMP_API_SECRET }}
+          KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
+          REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+          SPRING_PROFILES_ACTIVE=prod
+          EOF
 
       - name: 서버에 .env.production 전송
         uses: appleboy/scp-action@v0.1.4
@@ -73,7 +86,7 @@ jobs:
           username: ${{ secrets.DEPLOY_SERVER_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           source: ".env.production"
-          target: "~/"
+          target: "~"
 
       - name: 서버에 SSH 접속하여 Docker 실행
         uses: appleboy/ssh-action@v0.1.5
