@@ -1,9 +1,11 @@
 package com.capstone.domain.task.service;
 
 import com.capstone.domain.task.dto.request.TaskRequest;
+import com.capstone.domain.task.dto.response.AttachmentDto;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
 import com.capstone.domain.task.dto.response.TaskVersionResponse;
+import com.capstone.domain.task.entity.Attachment;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.message.TaskStatus;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,7 +57,15 @@ public class TaskService {
     public TaskSpecResponse loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
         Version version = VersionUtil.getCurrentVersionEntity(task);
-        return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
+        List<Attachment>attachments = version.getAttachmentList();
+
+        List<AttachmentDto> attachmentDtos =new ArrayList<>();
+
+        for(Attachment attachment : attachments){
+            attachmentDtos.add(AttachmentDto.from(attachment.getFileId(),attachment.getFileName()));
+        }
+
+        return TaskSpecResponse.from(task, attachmentDtos,version.getContent());
     }
 
     @Transactional
@@ -147,10 +158,18 @@ public class TaskService {
 
         List<Task> taskList = taskRepository.findByProjectId(projectId);
 
+
         return taskList.stream()
                 .map(task -> {
                     Version version = VersionUtil.getCurrentVersionEntity(task);
-                    return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
+                    List<Attachment>attachments = version.getAttachmentList();
+
+                    List<AttachmentDto> attachmentDtos =new ArrayList<>();
+
+                    for(Attachment attachment : attachments){
+                        attachmentDtos.add(AttachmentDto.from(attachment.getFileId(),attachment.getFileName()));
+                    }
+                    return TaskSpecResponse.from(task, attachmentDtos,version.getContent());
                 })
                 .toList();
     }
