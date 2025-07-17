@@ -57,15 +57,9 @@ public class TaskService {
     public TaskSpecResponse loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
         Version version = VersionUtil.getCurrentVersionEntity(task);
-        List<Attachment>attachments = version.getAttachmentList();
+        List<AttachmentDto> attachmentDtos = convertAttachmentsToDto(version.getAttachmentList());
+        return TaskSpecResponse.from(task, attachmentDtos, version.getContent());
 
-        List<AttachmentDto> attachmentDtos =new ArrayList<>();
-
-        for(Attachment attachment : attachments){
-            attachmentDtos.add(AttachmentDto.from(attachment.getFileId(),attachment.getFileName()));
-        }
-
-        return TaskSpecResponse.from(task, attachmentDtos,version.getContent());
     }
 
     @Transactional
@@ -85,6 +79,11 @@ public class TaskService {
         kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED, TaskChangePayload.from(task, beforeChange, afterChange, customUserDetails.getEmail(), taskDto.editors()));
         return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
 
+    }
+    private List<AttachmentDto> convertAttachmentsToDto(List<Attachment> attachments) {
+        return attachments.stream()
+            .map(attachment -> AttachmentDto.from(attachment.getFileId(), attachment.getFileName()))
+            .toList();
     }
 
     @Transactional
@@ -162,14 +161,8 @@ public class TaskService {
         return taskList.stream()
                 .map(task -> {
                     Version version = VersionUtil.getCurrentVersionEntity(task);
-                    List<Attachment>attachments = version.getAttachmentList();
-
-                    List<AttachmentDto> attachmentDtos =new ArrayList<>();
-
-                    for(Attachment attachment : attachments){
-                        attachmentDtos.add(AttachmentDto.from(attachment.getFileId(),attachment.getFileName()));
-                    }
-                    return TaskSpecResponse.from(task, attachmentDtos,version.getContent());
+                    List<AttachmentDto> attachmentDtos = convertAttachmentsToDto(version.getAttachmentList());
+                    return TaskSpecResponse.from(task, attachmentDtos, version.getContent());
                 })
                 .toList();
     }
