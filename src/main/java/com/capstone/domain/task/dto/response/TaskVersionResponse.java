@@ -1,5 +1,6 @@
 package com.capstone.domain.task.dto.response;
 
+import com.capstone.domain.task.entity.Attachment;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import lombok.Builder;
@@ -14,7 +15,7 @@ public record TaskVersionResponse(
         String modifiedDateTime,
         String modifiedBy,
         String content,
-        List<String> attachmentList,
+        List<Attachment> attachmentList,
         String title,
         LocalDate deadline
 
