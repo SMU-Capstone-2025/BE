@@ -1,6 +1,7 @@
 package com.capstone.domain.file.controller;
 
 import com.capstone.docs.FileControllerDocs;
+import com.capstone.domain.file.dto.FileResponse;
 import com.capstone.domain.file.service.FileService;
 import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class FileController implements FileControllerDocs {
 
 
     @PostMapping(value = "/upload/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<String>> uploadFile(
+    public ResponseEntity<ApiResponse<FileResponse>> uploadFile(
             @PathVariable("taskId") String taskId,
             @RequestParam("file") MultipartFile file) throws Exception {
         return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(taskId, file)));
