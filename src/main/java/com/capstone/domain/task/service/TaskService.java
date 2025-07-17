@@ -58,8 +58,8 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
-        Version version = taskUtil.createOrGetVersion(taskDto, fileId);
+    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId,String fileName ,CustomUserDetails customUserDetails){
+        Version version = taskUtil.createOrGetVersion(taskDto, fileId, fileName);
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         TaskChangeDetail beforeChange = TaskChangeDetail.from(task);
 
