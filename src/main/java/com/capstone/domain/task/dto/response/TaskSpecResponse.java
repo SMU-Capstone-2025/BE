@@ -15,10 +15,10 @@ public record  TaskSpecResponse(
         String status,
         String content,
         LocalDate deadline,
-        List<Attachment> attachmentList,
+        List<AttachmentDto> attachmentList,
         List<String> coworkers
 ) {
-    public static TaskSpecResponse from(Task task, List<Attachment> attachments,String content){
+    public static TaskSpecResponse from(Task task, List<AttachmentDto> attachments,String content){
         return TaskSpecResponse.builder()
                 .taskId(task.getId())
                 .title(task.getTitle())
