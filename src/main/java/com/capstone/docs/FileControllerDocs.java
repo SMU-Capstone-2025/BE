@@ -1,5 +1,6 @@
 package com.capstone.docs;
 
+import com.capstone.domain.file.dto.FileResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -37,7 +38,7 @@ public interface FileControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<String>> uploadFile(
+    ResponseEntity<com.capstone.global.response.ApiResponse<FileResponse>> uploadFile(
             @PathVariable("taskId") String taskId,
             @RequestParam("file") MultipartFile file) throws Exception;
 
