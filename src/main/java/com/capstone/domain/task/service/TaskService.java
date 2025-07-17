@@ -1,9 +1,11 @@
 package com.capstone.domain.task.service;
 
 import com.capstone.domain.task.dto.request.TaskRequest;
+import com.capstone.domain.task.dto.response.AttachmentDto;
 import com.capstone.domain.task.dto.response.TaskResponse;
 import com.capstone.domain.task.dto.response.TaskSpecResponse;
 import com.capstone.domain.task.dto.response.TaskVersionResponse;
+import com.capstone.domain.task.entity.Attachment;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 import com.capstone.domain.task.message.TaskStatus;
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -54,12 +57,14 @@ public class TaskService {
     public TaskSpecResponse loadVersionContent(String taskId) {
         Task task = findTaskByIdOrThrow(taskId);
         Version version = VersionUtil.getCurrentVersionEntity(task);
-        return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
+        List<AttachmentDto> attachmentDtos = convertAttachmentsToDto(version.getAttachmentList());
+        return TaskSpecResponse.from(task, attachmentDtos, version.getContent());
+
     }
 
     @Transactional
-    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId, CustomUserDetails customUserDetails){
-        Version version = taskUtil.createOrGetVersion(taskDto, fileId);
+    public TaskVersionResponse saveVersion(TaskRequest taskDto, String fileId,String fileName ,CustomUserDetails customUserDetails){
+        Version version = taskUtil.createOrGetVersion(taskDto, fileId, fileName);
         Task task = findTaskByIdOrThrow(taskDto.taskId());
         TaskChangeDetail beforeChange = TaskChangeDetail.from(task);
 
@@ -74,6 +79,11 @@ public class TaskService {
         kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED, TaskChangePayload.from(task, beforeChange, afterChange, customUserDetails.getEmail(), taskDto.editors()));
         return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
 
+    }
+    private List<AttachmentDto> convertAttachmentsToDto(List<Attachment> attachments) {
+        return attachments.stream()
+            .map(attachment -> AttachmentDto.from(attachment.getFileId(), attachment.getFileName()))
+            .toList();
     }
 
     @Transactional
@@ -147,10 +157,12 @@ public class TaskService {
 
         List<Task> taskList = taskRepository.findByProjectId(projectId);
 
+
         return taskList.stream()
                 .map(task -> {
                     Version version = VersionUtil.getCurrentVersionEntity(task);
-                    return TaskSpecResponse.from(task, version.getAttachmentList(),version.getContent());
+                    List<AttachmentDto> attachmentDtos = convertAttachmentsToDto(version.getAttachmentList());
+                    return TaskSpecResponse.from(task, attachmentDtos, version.getContent());
                 })
                 .toList();
     }

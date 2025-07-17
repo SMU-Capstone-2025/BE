@@ -2,6 +2,7 @@ package com.capstone.domain.file.service;
 
 import com.capstone.domain.file.common.FileMessages;
 import com.capstone.domain.file.common.FileTypes;
+import com.capstone.domain.file.dto.FileResponse;
 import com.capstone.domain.file.exception.InvalidFileException;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
@@ -39,13 +40,7 @@ public class FileService {
     private final GridFsTemplate gridFsTemplate;
     private final TaskRepository taskRepository;
 
-    public String upload(String taskId, MultipartFile file) throws IOException {
-        // Task 전체를 기준으로 가져옴
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new GlobalException(ErrorStatus.TASK_NOT_FOUND));
-
-        // 현재 버전에 해당하는 Version 객체를 versionHistory 안에서 직접 가져옴
-        Version targetVersion = VersionUtil.getCurrentVersionEntity(task);
+    public FileResponse upload(String taskId, MultipartFile file) throws IOException {
 
         if (!FileTypes.SUPPORTED_TYPES(file.getContentType())) {
             throw new GlobalException(ErrorStatus.FILE_NOT_SUPPORTED);
@@ -62,13 +57,9 @@ public class FileService {
                 file.getContentType()
         );
 
-        // Version 안에 attachment 추가
-        targetVersion.addAttachment(objectId.toHexString());
 
-        // 전체 Task 저장 (MongoDB는 embedded document만 직접 저장 불가)
-        taskRepository.save(task);
 
-        return objectId.toHexString();
+        return FileResponse.from(objectId.toHexString(),file.getOriginalFilename());
     }
 
     public ResponseEntity<Resource> download(String fileId) {

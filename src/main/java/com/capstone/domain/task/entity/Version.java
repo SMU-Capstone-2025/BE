@@ -17,13 +17,13 @@ public class Version extends BaseDocument{
     private String modifiedDateTime;
     private String modifiedBy;
     private String content;
-    private List<String> attachmentList;
+    private List<Attachment> attachmentList;
 
-    public void addAttachment(String fileId) {
+    public void addAttachment(String fileId,String fileName) {
         if (attachmentList == null) {
             attachmentList = new ArrayList<>();
         }
-        attachmentList.add(fileId);
+        attachmentList.add(new Attachment(fileId, fileName));
     }
 }
 

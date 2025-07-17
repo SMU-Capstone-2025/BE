@@ -1,5 +1,7 @@
 package com.capstone.domain.task.util;
 
+import com.capstone.domain.file.dto.FileResponse;
+import com.capstone.domain.task.entity.Attachment;
 import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.repository.TaskRepository;
 import com.capstone.global.response.exception.GlobalException;
@@ -18,18 +20,20 @@ import java.util.List;
 public class TaskUtil {
     private final TaskRepository taskRepository;
 
-    public Version createOrGetVersion(TaskRequest taskDto, String fileId) {
+    public Version createOrGetVersion(TaskRequest taskDto,String fileId, String fileName) {
         Task task = taskRepository.findById(taskDto.taskId()).orElseThrow();
 
         try {
             Version current = VersionUtil.getCurrentVersionEntity(task);
-            List<String> attachmentList = new ArrayList<>();
+            List<Attachment> attachmentList = new ArrayList<>();
             if (current.getAttachmentList() != null) {
                 attachmentList.addAll(current.getAttachmentList());
             }
-            if(fileId != null){
-                attachmentList.add(fileId);
+
+            if(fileId!=null && fileName!=null){
+                attachmentList.add(new Attachment(fileId,fileName));
             }
+
 
             return Version.builder()
                     .taskId(taskDto.taskId())
@@ -41,8 +45,11 @@ public class TaskUtil {
                     .build();
 
         } catch (GlobalException e) {
-            List<String> attachmentList = new ArrayList<>();
-            attachmentList.add(fileId);
+            List<Attachment> attachmentList = new ArrayList<>();
+
+            if(fileId!=null && fileName!=null){
+                attachmentList.add(new Attachment(fileId,fileName));
+            }
             return Version.builder()
                     .taskId(taskDto.taskId())
                     .version(taskDto.version())

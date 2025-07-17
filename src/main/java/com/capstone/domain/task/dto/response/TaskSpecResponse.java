@@ -1,5 +1,6 @@
 package com.capstone.domain.task.dto.response;
 
+import com.capstone.domain.task.entity.Attachment;
 import com.capstone.domain.task.entity.Task;
 import lombok.Builder;
 
@@ -14,10 +15,10 @@ public record  TaskSpecResponse(
         String status,
         String content,
         LocalDate deadline,
-        List<String> attachmentList,
+        List<AttachmentDto> attachmentList,
         List<String> coworkers
 ) {
-    public static TaskSpecResponse from(Task task, List<String> attachments,String content){
+    public static TaskSpecResponse from(Task task, List<AttachmentDto> attachments,String content){
         return TaskSpecResponse.builder()
                 .taskId(task.getId())
                 .title(task.getTitle())
