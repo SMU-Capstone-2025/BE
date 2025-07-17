@@ -234,8 +234,9 @@ public interface TaskControllerDocs {
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<TaskVersionResponse>> postVersion(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                               @Valid @RequestBody TaskRequest taskDto,
-                                                                                              @RequestParam(value = "fileId", required = false) String fileId);
-
+                                                                                              @RequestParam(value = "fileId", required = false) String fileId,
+                                                                                              @RequestParam(value = "fileName", required = false) String fileName
+    );
     @Operation(description = "작업 내 버전 목록 반환")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "반환 성공"),
