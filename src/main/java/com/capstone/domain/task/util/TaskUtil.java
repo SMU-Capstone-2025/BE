@@ -33,6 +33,9 @@ public class TaskUtil {
             if(fileId!=null && fileName!=null){
                 attachmentList.add(new Attachment(fileId,fileName));
             }
+            else if (fileId != null && fileName == null) {
+                attachmentList.removeIf(attachment -> fileId.equals(attachment.getFileId()));
+            }
 
 
             return Version.builder()
