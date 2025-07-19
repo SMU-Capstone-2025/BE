@@ -9,6 +9,7 @@ import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.repository.ProjectRepository;
 
 import com.capstone.domain.user.entity.ProjectUser;
+import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.service.UserService;
 
@@ -50,11 +51,15 @@ public class ProjectService {
     public ProjectResponse getProjectContent(String projectId){
         List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(projectId);
         List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
-                .map(coworker->ProjectCoworkerDto.from(
-                        coworker.getUserId(),
-                        coworker.getRole()
+                .map(coworker->
+                        {
+                            User user =userService.findUserByEmailOrThrow(coworker.getUserId());
 
-                ))
+                            return ProjectCoworkerDto.from(user.getName(),
+                            coworker.getUserId(),
+                            coworker.getRole() );
+                        }
+                )
                 .toList();
         return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId),projectCoworkerDtos);
     }
@@ -98,11 +103,15 @@ public class ProjectService {
                 .map(project -> {
                     List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(project.getId());
                     List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
-                            .map(coworker->ProjectCoworkerDto.from(
+                            .map(coworker->{
+                                User user =userService.findUserByEmailOrThrow(coworker.getUserId());
+                                return ProjectCoworkerDto.from(
+                                        user.getName(),
                                     coworker.getUserId(),
                                     coworker.getRole()
 
-                            ))
+                            );}
+                            )
                             .toList();
                     return ProjectResponse.from(project, projectCoworkerDtos);
                 })

@@ -7,12 +7,14 @@ import lombok.Builder;
 @Builder
 public record ProjectCoworkerDto(
         String email,
-        String role
+        String role,
+        String name
 ) {
-    public static ProjectCoworkerDto from(String email,String role) {
+    public static ProjectCoworkerDto from(String email,String role,String name) {
         return ProjectCoworkerDto.builder()
                 .email(email)
                 .role(role)
+                .name(name)
                 .build();
     }
 }
