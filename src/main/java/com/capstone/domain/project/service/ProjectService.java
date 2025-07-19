@@ -54,10 +54,12 @@ public class ProjectService {
                 .map(coworker->
                         {
                             User user =userService.findUserByEmailOrThrow(coworker.getUserId());
-
-                            return ProjectCoworkerDto.from(user.getName(),
+                            log.info("asd{}",coworker.getUserId());
+                            log.info("asd{}",user.getName());
+                            return ProjectCoworkerDto.from(
                             coworker.getUserId(),
-                            coworker.getRole() );
+                            coworker.getRole(),
+                                    user.getName());
                         }
                 )
                 .toList();
@@ -106,9 +108,10 @@ public class ProjectService {
                             .map(coworker->{
                                 User user =userService.findUserByEmailOrThrow(coworker.getUserId());
                                 return ProjectCoworkerDto.from(
-                                        user.getName(),
+
                                     coworker.getUserId(),
-                                    coworker.getRole()
+                                    coworker.getRole(),
+                                        user.getName()
 
                             );}
                             )
