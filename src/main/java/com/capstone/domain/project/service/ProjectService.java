@@ -1,6 +1,7 @@
 package com.capstone.domain.project.service;
 
 import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
+import com.capstone.domain.project.dto.response.ProjectCoworkerDto;
 import com.capstone.domain.project.dto.response.ProjectResponse;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -46,7 +48,15 @@ public class ProjectService {
     }
 
     public ProjectResponse getProjectContent(String projectId){
-        return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId), projectUserRepository.findUserIdByProjectId(projectId));
+        List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(projectId);
+        List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
+                .map(coworker->ProjectCoworkerDto.from(
+                        coworker.getUserId(),
+                        coworker.getRole()
+
+                ))
+                .toList();
+        return ProjectResponse.from(findProjectByProjectIdOrThrow(projectId),projectCoworkerDtos);
     }
 
     public Project processRegister(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
@@ -86,8 +96,15 @@ public class ProjectService {
 
         return projects.stream()
                 .map(project -> {
-                    List<String> coworkers = projectUserRepository.findUserIdByProjectId(project.getId());
-                    return ProjectResponse.from(project, coworkers);
+                    List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(project.getId());
+                    List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
+                            .map(coworker->ProjectCoworkerDto.from(
+                                    coworker.getUserId(),
+                                    coworker.getRole()
+
+                            ))
+                            .toList();
+                    return ProjectResponse.from(project, projectCoworkerDtos);
                 })
                 .toList();
     }
