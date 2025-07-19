@@ -56,4 +56,11 @@ public class CustomProjectUserRepositoryImpl implements CustomProjectUserReposit
         return mongoTemplate.find(query, ProjectUserAuthority.class, "project_user");
     }
 
+    @Override
+    public List<ProjectUser> findUserIdAndRoleByProjectId(String projectId) {
+        Query query = new Query(Criteria.where("projectId").is(projectId));
+        List<ProjectUser> projectUsers = mongoTemplate.find(query, ProjectUser.class);
+        return projectUsers;
+    }
+
 }
