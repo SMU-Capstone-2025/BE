@@ -11,14 +11,14 @@ public record ProjectResponse(
         String projectId,
         String name,
         String description,
-        List<String> coworkers
+        List<ProjectCoworkerDto> coworkers
 ) {
-    public static ProjectResponse from(Project project, List<String> emails){
+    public static ProjectResponse from(Project project, List<ProjectCoworkerDto> coworkers) {
         return ProjectResponse.builder()
                 .projectId(project.getId())
                 .name(project.getProjectName())
                 .description(project.getDescription())
-                .coworkers(emails)
+                .coworkers(coworkers)
                 .build();
     }
 }
