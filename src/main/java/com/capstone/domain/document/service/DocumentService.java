@@ -37,7 +37,7 @@ public class DocumentService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final KafkaProducerService kafkaProducerService;
 
-    @Cacheable(value = "document", key = "'DOC:loaded' + #key", unless = "#result == null")
+
     public DocumentResponse findDocumentCacheFirst(String key){
         Document doc = Optional.ofNullable(documentRepository.findDocumentByDocumentId(key))
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
@@ -120,7 +120,6 @@ public class DocumentService {
 
                 if (data != null) {
                     Document document = mapToDocument(data);
-
 
                     if (document != null) {
                         documentRepository.save(document);
