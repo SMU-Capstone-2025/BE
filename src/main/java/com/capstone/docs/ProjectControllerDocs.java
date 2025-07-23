@@ -1,6 +1,7 @@
 package com.capstone.docs;
 
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
+import com.capstone.domain.project.dto.request.ProjectInviteRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
 import com.capstone.domain.project.dto.response.ProjectResponse;
@@ -89,6 +90,7 @@ public interface ProjectControllerDocs {
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("projectId") String projectId,
             @RequestBody ProjectUpdateRequest projectUpdateRequest);
 
     @Operation(description = "프로젝트 내 권한 변경")
@@ -132,7 +134,8 @@ public interface ProjectControllerDocs {
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateAuthority(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ProjectAuthorityRequest projectAuthorityRequest);
+            @PathVariable String projectId,
+            @RequestBody ProjectAuthorityRequest projectAuthority);
 
     @Operation(description = "프로젝트에 신규 인원 추가")
     @ApiResponses(value = {
@@ -173,9 +176,10 @@ public interface ProjectControllerDocs {
             )
 
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Project>> inviteProject(
+    ResponseEntity<com.capstone.global.response.ApiResponse<Void>> inviteProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ProjectAuthorityRequest projectAuthorityRequest);
+            @PathVariable String projectId,
+            @RequestBody ProjectInviteRequest projectInviteRequest);
 
     @Operation(description = "프로젝트의 세부 내용 불러오기")
     @ApiResponses(value = {

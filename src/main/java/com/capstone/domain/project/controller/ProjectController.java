@@ -2,6 +2,8 @@ package com.capstone.domain.project.controller;
 
 import com.capstone.docs.ProjectControllerDocs;
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
+
+import com.capstone.domain.project.dto.request.ProjectInviteRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
 import com.capstone.domain.project.dto.response.ProjectResponse;
@@ -14,11 +16,13 @@ import com.capstone.global.security.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -38,30 +42,41 @@ public class ProjectController implements ProjectControllerDocs {
     }
 
 
-    @PutMapping("/update")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectUpdateRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    @PutMapping("/update/{projectId}")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Project>> updateProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable("projectId") String projectId,
             @Valid @RequestBody ProjectUpdateRequest projectUpdateRequest){
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectUpdateRequest, customUserDetails)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectService.processUpdate(projectId, projectUpdateRequest, customUserDetails)));
     }
 
-    @PutMapping("/auth")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    @PutMapping("/auth/{projectId}")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<Project>> updateAuthority(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ProjectAuthorityRequest projectAuthorityRequest){
-        projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(customUserDetails, projectAuthorityRequest)));
+            @PathVariable("projectId") String projectId,
+            @RequestBody ProjectAuthorityRequest projectAuthority){
+        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(customUserDetails, projectId, projectAuthority)));
     }
 
-    @PutMapping("/invite")
-    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectAuthorityRequest.projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Project>> inviteProject(
+    @PutMapping("/invite/{projectId}")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<Void>> inviteProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ProjectAuthorityRequest projectAuthorityRequest){
-        projectAuthorityRequest.validateRoles();
-        return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processInvite(customUserDetails, projectAuthorityRequest)));
+            @PathVariable("projectId") String projectId,
+            @RequestBody ProjectInviteRequest inviteRequest){
+        projectUserService.processInvite(customUserDetails, projectId, inviteRequest);
+        return ResponseEntity.ok(ApiResponse.onSuccess());
+    }
+
+    @GetMapping("/invite/accept")
+    public ResponseEntity<Object> acceptInvitation(@RequestParam String credentialCode){
+        projectUserService.insertProjectUser(credentialCode);
+
+        // TODO: 프론트 배포 후 해당 주소로 변경
+        URI redirectUri = URI.create("https://www.naver.com");
+        return ResponseEntity.status(HttpStatus.FOUND).location(redirectUri).build();
     }
 
     @GetMapping("/load")
