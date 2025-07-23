@@ -1,19 +1,16 @@
 package com.capstone.global.kafka.config;
+import com.capstone.global.kafka.dto.ProjectAuthPayload;
 import com.capstone.global.kafka.dto.ProjectChangePayload;
+import com.capstone.global.kafka.dto.ProjectInvitePayload;
 import com.capstone.global.kafka.dto.TaskChangePayload;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.support.converter.BatchMessageConverter;
-import org.springframework.kafka.support.converter.StringJsonMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import java.util.HashMap;
@@ -62,6 +59,36 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, ProjectChangePayload> projectKafkaListenerContainerFactory() {
         var factory = new ConcurrentKafkaListenerContainerFactory<String, ProjectChangePayload>();
         factory.setConsumerFactory(projectConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, ProjectInvitePayload> projectInviteConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(
+                baseConsumerConfigs(),
+                new StringDeserializer(),
+                new JsonDeserializer<>(ProjectInvitePayload.class, false));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ProjectInvitePayload> projectInviteKafkaListenerContainerFactory() {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, ProjectInvitePayload>();
+        factory.setConsumerFactory(projectInviteConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, ProjectAuthPayload> projectAuthConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(
+                baseConsumerConfigs(),
+                new StringDeserializer(),
+                new JsonDeserializer<>(ProjectAuthPayload.class, false));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ProjectAuthPayload> projectAuthKafkaListenerContainerFactory() {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, ProjectAuthPayload>();
+        factory.setConsumerFactory(projectAuthConsumerFactory());
         return factory;
     }
 }
