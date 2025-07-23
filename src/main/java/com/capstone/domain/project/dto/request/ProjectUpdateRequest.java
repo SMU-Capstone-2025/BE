@@ -6,8 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ProjectUpdateRequest (
-        @Nullable
-        String projectId,
         @NotNull
         @Size(min = 1)
         String projectName,
