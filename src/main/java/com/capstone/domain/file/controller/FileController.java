@@ -38,4 +38,11 @@ public class FileController implements FileControllerDocs {
     public ResponseEntity<ApiResponse<String>> deleteFile(@RequestParam("fileId") String fileId){
         return ResponseEntity.ok(ApiResponse.onSuccess(fileService.delete(fileId)));
     }
+
+    @GetMapping("/get")
+    public ResponseEntity<Resource> getFile(@RequestParam("fileId") String fileId) throws IOException{
+
+        return fileService.getFile(fileId);
+    }
+
 }
