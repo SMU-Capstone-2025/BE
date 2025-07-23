@@ -1,9 +1,8 @@
 package com.capstone.global.kafka.dto.detail;
 
-import com.capstone.domain.project.dto.query.ProjectUserAuthority;
+import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.entity.Project;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -14,7 +13,7 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectChangeDetail extends ChangeDetail<List<ProjectUserAuthority>>{
+public class ProjectChangeDetail extends ChangeDetail<List<ProjectAuthorityRequest>>{
     private String description;
     private List<String> taskIds;
     private List<String> documentIds;
@@ -29,7 +28,7 @@ public class ProjectChangeDetail extends ChangeDetail<List<ProjectUserAuthority>
     }
 
     // 권한 조정 및 초대 시 사용.
-    public static ProjectChangeDetail from(List<ProjectUserAuthority> coworkers){
+    public static ProjectChangeDetail from(List<ProjectAuthorityRequest> coworkers){
         return ProjectChangeDetail.builder()
                 .coworkers(coworkers)
                 .build();

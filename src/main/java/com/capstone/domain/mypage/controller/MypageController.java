@@ -8,7 +8,7 @@ import com.capstone.domain.mypage.dto.EmailDto;
 import com.capstone.domain.mypage.dto.UserDto;
 import com.capstone.domain.mypage.service.MypageService;
 
-import com.capstone.global.mail.service.MailService;
+import com.capstone.domain.mail.service.RegisterMailService;
 import com.capstone.global.response.ApiResponse;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import java.util.List;
 public class MypageController implements MypageControllerDocs
 {
     private final MypageService mypageService;
-    private final MailService mailService;
+    private final RegisterMailService mailService;
 
     //유저 정보
     @GetMapping("/user")
@@ -62,7 +62,7 @@ public class MypageController implements MypageControllerDocs
     @PostMapping("/email/check")
     public ResponseEntity<ApiResponse<String>> checkEmail(@RequestBody EmailDto emailDto) throws Exception
     {
-        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessageCheckEmail(emailDto)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(mailService.sendSimpleMessage(emailDto.email())));
     }
     @GetMapping("/email/avail")
     public ResponseEntity<ApiResponse<Boolean>> checkEmailAvailable(@RequestParam String name,

@@ -5,23 +5,19 @@ import jakarta.persistence.Id;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "project_user")
+@Document(collection = "pending_user")
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectUser extends BaseDocument {
+public class PendingUser extends BaseDocument {
+
     @Id
     private String id;
-
-    private String projectId;
     private String userId;
+    private String projectId;
+    private String credentialCode;
 
-    private String role;
-    private String joinedAt;
-
-    public void updateRole(String role){
-        this.role = role;
-    }
+    private String email;
 }

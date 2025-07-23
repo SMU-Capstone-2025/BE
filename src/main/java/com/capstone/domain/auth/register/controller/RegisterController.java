@@ -4,7 +4,6 @@ import com.capstone.docs.RegisterControllerDocs;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.auth.register.service.RegisterService;
 import com.capstone.domain.user.entity.User;
-import com.capstone.global.mail.service.MailService;
 import com.capstone.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

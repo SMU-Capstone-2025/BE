@@ -22,7 +22,6 @@ import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.jwt.JwtUtil;
-import com.capstone.global.mail.service.MailService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -34,10 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.capstone.domain.mypage.message.MypageMessages.PASSWORD_MISMATCH;
-import static com.capstone.domain.mypage.message.MypageMessages.PASSWORD_NOT_FOUND;
 import static com.capstone.domain.user.message.UserMessages.USER_FOUND;
 import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
 
