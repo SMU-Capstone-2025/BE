@@ -10,8 +10,8 @@ public record CalendarTaskDto(
         String id,
         String title,
         String status,
-        LocalDate deadline,
-        LocalDateTime startDay
+        LocalDate end,
+        LocalDateTime start
 ) {
     public static CalendarTaskDto from(Task task) {
 
