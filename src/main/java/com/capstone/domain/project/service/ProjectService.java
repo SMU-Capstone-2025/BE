@@ -80,7 +80,14 @@ public class ProjectService {
         Project project = findProjectByProjectIdOrThrow(projectUpdateRequest.projectId());
         ProjectChangeDetail beforeUpdate = ProjectChangeDetail.from(project);
 
-        project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
+        if(projectUpdateRequest.imageId() != null){
+            project.updateProjectInfoWithImage(projectUpdateRequest.projectName(), projectUpdateRequest.description(),projectUpdateRequest.imageId());
+        }
+        else {
+            project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
+        }
+
+
         ProjectChangeDetail afterUpdate = ProjectChangeDetail.from(project);
 
         List<String> coworkers = projectUserRepository.findUserIdByProjectId(project.getId());
