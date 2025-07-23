@@ -24,9 +24,8 @@ public class FileController implements FileControllerDocs {
 
     @PostMapping(value = "/upload/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileResponse>> uploadFile(
-            @PathVariable("taskId") String taskId,
             @RequestParam("file") MultipartFile file) throws Exception {
-        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(taskId, file)));
+        return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(file)));
     }
 
     @GetMapping("/download")

@@ -40,7 +40,7 @@ public class FileService {
     private final GridFsTemplate gridFsTemplate;
     private final TaskRepository taskRepository;
 
-    public FileResponse upload(String taskId, MultipartFile file) throws IOException {
+    public FileResponse upload(MultipartFile file) throws IOException {
 
         if (!FileTypes.SUPPORTED_TYPES(file.getContentType())) {
             throw new GlobalException(ErrorStatus.FILE_NOT_SUPPORTED);
