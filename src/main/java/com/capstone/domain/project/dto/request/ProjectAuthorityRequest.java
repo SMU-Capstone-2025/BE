@@ -1,4 +1,4 @@
-package com.capstone.domain.project.dto.query;
+package com.capstone.domain.project.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectUserAuthority {
-    private String userId;
+public class ProjectAuthorityRequest {
+    private String userEmail;
     private String role;
 }
