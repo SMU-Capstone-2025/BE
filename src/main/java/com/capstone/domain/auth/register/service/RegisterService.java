@@ -3,7 +3,7 @@ package com.capstone.domain.auth.register.service;
 import com.capstone.domain.auth.register.dto.RegisterRequest;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.repository.UserRepository;
-import com.capstone.global.mail.service.MailService;
+import com.capstone.domain.mail.service.RegisterMailService;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class RegisterService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final MailService mailService;
+    private final RegisterMailService mailService;
 
     public User registerUser(RegisterRequest registerRequest){
         return userRepository.save(registerRequest.from(passwordEncoder.encode(registerRequest.password())));

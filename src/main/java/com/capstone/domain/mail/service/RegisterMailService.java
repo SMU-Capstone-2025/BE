@@ -1,10 +1,6 @@
-package com.capstone.global.mail.service;
+package com.capstone.domain.mail.service;
 
 import com.capstone.domain.mypage.dto.EmailDto;
-import com.capstone.global.kafka.dto.ProjectChangePayload;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
@@ -13,18 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class MailService {
+public class RegisterMailService implements MailService {
 
     private final JavaMailSender javaMailSender;
     private String ePw;
@@ -32,6 +26,7 @@ public class MailService {
     @Value("${spring.mail.username}")
     private String id;
 
+    @Override
     public MimeMessage createMessage(String to) throws MessagingException, UnsupportedEncodingException {
 
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -55,32 +50,9 @@ public class MailService {
 
         return message;
     }
-    public MimeMessage createEmailChangeMessage(String to) throws MessagingException, UnsupportedEncodingException {
-
-        MimeMessage message = javaMailSender.createMimeMessage();
-        ePw = createKey();
-        message.addRecipients(MimeMessage.RecipientType.TO, to); // to 보내는 대상
-        message.setSubject("[Doctalk] 인증 코드"); //메일 제목
-
-        String msg = "<div style=\"width: 100%; font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;\">"
-                + "<div style=\"max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; text-align: center;\">"
-                + "<h1 style=\"color: #333; font-size: 24px;\">이메일 주소 확인</h1>"
-                + "<p style=\"font-size: 16px; color: #555;\">아래 인증 코드를 이메일 변경 화면에서 입력해주세요.</p>"
-                + "<div style=\"margin: 20px 0; padding: 15px; background-color: #F4F4F4; border-radius: 10px; display: inline-block;\">"
-                + "<span style=\"font-size: 32px; font-weight: bold; color: #333; letter-spacing: 4px;\">" + ePw + "</span>"
-                + "</div>"
-                + "<p style=\"font-size: 14px; color: #888;\">이 코드는 10분 동안 유효합니다.</p>"
-                + "</div>"
-                + "</div>";
-
-        message.setText(msg, "utf-8", "html"); //내용, charset타입, subtype
-        message.setFrom(new InternetAddress(id,"Doctalk")); //보내는 사람의 메일 주소, 보내는 사람 이름
-
-        return message;
-    }
 
 
-    public String createKey() {
+    private String createKey() {
         StringBuilder key = new StringBuilder();
         SecureRandom rnd = new SecureRandom();
 
@@ -90,10 +62,11 @@ public class MailService {
         return key.toString();
     }
 
+    @Override
     public String sendSimpleMessage(String email) throws Exception {
         MimeMessage message = createMessage(email);
         try{
-            javaMailSender.send(message); // 메일 발송
+            javaMailSender.send(message);
         }catch(MailException es){
             es.printStackTrace();
             throw new IllegalArgumentException();
@@ -101,6 +74,7 @@ public class MailService {
         return ePw; // 메일로 보냈던 인증 코드를 클라이언트로 리턴
     }
 
+    @Override
     public void sendMultipleMessages(List<String> emails){
         emails.forEach(email -> {
                     try{
@@ -110,15 +84,5 @@ public class MailService {
                     }
                 }
         );
-    }
-    public String sendSimpleMessageCheckEmail(EmailDto emailDto) throws Exception {
-        MimeMessage message = createEmailChangeMessage(emailDto.email());
-        try{
-            javaMailSender.send(message); // 메일 발송
-        }catch(MailException es){
-            es.printStackTrace();
-            throw new IllegalArgumentException();
-        }
-        return ePw;
     }
 }
