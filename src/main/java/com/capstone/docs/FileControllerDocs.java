@@ -39,7 +39,6 @@ public interface FileControllerDocs {
             )
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<FileResponse>> uploadFile(
-            @PathVariable("taskId") String taskId,
             @RequestParam("file") MultipartFile file) throws Exception;
 
     @Operation(description = "파일 다운로드")
