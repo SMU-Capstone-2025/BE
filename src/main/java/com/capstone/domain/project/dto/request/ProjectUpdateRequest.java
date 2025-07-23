@@ -13,6 +13,7 @@ public record ProjectUpdateRequest (
         String projectName,
         @NotNull
         @Size(min = 1)
-        String description
+        String description,
+        String imageId
 ){
 }
