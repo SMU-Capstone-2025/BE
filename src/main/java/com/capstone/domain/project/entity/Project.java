@@ -20,12 +20,20 @@ public class Project extends BaseDocument {
     @Id
     private String id;
     private String projectName;
+    private String imageId;
     private String description;
     private List<String> taskIds;
     private List<String> documentIds;
 
+    public void updateProjectInfoWithImage(String projectName, String description,String imageId) {
+        this.projectName = projectName;
+        this.description = description;
+        this.imageId = imageId;
+
+    }
     public void updateProjectInfo(String projectName, String description) {
         this.projectName = projectName;
         this.description = description;
+
     }
 }
