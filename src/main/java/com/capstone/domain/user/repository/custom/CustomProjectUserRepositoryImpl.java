@@ -1,6 +1,6 @@
 package com.capstone.domain.user.repository.custom;
 
-import com.capstone.domain.project.dto.query.ProjectUserAuthority;
+import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.user.entity.ProjectUser;
 import lombok.RequiredArgsConstructor;
@@ -43,17 +43,6 @@ public class CustomProjectUserRepositoryImpl implements CustomProjectUserReposit
         }
         Query projectQuery = new Query(Criteria.where("_id").in(projectIds));
         return mongoTemplate.find(projectQuery, Project.class);
-    }
-
-    @Override
-    public List<ProjectUserAuthority> findUserAuthByProjectId(String projectId) {
-
-        Query query = new Query(Criteria.where("projectId").is(projectId));
-        query.fields().include("role");
-        query.fields().include("userId");
-
-        // 컬렉션명과 반환 객체의 이름이 다르다면 3번째 매개변수에 컬렉션명 명시.
-        return mongoTemplate.find(query, ProjectUserAuthority.class, "project_user");
     }
 
     @Override
