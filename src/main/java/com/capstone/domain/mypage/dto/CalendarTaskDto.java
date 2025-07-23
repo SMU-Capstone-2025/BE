@@ -4,12 +4,14 @@ import com.capstone.domain.task.entity.Task;
 import com.capstone.domain.task.entity.Version;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record CalendarTaskDto(
         String id,
         String title,
         String status,
-        LocalDate deadline
+        LocalDate deadline,
+        LocalDateTime startDay
 ) {
     public static CalendarTaskDto from(Task task) {
 
@@ -17,7 +19,8 @@ public record CalendarTaskDto(
                 task.getId(),
                 task.getTitle(),
                 task.getStatus(),
-                task.getDeadline()
+                task.getDeadline(),
+                task.getCreatedAt()
         );
     }
 }
