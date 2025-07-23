@@ -98,4 +98,23 @@ public class FileService {
         gridFsTemplate.delete(Query.query(Criteria.where("_id").is(fileId)));
         return file.getFilename();
     }
+
+    public ResponseEntity<Resource> getFile(String fileId) {
+        GridFSFile gridFsFile = gridFsTemplate.findOne(
+                new Query(Criteria.where("_id").is(new ObjectId(fileId)))
+        );
+
+        if (gridFsFile == null) {
+            throw new GlobalException(ErrorStatus.FILE_NOT_FOUND);
+        }
+
+        GridFsResource resource = gridFsTemplate.getResource(gridFsFile);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(gridFsFile.getMetadata().get("_contentType").toString()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + gridFsFile.getFilename() + "\"")
+                .body(resource);
+    }
+
+
 }
