@@ -122,12 +122,12 @@ public class DocumentService {
                     Document document = mapToDocument(data);
 
 
-
                     if (document != null) {
                         documentRepository.save(document);
 
-                        String newKey = key.replace("DOC:waited:", "DOC:loaded:");
-                        redisTemplate.rename(key, newKey);
+                        String loadedKey = "DOC:loaded:" + document.getId();
+                        redisTemplate.opsForValue().set(loadedKey, document);
+                        redisTemplate.delete(key);
 
                     }
                 }
