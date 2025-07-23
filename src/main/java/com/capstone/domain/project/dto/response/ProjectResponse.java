@@ -11,7 +11,8 @@ public record ProjectResponse(
         String projectId,
         String name,
         String description,
-        List<ProjectCoworkerDto> coworkers
+        List<ProjectCoworkerDto> coworkers,
+        String imageId
 ) {
     public static ProjectResponse from(Project project, List<ProjectCoworkerDto> coworkers) {
         return ProjectResponse.builder()
@@ -19,6 +20,7 @@ public record ProjectResponse(
                 .name(project.getProjectName())
                 .description(project.getDescription())
                 .coworkers(coworkers)
+                .imageId(project.getImageId())
                 .build();
     }
 }
