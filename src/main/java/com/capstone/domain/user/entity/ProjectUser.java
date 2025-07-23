@@ -19,6 +19,9 @@ public class ProjectUser extends BaseDocument {
     private String userId;
 
     private String role;
-    private String status;
     private String joinedAt;
+
+    public void updateRole(String role){
+        this.role = role;
+    }
 }

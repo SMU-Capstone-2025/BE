@@ -3,7 +3,6 @@ package com.capstone.domain.project.service;
 import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
 import com.capstone.domain.project.dto.response.ProjectCoworkerDto;
 import com.capstone.domain.project.dto.response.ProjectResponse;
-import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.repository.ProjectRepository;
@@ -53,9 +52,7 @@ public class ProjectService {
         List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                 .map(coworker->
                         {
-                            User user =userService.findUserByEmailOrThrow(coworker.getUserId());
-                            log.info("asd{}",coworker.getUserId());
-                            log.info("asd{}",user.getName());
+                            User user = userService.findUserByEmailOrThrow(coworker.getUserId());
                             return ProjectCoworkerDto.from(
                             coworker.getUserId(),
                             coworker.getRole(),
@@ -76,8 +73,8 @@ public class ProjectService {
 
 
     @Transactional
-    public Project processUpdate(ProjectUpdateRequest projectUpdateRequest, CustomUserDetails customUserDetails){
-        Project project = findProjectByProjectIdOrThrow(projectUpdateRequest.projectId());
+    public Project processUpdate(String projectId, ProjectUpdateRequest projectUpdateRequest, CustomUserDetails customUserDetails){
+        Project project = findProjectByProjectIdOrThrow(projectId);
         ProjectChangeDetail beforeUpdate = ProjectChangeDetail.from(project);
 
         project.updateProjectInfo(projectUpdateRequest.projectName(), projectUpdateRequest.description());
@@ -134,7 +131,6 @@ public class ProjectService {
                             .projectId(project.getId())
                             .userId(email)
                             .role("ROLE_MEMBER") // 기본 권한 설정
-                            .status("INVITED")
                             .joinedAt(LocalDate.now().toString())
                             .build()
                     ).toList());
@@ -144,7 +140,6 @@ public class ProjectService {
                     .projectId(project.getId())
                     .userId(inviterEmail)
                     .role("ROLE_MEMBER")
-                    .status("ACCEPTED")
                     .joinedAt(LocalDate.now().toString())
                     .build();
 
