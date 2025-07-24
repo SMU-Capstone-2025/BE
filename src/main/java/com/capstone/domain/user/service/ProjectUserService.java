@@ -83,6 +83,7 @@ public class ProjectUserService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
     }
 
+    @Transactional
     public void deleteProjectUser(CustomUserDetails customUserDetails, String projectId,String email)
     {
         String managerEmail = customUserDetails.getEmail();
