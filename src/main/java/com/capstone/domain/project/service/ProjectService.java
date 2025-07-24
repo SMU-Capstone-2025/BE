@@ -146,7 +146,7 @@ public class ProjectService {
             ProjectUser inviteUser = ProjectUser.builder()
                     .projectId(project.getId())
                     .userId(inviterEmail)
-                    .role("ROLE_MEMBER")
+                    .role("ROLE_MANAGER")
                     .joinedAt(LocalDate.now().toString())
                     .build();
 
