@@ -1,11 +1,8 @@
 package com.capstone.domain.project.controller;
 
 import com.capstone.docs.ProjectControllerDocs;
-import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
+import com.capstone.domain.project.dto.request.*;
 
-import com.capstone.domain.project.dto.request.ProjectInviteRequest;
-import com.capstone.domain.project.dto.request.ProjectSaveRequest;
-import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
 import com.capstone.domain.project.dto.response.ProjectResponse;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.service.ProjectService;
@@ -88,6 +85,16 @@ public class ProjectController implements ProjectControllerDocs {
     @GetMapping("/list")
     public ResponseEntity<ApiResponse<List<ProjectResponse>>> loadProjectList(@AuthenticationPrincipal CustomUserDetails userDetails){
         return ResponseEntity.ok(ApiResponse.onSuccess(projectService.getProjectList(userDetails)));
+    }
+
+    @DeleteMapping("/{projectId}/user/{email}")
+    @PreAuthorize("@projectAuthorityEvaluator.hasPermission(#projectId, {'ROLE_MANAGER'}, authentication)")
+    public ResponseEntity<ApiResponse<Void>> deleteProjectUser(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable String projectId,
+            @PathVariable String email){
+        projectUserService.deleteProjectUser(customUserDetails, projectId, email);
+        return ResponseEntity.ok(ApiResponse.onSuccess());
     }
 
 }
