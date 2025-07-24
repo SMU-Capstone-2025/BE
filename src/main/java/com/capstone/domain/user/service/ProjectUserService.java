@@ -82,4 +82,25 @@ public class ProjectUserService {
         return projectRepository.findById(projectId)
                 .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
     }
+
+    public void deleteProjectUser(CustomUserDetails customUserDetails, String projectId,String email)
+    {
+        String managerEmail = customUserDetails.getEmail();
+        ProjectUser manager = projectUserRepository.findByProjectIdAndUserId(projectId, managerEmail)
+                .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
+        if(manager.getRole().equals("ROLE_MANAGER"))
+        {
+            ProjectUser projectUser = projectUserRepository.findByProjectIdAndUserId(projectId, email)
+                    .orElseThrow(() -> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
+
+            projectUserRepository.delete(projectUser);
+        }
+        else {
+            throw new GlobalException(ErrorStatus.PROJECT_NOT_ACCESS);
+        }
+
+
+
+    }
+
 }
