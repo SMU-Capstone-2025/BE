@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -50,6 +51,14 @@ public class CustomProjectUserRepositoryImpl implements CustomProjectUserReposit
         Query query = new Query(Criteria.where("projectId").is(projectId));
         List<ProjectUser> projectUsers = mongoTemplate.find(query, ProjectUser.class);
         return projectUsers;
+    }
+
+    @Override
+    public Optional<ProjectUser> findByProjectAndUser(String projectId, String userId) {
+        Query query = new Query().addCriteria(Criteria.where("projectId").is(projectId)
+                .and("userId").is(userId));
+
+        return Optional.ofNullable(mongoTemplate.findOne(query, ProjectUser.class));
     }
 
 }
