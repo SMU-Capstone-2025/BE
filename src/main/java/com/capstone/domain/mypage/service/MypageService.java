@@ -123,7 +123,7 @@ public class MypageService {
         userRepository.save(userExists);
 
         //프로젝트 및 작업에 저장된 이메일 변경
-        List<Project> projectList=getUserProject(user.orElse(null));
+        List<Project> projectList=getUserProject(userExists);
         log.info("projectList {}",projectList.get(0).getProjectName());
         for(Project project:projectList)
         {
