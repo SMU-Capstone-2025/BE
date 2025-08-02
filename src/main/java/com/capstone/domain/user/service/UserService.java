@@ -29,14 +29,18 @@ public class UserService {
         BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, User.class);
 
         for (String email : emails) {
-            User user = findUserByEmailOrThrow(email);
 
-            List<String> updatedProjectIds = participateProject(user.getProjectIds(), projectId);
+            Optional<User> userOptional = findUserByEmailOrThrow(email);
+            if(userOptional.isPresent()){
+                User user = userOptional.get();
+                List<String> updatedProjectIds = participateProject(user.getProjectIds(), projectId);
+                Query query = new Query(Criteria.where("email").is(email));
+                Update update = new Update().set("projectIds", updatedProjectIds);
 
-            Query query = new Query(Criteria.where("email").is(email));
-            Update update = new Update().set("projectIds", updatedProjectIds);
-
-            bulkOps.updateOne(query, update);
+                bulkOps.updateOne(query, update);
+            } else {
+                throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+            }
         }
 
         bulkOps.execute();
@@ -51,9 +55,9 @@ public class UserService {
     }
 
 
-    public User findUserByEmailOrThrow(String email){
-        return Optional.ofNullable(userRepository.findUserByEmail(email))
-                .orElseThrow(() -> new UserNotFoundException(UserMessages.USER_NOT_FOUND));
+    public Optional<User> findUserByEmailOrThrow(String email){
+        return Optional.ofNullable(userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException(UserMessages.USER_NOT_FOUND)));
     }
 
     public List<String> fetchAllProject(String email){

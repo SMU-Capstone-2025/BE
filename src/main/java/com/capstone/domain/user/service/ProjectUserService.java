@@ -8,6 +8,7 @@ import com.capstone.domain.user.entity.PendingUser;
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.User;
 import com.capstone.domain.user.exception.UserFoundException;
+import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.message.UserMessages;
 import com.capstone.domain.user.repository.PendingUserRepository;
 import com.capstone.domain.user.repository.ProjectUserRepository;
@@ -43,20 +44,26 @@ public class ProjectUserService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(()-> new GlobalException(ErrorStatus.PROJECT_NOT_FOUND));
 
-        User user = userRepository.findUserByEmail(projectInviteRequest.email());
-        String userId = user.getId();
+        Optional<User> user = userRepository.findUserByEmail(projectInviteRequest.email());
+        if(user.isPresent()){
+            String userId = user.get().getId();
 
-        Optional<PendingUser> pendingUserExists = pendingUserRepository.findByProjectAndUser(projectId, userId);
-        if(pendingUserExists.isPresent()){
-            throw new UserFoundException(UserMessages.PENDING_USER_EXISTS);
+            Optional<PendingUser> pendingUserExists = pendingUserRepository.findByProjectAndUser(projectId, userId);
+            if(pendingUserExists.isPresent()){
+                throw new UserFoundException(UserMessages.PENDING_USER_EXISTS);
+            }
+
+            Optional<ProjectUser> projectUserExists = projectUserRepository.findByProjectIdAndUserId(projectId, userId);
+            if(projectUserExists.isPresent()){
+                throw new UserFoundException(UserMessages.PROJECT_USER_EXISTS);
+            }
+
+            kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_INVITED, ProjectInvitePayload.from(project, customUserDetails, projectInviteRequest.email()));
+        }
+        else {
+            throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
         }
 
-        Optional<ProjectUser> projectUserExists = projectUserRepository.findByProjectIdAndUserId(projectId, userId);
-        if(projectUserExists.isPresent()){
-            throw new UserFoundException(UserMessages.PROJECT_USER_EXISTS);
-        }
-
-        kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_INVITED, ProjectInvitePayload.from(project, customUserDetails, projectInviteRequest.email()));
     }
 
     @Transactional

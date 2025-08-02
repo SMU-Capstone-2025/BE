@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
 
@@ -31,16 +32,17 @@ public class PaymentService {
     public PaymentEntity processPayment(CustomUserDetails userDetails, String impUid)
     {
         String email =userDetails.getEmail();
-        User user=userRepository.findUserByEmail(email);
-        if(user == null)
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if(user.isEmpty())
         {
             throw new UserNotFoundException(USER_NOT_FOUND);
         }
         log.info("email={}",email);
 
+        User userExist = user.get();
         //유저 멤버쉽 프리미엄으로 변경
-        user.setMembership(MembershipType.PREMIUM_USER);
-        userRepository.save(user);
+        userExist.setMembership(MembershipType.PREMIUM_USER);
+        userRepository.save(userExist);
 
         //결제 엔티티 생성ㅇ
         PaymentEntity paymentEntity = PaymentEntity.builder()

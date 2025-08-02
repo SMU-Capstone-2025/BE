@@ -8,15 +8,16 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
 public class CustomUserRepositoryImpl implements CustomUserRepository{
     private final MongoTemplate mongoTemplate;
     @Override
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         Query query = new Query().addCriteria(Criteria.where("email").is(email));
-        return mongoTemplate.findOne(query, User.class);
+        return Optional.ofNullable(mongoTemplate.findOne(query, User.class));
     }
 
     @Override

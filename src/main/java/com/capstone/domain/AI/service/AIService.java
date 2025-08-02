@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.capstone.domain.AI.message.AIMessages.AI_LIMIT_EXCEEDED;
@@ -60,12 +61,12 @@ public class AIService
 
     public void checkUserMembership(String email)
     {
-        User user = userRepository.findUserByEmail(email);
-        if(user==null)
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if(user.isEmpty())
         {
             throw new UserNotFoundException(USER_NOT_FOUND);
         }
-        if(user.getMembership().equals(MembershipType.FREE_USER))
+        if(user.get().getMembership().equals(MembershipType.FREE_USER))
         {
             if (isUsageLimitExceeded(email)) {
                 throw new AIException(AI_LIMIT_EXCEEDED);

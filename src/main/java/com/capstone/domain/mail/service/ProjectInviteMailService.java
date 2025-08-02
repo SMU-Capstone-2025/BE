@@ -3,6 +3,8 @@ package com.capstone.domain.mail.service;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.user.entity.PendingUser;
 import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.UserNotFoundException;
+import com.capstone.domain.user.message.UserMessages;
 import com.capstone.domain.user.repository.PendingUserRepository;
 import com.capstone.domain.user.repository.UserRepository;
 import jakarta.mail.MessagingException;
@@ -15,6 +17,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,16 +38,22 @@ public class ProjectInviteMailService {
 
         UUID userCredentialCode = UUID.randomUUID();
 
-        User user = userRepository.findUserByEmail(invitee);
+        Optional<User> user = userRepository.findUserByEmail(invitee);
 
-        PendingUser pendingUser = PendingUser.builder()
-                .projectId(projectId)
-                .userId(user.getId())
-                .credentialCode(userCredentialCode.toString())
-                .email(invitee)
-                .build();
+        if(user.isPresent()){
+            User userExist = user.get();
+            PendingUser pendingUser = PendingUser.builder()
+                    .projectId(projectId)
+                    .userId(userExist.getId())
+                    .credentialCode(userCredentialCode.toString())
+                    .email(invitee)
+                    .build();
 
-        pendingUserRepository.save(pendingUser);
+            pendingUserRepository.save(pendingUser);
+        } else {
+            throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+        }
+
 
 
 

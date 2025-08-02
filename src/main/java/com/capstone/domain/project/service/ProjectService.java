@@ -9,6 +9,8 @@ import com.capstone.domain.project.repository.ProjectRepository;
 
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.UserNotFoundException;
+import com.capstone.domain.user.message.UserMessages;
 import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.service.UserService;
 
@@ -27,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -52,11 +53,16 @@ public class ProjectService {
         List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                 .map(coworker->
                         {
-                            User user = userService.findUserByEmailOrThrow(coworker.getUserId());
-                            return ProjectCoworkerDto.from(
-                            coworker.getUserId(),
-                            coworker.getRole(),
-                                    user.getName());
+                            Optional<User> user = userService.findUserByEmailOrThrow(coworker.getUserId());
+                            if(user.isPresent()){
+                                return ProjectCoworkerDto.from(
+                                        coworker.getUserId(),
+                                        coworker.getRole(),
+                                        user.get().getName());
+                            }
+                            else {
+                                throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+                            }
                         }
                 )
                 .toList();
@@ -110,15 +116,18 @@ public class ProjectService {
                     List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(project.getId());
                     List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                             .map(coworker->{
-                                User user =userService.findUserByEmailOrThrow(coworker.getUserId());
-                                return ProjectCoworkerDto.from(
+                                Optional<User> user = userService.findUserByEmailOrThrow(coworker.getUserId());
+                                if(user.isPresent()){
+                                    User userExists = user.get();
+                                    return ProjectCoworkerDto.from(
+                                            coworker.getUserId(),
+                                            coworker.getRole(),
+                                            userExists.getName());
+                                } else {
+                                    throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+                                }
 
-                                    coworker.getUserId(),
-                                    coworker.getRole(),
-                                        user.getName()
-
-                            );}
-                            )
+                            })
                             .toList();
                     return ProjectResponse.from(project, projectCoworkerDtos);
                 })
