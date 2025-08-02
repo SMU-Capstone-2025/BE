@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class CustomPendingUserRepositoryImpl implements CustomPendingUserRepository {
@@ -20,5 +22,13 @@ public class CustomPendingUserRepositoryImpl implements CustomPendingUserReposit
         Query query = new Query().addCriteria(Criteria.where("credentialCode").is(credentialCode));
 
         return mongoTemplate.findOne(query, PendingUser.class);
+    }
+
+    @Override
+    public Optional<PendingUser> findByProjectAndUser(String projectId, String userId) {
+        Query query = new Query().addCriteria(Criteria.where("projectId").is(projectId)
+                .and("userId").is(userId));
+
+        return Optional.ofNullable(mongoTemplate.findOne(query, PendingUser.class));
     }
 }
