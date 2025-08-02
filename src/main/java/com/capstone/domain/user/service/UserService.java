@@ -30,9 +30,7 @@ public class UserService {
 
         for (String email : emails) {
             User user = findUserByEmailOrThrow(email);
-
             List<String> updatedProjectIds = participateProject(user.getProjectIds(), projectId);
-
             Query query = new Query(Criteria.where("email").is(email));
             Update update = new Update().set("projectIds", updatedProjectIds);
 
@@ -51,8 +49,8 @@ public class UserService {
     }
 
 
-    public User findUserByEmailOrThrow(String email){
-        return Optional.ofNullable(userRepository.findUserByEmail(email))
+    public User findUserByEmailOrThrow(String email) {
+        return userRepository.findUserByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(UserMessages.USER_NOT_FOUND));
     }
 

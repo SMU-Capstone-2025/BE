@@ -14,6 +14,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -58,10 +60,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        User existingUser = userRepository.findUserByEmail(oAuth2UserInfo.getEmail());
+        Optional<User> existingUser = userRepository.findUserByEmail(oAuth2UserInfo.getEmail());
         log.info("user", existingUser);
 
-        if (existingUser == null){
+        if (existingUser.isEmpty()){
             User user = User.builder()
                     .email(oAuth2UserInfo.getEmail())
                     .name(oAuth2UserInfo.getName())

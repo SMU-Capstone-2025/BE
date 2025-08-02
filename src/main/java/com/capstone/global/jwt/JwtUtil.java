@@ -115,7 +115,7 @@ public class JwtUtil {
         }
 
         // DB에서 googleId 기반으로 사용자 찾기
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findUserByEmail(email));
+        Optional<User> userOptional = userRepository.findUserByEmail(email);
         if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("User not found with googleId: " + email);
         }

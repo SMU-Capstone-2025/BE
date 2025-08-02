@@ -9,6 +9,8 @@ import com.capstone.domain.project.repository.ProjectRepository;
 
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.UserNotFoundException;
+import com.capstone.domain.user.message.UserMessages;
 import com.capstone.domain.user.repository.ProjectUserRepository;
 import com.capstone.domain.user.service.UserService;
 
@@ -27,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -54,8 +55,8 @@ public class ProjectService {
                         {
                             User user = userService.findUserByEmailOrThrow(coworker.getUserId());
                             return ProjectCoworkerDto.from(
-                            coworker.getUserId(),
-                            coworker.getRole(),
+                                    coworker.getUserId(),
+                                    coworker.getRole(),
                                     user.getName());
                         }
                 )
@@ -110,15 +111,13 @@ public class ProjectService {
                     List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(project.getId());
                     List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                             .map(coworker->{
-                                User user =userService.findUserByEmailOrThrow(coworker.getUserId());
+                                User user = userService.findUserByEmailOrThrow(coworker.getUserId());
                                 return ProjectCoworkerDto.from(
+                                        coworker.getUserId(),
+                                        coworker.getRole(),
+                                        user.getName());
 
-                                    coworker.getUserId(),
-                                    coworker.getRole(),
-                                        user.getName()
-
-                            );}
-                            )
+                            })
                             .toList();
                     return ProjectResponse.from(project, projectCoworkerDtos);
                 })
