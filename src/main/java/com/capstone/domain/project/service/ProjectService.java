@@ -53,16 +53,11 @@ public class ProjectService {
         List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                 .map(coworker->
                         {
-                            Optional<User> user = userService.findUserByEmailOrThrow(coworker.getUserId());
-                            if(user.isPresent()){
-                                return ProjectCoworkerDto.from(
-                                        coworker.getUserId(),
-                                        coworker.getRole(),
-                                        user.get().getName());
-                            }
-                            else {
-                                throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
-                            }
+                            User user = userService.findUserByEmailOrThrow(coworker.getUserId());
+                            return ProjectCoworkerDto.from(
+                                    coworker.getUserId(),
+                                    coworker.getRole(),
+                                    user.getName());
                         }
                 )
                 .toList();
@@ -116,16 +111,11 @@ public class ProjectService {
                     List<ProjectUser> projectUserList= projectUserRepository.findUserIdAndRoleByProjectId(project.getId());
                     List<ProjectCoworkerDto> projectCoworkerDtos= projectUserList.stream()
                             .map(coworker->{
-                                Optional<User> user = userService.findUserByEmailOrThrow(coworker.getUserId());
-                                if(user.isPresent()){
-                                    User userExists = user.get();
-                                    return ProjectCoworkerDto.from(
-                                            coworker.getUserId(),
-                                            coworker.getRole(),
-                                            userExists.getName());
-                                } else {
-                                    throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
-                                }
+                                User user = userService.findUserByEmailOrThrow(coworker.getUserId());
+                                return ProjectCoworkerDto.from(
+                                        coworker.getUserId(),
+                                        coworker.getRole(),
+                                        user.getName());
 
                             })
                             .toList();

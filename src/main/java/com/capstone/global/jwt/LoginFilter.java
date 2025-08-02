@@ -3,6 +3,8 @@ package com.capstone.global.jwt;
 //import com.capstone.domain.auth.exception.SocialLoginException;
 import com.capstone.domain.auth.login.dto.LoginRequest;
 import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.UserNotFoundException;
+import com.capstone.domain.user.message.UserMessages;
 import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,8 +52,12 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             Optional<User> user = userRepository.findUserByEmail(loginRequest.getEmail());
             log.info("");
 
-            if (user.get().getSocial() != null){
-                throw new RuntimeException(user.get().getSocial() + "계정으로 가입된 회원입니다.");
+            if(user.isPresent()){
+                if (user.get().getSocial() != null){
+                    throw new RuntimeException(user.get().getSocial() + "계정으로 가입된 회원입니다.");
+                }
+            } else {
+                throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
             }
 
             UsernamePasswordAuthenticationToken authToken =
