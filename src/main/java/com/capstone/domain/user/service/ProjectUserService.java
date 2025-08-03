@@ -71,7 +71,7 @@ public class ProjectUserService {
         PendingUser pendingUser = pendingUserRepository.findByCredentialCode(credentialCode);
         ProjectUser projectUser = ProjectUser.builder()
                 .projectId(pendingUser.getProjectId())
-                .userId(pendingUser.getUserId())
+                .userId(pendingUser.getEmail())
                 .role("ROLE_MEMBER")
                 .joinedAt(LocalTime.now().toString())
                 .build();
