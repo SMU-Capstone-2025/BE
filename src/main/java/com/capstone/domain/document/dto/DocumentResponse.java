@@ -14,7 +14,8 @@ public record DocumentResponse(
         String status,
         String content,
         List<String> logs,
-        List<String> attachments)
+        List<String> attachments,
+        String projectId)
 {
     public static DocumentResponse from(Document document) {
         return DocumentResponse.builder()
@@ -23,6 +24,7 @@ public record DocumentResponse(
                 .content(document.getContent())
                 .logs(document.getLogs())
                 .attachments(document.getAttachments())
+                .projectId(document.getProjectId())
                 .build();
     }
 }
