@@ -6,6 +6,8 @@ import com.capstone.domain.task.entity.Version;
 import jakarta.annotation.Nullable;
 import lombok.Builder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -15,7 +17,9 @@ public record DocumentResponse(
         String content,
         List<String> logs,
         List<String> attachments,
-        String projectId)
+        String projectId,
+        LocalDateTime updateTime
+)
 {
     public static DocumentResponse from(Document document) {
         return DocumentResponse.builder()
@@ -25,6 +29,7 @@ public record DocumentResponse(
                 .logs(document.getLogs())
                 .attachments(document.getAttachments())
                 .projectId(document.getProjectId())
+                .updateTime(document.getUpdatedAt())
                 .build();
     }
 }
