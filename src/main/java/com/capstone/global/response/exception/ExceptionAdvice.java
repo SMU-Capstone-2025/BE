@@ -76,14 +76,16 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
     }
 
     // 사용자 정의 예외 처리 (400번대)
-    @ExceptionHandler(value = GlobalException.class)
-    public ResponseEntity onThrowException(GlobalException globalException,
-                                           HttpServletRequest request) {
-
-        ErrorInfoDto errorReasonHttpStatus = globalException.getErrorReasonHttpStatus();
-        return handleExceptionInternal(globalException, errorReasonHttpStatus, null, request);
+    @ExceptionHandler(GlobalException.class)
+    public ResponseEntity<Object> handleGlobalException(GlobalException e, HttpServletRequest request) {
+        ErrorInfoDto errorInfo = e.getErrorReasonHttpStatus();
+        ApiResponse<Object> body = ApiResponse.onFailure(
+                errorInfo.code(),
+                errorInfo.message(),
+                e.getDetail() // null이 아니면 추가 정보
+        );
+        return ResponseEntity.status(errorInfo.httpStatus()).body(body);
     }
-
     private ResponseEntity<Object> handleExceptionInternal(Exception e, ErrorInfoDto info,
                                                            HttpHeaders headers, HttpServletRequest request) {
 
