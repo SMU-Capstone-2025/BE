@@ -193,8 +193,7 @@ public class MypageService {
         return email;
     }
 
-    public List<Project> getUserProject(User user)
-    {
+    public List<Project> getUserProject(User user) {
         return projectUserRepository.findProjectsByUserId(user.getEmail());
     }
 
@@ -209,16 +208,16 @@ public class MypageService {
         }
 
         List<Project> projectList=getUserProject(user.orElse(null));
-        log.info("projectList {}",projectList.get(0).getProjectName());
-        List<CalendarTaskDto> calendarTaskDtoList=new ArrayList<>();
-        for(Project project:projectList)
-        {
-            List<String> taskIds= project.getTaskIds();
+
+        List<CalendarTaskDto> calendarTaskDtoList = new ArrayList<>();
+        for(Project project : projectList) {
+            List<String> taskIds = project.getTaskIds();
             if(taskIds == null || taskIds.isEmpty()) {
                 continue;
             }
-            log.info("taskIds: {}", taskIds);
+
             List<Task> tasks = taskRepository.findByProjectId(project.getId());
+
             for (Task task : tasks) {
                 CalendarTaskDto calendarTaskDto=CalendarTaskDto.from(task);
                 calendarTaskDtoList.add(calendarTaskDto);
