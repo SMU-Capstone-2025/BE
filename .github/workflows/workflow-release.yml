@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [fix/#104-mypage-task-return]
+    branches: [main]
 
 jobs:
   CI:
