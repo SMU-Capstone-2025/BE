@@ -66,7 +66,9 @@ public class ProjectService {
 
     public Project processRegister(CustomUserDetails customUserDetails, ProjectSaveRequest projectSaveRequest){
         Project project = saveProject(customUserDetails, projectSaveRequest);
-        userService.participateProcess(Objects.requireNonNull(projectSaveRequest.invitedEmails()), project.getId());
+        if (projectSaveRequest.invitedEmails() != null) {
+            userService.participateProcess(projectSaveRequest.invitedEmails(), project.getId());
+        }
         kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_CREATED, ProjectChangePayload.from(project, null, null, customUserDetails.getEmail(), projectSaveRequest.invitedEmails()));
         return project;
     }
@@ -131,27 +133,28 @@ public class ProjectService {
     }
 
     public void saveProjectUsers(ProjectSaveRequest projectSaveRequest, Project project, String inviterEmail){
+        List<ProjectUser> projectUsers = new ArrayList<>();
+        ProjectUser inviteUser = ProjectUser.builder()
+                .projectId(project.getId())
+                .userId(inviterEmail)
+                .role("ROLE_MANAGER")
+                .joinedAt(LocalDate.now().toString())
+                .build();
+        projectUsers.add(inviteUser);
         if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
-            List<ProjectUser> projectUsers = new ArrayList<>(projectSaveRequest.invitedEmails().stream()
+            projectUsers.addAll(
+                    projectSaveRequest.invitedEmails().stream()
                     .map(email -> ProjectUser.builder()
                             .projectId(project.getId())
                             .userId(email)
-                            .role("ROLE_MEMBER") // 기본 권한 설정
+                            .role("ROLE_MEMBER")
                             .joinedAt(LocalDate.now().toString())
                             .build()
                     ).toList());
 
 
-            ProjectUser inviteUser = ProjectUser.builder()
-                    .projectId(project.getId())
-                    .userId(inviterEmail)
-                    .role("ROLE_MANAGER")
-                    .joinedAt(LocalDate.now().toString())
-                    .build();
 
-            projectUsers.add(inviteUser);
-
-            projectUserRepository.saveAll(projectUsers);
         }
+        projectUserRepository.saveAll(projectUsers);
     }
 }
