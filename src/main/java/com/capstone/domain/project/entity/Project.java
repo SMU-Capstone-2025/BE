@@ -1,14 +1,12 @@
 package com.capstone.domain.project.entity;
 
-import com.capstone.domain.project.dto.request.ProjectSaveRequest;
-import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
 import com.capstone.global.entity.BaseDocument;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Document(collection= "project")
 @Getter
@@ -34,6 +32,14 @@ public class Project extends BaseDocument {
     public void updateProjectInfo(String projectName, String description) {
         this.projectName = projectName;
         this.description = description;
+    }
 
+    public void addNewTaskId(String taskId){
+        if(this.taskIds == null) {
+            this.taskIds = new ArrayList<>();
+        }
+        if (!this.taskIds.contains(taskId)) {
+            this.taskIds.add(taskId);
+        }
     }
 }

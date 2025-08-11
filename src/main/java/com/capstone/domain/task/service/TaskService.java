@@ -1,5 +1,8 @@
 package com.capstone.domain.task.service;
 
+import com.capstone.domain.project.entity.Project;
+import com.capstone.domain.project.exception.ProjectNotFoundException;
+import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.task.dto.request.TaskRequest;
 import com.capstone.domain.task.dto.response.AttachmentDto;
 import com.capstone.domain.task.dto.response.TaskResponse;
@@ -39,6 +42,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Observed
 public class TaskService {
+    private final ProjectRepository projectRepository;
     private final TaskRepository taskRepository;
     private final LogRepository logRepository;
     private final KafkaProducerService kafkaProducerService;
@@ -47,8 +51,12 @@ public class TaskService {
 
     public Task saveTask(TaskRequest taskDto, CustomUserDetails userDetails){
         validateStatus(taskDto.status());
-
+        Project project = projectRepository.findById(taskDto.projectId()).orElseThrow(
+                ProjectNotFoundException::new
+        );
         Task saved = taskRepository.save(taskDto.toTask());
+        project.addNewTaskId(saved.getId());
+        projectRepository.save(project);
         kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED,TaskChangePayload.from(saved, null, null, userDetails.getEmail(), taskDto.editors()));
 
         return saved;
