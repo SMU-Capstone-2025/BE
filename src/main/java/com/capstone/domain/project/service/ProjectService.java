@@ -9,9 +9,9 @@ import com.capstone.domain.project.repository.ProjectRepository;
 
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.User;
-import com.capstone.domain.user.exception.UserNotFoundException;
-import com.capstone.domain.user.message.UserMessages;
+import com.capstone.domain.user.exception.InvalidUserException;
 import com.capstone.domain.user.repository.ProjectUserRepository;
+import com.capstone.domain.user.repository.UserRepository;
 import com.capstone.domain.user.service.UserService;
 
 import com.capstone.global.kafka.dto.ProjectChangePayload;
@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -36,6 +37,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ProjectService {
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
     private final UserService userService;
     private final KafkaProducerService kafkaProducerService;
     private final ProjectUserRepository projectUserRepository;
@@ -134,6 +136,29 @@ public class ProjectService {
 
     public void saveProjectUsers(ProjectSaveRequest projectSaveRequest, Project project, String inviterEmail){
         List<ProjectUser> projectUsers = new ArrayList<>();
+        List<String> invalidEmails = new ArrayList<>();
+
+        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
+            projectSaveRequest.invitedEmails().forEach(
+                    invitedEmail -> {
+                        if (userRepository.findUserByEmail(invitedEmail).isEmpty()){
+                            invalidEmails.add(invitedEmail);
+                        }
+                    }
+            );
+            projectUsers.addAll(
+                    projectSaveRequest.invitedEmails().stream()
+                            .map(email -> ProjectUser.builder()
+                                    .projectId(project.getId())
+                                    .userId(email)
+                                    .role("ROLE_MEMBER")
+                                    .joinedAt(LocalDate.now().toString())
+                                    .build()
+                            ).toList());
+        }
+        if (!invalidEmails.isEmpty()) {
+            throw new InvalidUserException(invalidEmails);
+        }
         ProjectUser inviteUser = ProjectUser.builder()
                 .projectId(project.getId())
                 .userId(inviterEmail)
@@ -141,20 +166,8 @@ public class ProjectService {
                 .joinedAt(LocalDate.now().toString())
                 .build();
         projectUsers.add(inviteUser);
-        if (projectSaveRequest.invitedEmails() != null && !projectSaveRequest.invitedEmails().isEmpty()) {
-            projectUsers.addAll(
-                    projectSaveRequest.invitedEmails().stream()
-                    .map(email -> ProjectUser.builder()
-                            .projectId(project.getId())
-                            .userId(email)
-                            .role("ROLE_MEMBER")
-                            .joinedAt(LocalDate.now().toString())
-                            .build()
-                    ).toList());
-
-
-
-        }
         projectUserRepository.saveAll(projectUsers);
+
+
     }
 }
