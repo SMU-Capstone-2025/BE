@@ -7,7 +7,9 @@ import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
 
+import com.capstone.global.kafka.dto.DocumentChangePayload;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -55,10 +57,12 @@ public class DocumentService {
         redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 10, TimeUnit.SECONDS);
     }
 
-    public void deleteDocumentFromCacheAndDB(String key){
+    public void deleteDocumentFromCacheAndDB(CustomUserDetails customUserDetails, String key){
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
         documentRepository.delete(document);
+        kafkaProducerService.sendEvent(KafkaEventTopic.DOCUMENT_DELETED, DocumentChangePayload.from(document
+                , null, null, customUserDetails.getEmail(), document.getEditors()));
     }
 
     public void createDocument(CustomUserDetails customUserDetails, DocumentCreateRequest documentCreateRequest){
