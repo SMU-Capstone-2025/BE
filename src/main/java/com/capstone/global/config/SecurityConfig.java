@@ -108,6 +108,8 @@ public class SecurityConfig {
                                 "/api/login",
                                 "/api/swagger-ui/**",
                                 "/api/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
                                 "/api/csrf-token",
                                 "/api/project/**",
                                 "/api/doc/ws", "/api/doc/ws/**",
