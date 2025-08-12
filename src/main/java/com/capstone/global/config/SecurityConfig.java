@@ -101,8 +101,25 @@ public class SecurityConfig {
                             response.getWriter().write("{\"error\": \"Unauthorized request\"}");
                         })
                 )
-        http.formLogin(AbstractHttpConfigurer::disable);
-
+                .authorizeHttpRequests(requests -> requests
+                        .requestMatchers(
+                                "/api/oauth2/**",
+                                "/api/register/*",
+                                "/api/login",
+                                "/api/swagger-ui/**",
+                                "/api/v3/api-docs/**",
+                                "/api/csrf-token",
+                                "/api/project/**",
+                                "/api/doc/ws", "/api/doc/ws/**",
+                                "/api/document/**",
+                                "/api/editing",
+                                "/api/notification/**",
+                                "/api/mypage/email/avail",
+                                "/api/mypage/password/new",
+                                "/api/mypage/email/check",
+                                "/api/project/invite/accept"
+                        ).permitAll().anyRequest().authenticated()
+                )
                 .oauth2Login(configure ->
                         configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                                 .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
@@ -123,7 +140,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342", "https://docktalk.co.kr", "http://docktalk.co.kr"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342", "http://docktalk.co.kr", "http://docktalk.co.kr"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.addExposedHeader("access");
