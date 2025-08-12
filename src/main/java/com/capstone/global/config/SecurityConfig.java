@@ -101,12 +101,8 @@ public class SecurityConfig {
                             response.getWriter().write("{\"error\": \"Unauthorized request\"}");
                         })
                 )
-                .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
-                                "/v3/api-docs/**","/csrf-token", "/project/**", "/doc/ws", "/doc/ws/**", "/document/**", "/editing", "/notification/**",
-                                "/mypage/email/avail","/mypage/password/new","/mypage/email/check", "/project/invite/accept").permitAll()
-                        .anyRequest().authenticated()
-                )
+        http.formLogin(AbstractHttpConfigurer::disable);
+
                 .oauth2Login(configure ->
                         configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
                                 .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
@@ -127,7 +123,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342", "https://docktalk.co.kr", "http://docktalk.co.kr"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.addExposedHeader("access");

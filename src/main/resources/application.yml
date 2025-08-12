@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    default: local
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -21,7 +23,7 @@ spring:
       max-request-size: 50MB
 
   kafka:
-    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
     topics:
       task-created: task.created
       task-updated: task.updated
@@ -120,6 +122,8 @@ server:
   port: 8080
   address: 0.0.0.0
   max-http-header-size: 16KB
+  servlet:
+    context-path: /api
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain
