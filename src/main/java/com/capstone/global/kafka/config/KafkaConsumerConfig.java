@@ -1,8 +1,5 @@
 package com.capstone.global.kafka.config;
-import com.capstone.global.kafka.dto.ProjectAuthPayload;
-import com.capstone.global.kafka.dto.ProjectChangePayload;
-import com.capstone.global.kafka.dto.ProjectInvitePayload;
-import com.capstone.global.kafka.dto.TaskChangePayload;
+import com.capstone.global.kafka.dto.*;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -89,6 +86,21 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, ProjectAuthPayload> projectAuthKafkaListenerContainerFactory() {
         var factory = new ConcurrentKafkaListenerContainerFactory<String, ProjectAuthPayload>();
         factory.setConsumerFactory(projectAuthConsumerFactory());
+        return factory;
+    }
+
+    @Bean
+    public ConsumerFactory<String, DocumentChangePayload> documentChangeConsumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(
+                baseConsumerConfigs(),
+                new StringDeserializer(),
+                new JsonDeserializer<>(DocumentChangePayload.class, false));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, DocumentChangePayload> documentChangeKafkaListenerContainerFactory() {
+        var factory = new ConcurrentKafkaListenerContainerFactory<String, DocumentChangePayload>();
+        factory.setConsumerFactory(documentChangeConsumerFactory());
         return factory;
     }
 }
