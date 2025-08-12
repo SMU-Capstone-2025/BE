@@ -38,8 +38,10 @@ public class DocumentController implements DocumentControllerDocs {
 
     @DeleteMapping("/delete")
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
-    public ResponseEntity<ApiResponse<Void>> deleteDocument(@RequestParam("documentId") String documentId){
-        documentService.deleteDocumentFromCacheAndDB(documentId);
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam("documentId") String documentId){
+        documentService.deleteDocumentFromCacheAndDB(customUserDetails, documentId);
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
