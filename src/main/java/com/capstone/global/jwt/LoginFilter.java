@@ -50,14 +50,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             LoginRequest loginRequest = new ObjectMapper().readValue(messageBody, LoginRequest.class);
 
             Optional<User> user = userRepository.findUserByEmail(loginRequest.getEmail());
-            log.info("");
 
             if(user.isPresent()){
                 if (user.get().getSocial() != null){
                     throw new RuntimeException(user.get().getSocial() + "계정으로 가입된 회원입니다.");
                 }
             } else {
-                throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+                throw new UserNotFoundException();
             }
 
             UsernamePasswordAuthenticationToken authToken =
