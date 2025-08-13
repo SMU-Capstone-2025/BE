@@ -4,6 +4,7 @@ import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectInviteRequest;
 import com.capstone.domain.project.dto.request.ProjectSaveRequest;
 import com.capstone.domain.project.dto.request.ProjectUpdateRequest;
+import com.capstone.domain.project.dto.response.InviteCheckResult;
 import com.capstone.domain.project.dto.response.ProjectResponse;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.global.security.CustomUserDetails;
@@ -13,6 +14,8 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +50,7 @@ public interface ProjectControllerDocs {
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<Project>> registerProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
-            @RequestBody ProjectSaveRequest projectSaveRequest);
+            @Valid @RequestBody ProjectSaveRequest projectSaveRequest);
 
     @Operation(description = "프로젝트 업데이트")
     @ApiResponses(value = {
@@ -91,7 +94,7 @@ public interface ProjectControllerDocs {
     ResponseEntity<com.capstone.global.response.ApiResponse<Project>> updateProject(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable("projectId") String projectId,
-            @RequestBody ProjectUpdateRequest projectUpdateRequest);
+            @Valid @RequestBody ProjectUpdateRequest projectUpdateRequest);
 
     @Operation(description = "프로젝트 내 권한 변경")
     @ApiResponses(value = {
@@ -136,6 +139,65 @@ public interface ProjectControllerDocs {
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable String projectId,
             @RequestBody ProjectAuthorityRequest projectAuthority);
+
+    @Operation(description = "프로젝트 초대 중 이메일 유효성 검사")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "사용 가능"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "이메일 형식 미준수",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "이메일 형식 미준수 응답",
+                                    summary = "유효하지 않은 이메일 형식",
+                                    value = """
+                    {
+                      "success": false,
+                      "code": "COMMON_400",
+                      "message": "이메일 형식이 올바르지 않습니다."
+                    }
+                    """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "400", description = "회원가입 되지 않은 사용자",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "존재하지 않는 사용자",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "USER_002",
+                  "message": "해당 사용자를 찾을 수 없습니다."
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "409", description = "이미 프로젝트에 존재하는 사용자",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "이미 프로젝트에 존재하는 사용자",
+                                    value = """
+                {
+                  "success": false,
+                  "code": "COMMON_409",
+                  "message": "이미 프로젝트에 존재하는 사용자입니다."
+                }
+                """
+                            )
+                    )
+            )
+
+    })
+    ResponseEntity<com.capstone.global.response.ApiResponse<InviteCheckResult>> validateInviteMember(
+            @PathVariable String projectId,
+            @Email(message = "이메일 형식이 올바르지 않습니다.") @RequestParam String email);
+
+
 
     @Operation(description = "프로젝트에 신규 인원 추가")
     @ApiResponses(value = {
