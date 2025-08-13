@@ -144,36 +144,56 @@ public interface ProjectControllerDocs {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "사용 가능"),
             @ApiResponse(
-                    responseCode = "400",
-                    description = "이메일 형식 미준수",
+                    responseCode = "200",
+                    description = "초대 가능",
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(
-                                    name = "이메일 형식 미준수 응답",
-                                    summary = "유효하지 않은 이메일 형식",
+                                    name = "초대 가능한 이메일",
                                     value = """
                     {
-                      "success": false,
-                      "code": "COMMON_400",
-                      "message": "이메일 형식이 올바르지 않습니다."
+                      "success": true,
+                      "code": "COMMON_200",
+                      "result": {
+                        "available": true,
+                        "message": "초대 가능한 사용자 입니다."
+                      },
+                      "message": "성공입니다."
                     }
                     """
                             )
                     )
             ),
-            @ApiResponse(responseCode = "400", description = "회원가입 되지 않은 사용자",
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 이메일"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
                     content = @Content(
                             mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    name = "존재하지 않는 사용자",
-                                    value = """
+                            examples = {
+                                    @ExampleObject(
+                                            name = "이메일 형식 미준수",
+                                            summary = "유효하지 않은 이메일 형식",
+                                            value = """
+                {
+                  "success": false,
+                  "code": "COMMON_400",
+                  "message": "이메일 형식이 올바르지 않습니다."
+                }
+                """
+                                    ),
+                                    @ExampleObject(
+                                            name = "존재하지 않는 사용자",
+                                            summary = "회원가입 되지 않은 사용자",
+                                            value = """
                 {
                   "success": false,
                   "code": "USER_002",
                   "message": "해당 사용자를 찾을 수 없습니다."
                 }
                 """
-                            )
+                                    )
+                            }
                     )
             ),
             @ApiResponse(responseCode = "409", description = "이미 프로젝트에 존재하는 사용자",
