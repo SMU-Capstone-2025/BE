@@ -54,11 +54,12 @@ public class CustomProjectUserRepositoryImpl implements CustomProjectUserReposit
     }
 
     @Override
-    public Optional<ProjectUser> findByProjectAndUser(String projectId, String userId) {
-        Query query = new Query().addCriteria(Criteria.where("projectId").is(projectId)
-                .and("userId").is(userId));
-
-        return Optional.ofNullable(mongoTemplate.findOne(query, ProjectUser.class));
+    public boolean existsByProjectIdAndUserId(String projectId, String userId) {
+        Query query = new Query();
+        query.addCriteria(
+                Criteria.where("projectId").is(projectId)
+                        .and("userId").is(userId)
+        );
+        return mongoTemplate.exists(query, ProjectUser.class);
     }
-
 }

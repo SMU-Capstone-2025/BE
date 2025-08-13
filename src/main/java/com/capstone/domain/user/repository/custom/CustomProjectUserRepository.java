@@ -11,5 +11,5 @@ public interface CustomProjectUserRepository {
     List<String> findUserIdByProjectId(String projectId);
     List<Project> findProjectsByUserId(String userId);
     List<ProjectUser> findUserIdAndRoleByProjectId(String projectId);
-    Optional<ProjectUser> findByProjectAndUser(String projectId, String userId);
+    boolean existsByProjectIdAndUserId(String projectId, String userId);
 }

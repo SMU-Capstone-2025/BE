@@ -4,12 +4,15 @@ import com.capstone.global.response.ApiResponse;
 import com.capstone.global.response.ErrorInfoDto;
 import com.capstone.global.response.status.ErrorStatus;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -23,24 +26,23 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @Slf4j
-@RestControllerAdvice(annotations = {RestController.class})
+@RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
-    // Bean Validation 제약 조건 위반 시 발생하는 예외를 처리
-    @ExceptionHandler
-    public ResponseEntity<Object> validation(ConstraintViolationException e, WebRequest request) {
-        String errorMessage = e.getConstraintViolations().stream()
-                .map(violation -> String.format("prop '%s' | val '%s' | msg %s",
-                        violation.getPropertyPath(), // 위반된 필드 경로
-                        violation.getInvalidValue(), // 유효하지 않은 값
-                        violation.getMessage()       // 제약 조건 위반 메시지
-                ))
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(ConstraintViolationException ex) {
+        String message = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("ConstraintViolationException 추출 도중 에러 발생"));
+                .orElse("요청 파라미터가 올바르지 않습니다.");
 
-        return handleExceptionInternalConstraint(e, HttpHeaders.EMPTY, request, errorMessage);
+        return ResponseEntity
+                .badRequest()
+                .body(ApiResponse.onFailure(ErrorStatus.BAD_REQUEST.getCode(), message, null));
     }
-
     // @Valid 어노테이션을 통한 검증 실패 시 발생하는 예외를 처리
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(

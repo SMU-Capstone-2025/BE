@@ -51,7 +51,7 @@ public class UserService {
 
     public User findUserByEmailOrThrow(String email) {
         return userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(UserMessages.USER_NOT_FOUND));
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public List<String> fetchAllProject(String email){

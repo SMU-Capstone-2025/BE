@@ -52,7 +52,7 @@ public class MypageService {
         String email=userDetails.getEmail();
         Optional<User> user = userRepository.findUserByEmail(email);
         if(user.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         return user.get().toDto();
     }
@@ -73,7 +73,7 @@ public class MypageService {
         String email=userPasswordDto.getEmail();
         Optional<User> user=userRepository.findUserByEmail(email);
         if(user.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         User userExists = user.get();
         //새로 입력한 비번이랑 다시한번 입력하는 새로운 비번이랑 같은지 확인
@@ -93,7 +93,7 @@ public class MypageService {
         Optional<User> user=userRepository.findUserByEmail(email);
         if(user.isEmpty())
         {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         User userExists = user.get();
         userExists.setProfileImage(userProfileDto.getProfileImage());
@@ -107,11 +107,11 @@ public class MypageService {
         log.info("email {}",email);
         Optional<User> user = userRepository.findUserByEmail(email);
         if(user.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
         if(!email.equals(userEmailDto.getCurrentEmail())) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         Optional<User> newUser = userRepository.findUserByEmail(userEmailDto.getNewEmail());
         if(newUser.isPresent()) {
@@ -163,7 +163,7 @@ public class MypageService {
 
         if(user.isEmpty())
         {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         List<Project> projectList=getUserProject(user.orElse(null));
         if(projectList==null)
@@ -204,7 +204,7 @@ public class MypageService {
         Optional<User> user=userRepository.findUserByEmail(email);
         if(user.isEmpty())
         {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
         List<Project> projectList=getUserProject(user.orElse(null));

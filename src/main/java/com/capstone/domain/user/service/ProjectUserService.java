@@ -2,11 +2,13 @@ package com.capstone.domain.user.service;
 
 import com.capstone.domain.project.dto.request.ProjectAuthorityRequest;
 import com.capstone.domain.project.dto.request.ProjectInviteRequest;
+import com.capstone.domain.project.dto.response.InviteCheckResult;
 import com.capstone.domain.project.entity.Project;
 import com.capstone.domain.project.repository.ProjectRepository;
 import com.capstone.domain.user.entity.PendingUser;
 import com.capstone.domain.user.entity.ProjectUser;
 import com.capstone.domain.user.entity.User;
+import com.capstone.domain.user.exception.ProjectUserFoundException;
 import com.capstone.domain.user.exception.UserFoundException;
 import com.capstone.domain.user.exception.UserNotFoundException;
 import com.capstone.domain.user.message.UserMessages;
@@ -22,6 +24,7 @@ import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +64,7 @@ public class ProjectUserService {
             kafkaProducerService.sendEvent(KafkaEventTopic.PROJECT_INVITED, ProjectInvitePayload.from(project, customUserDetails, projectInviteRequest.email()));
         }
         else {
-            throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
     }
@@ -127,8 +130,15 @@ public class ProjectUserService {
             throw new GlobalException(ErrorStatus.PROJECT_NOT_ACCESS);
         }
 
-
-
     }
 
+    public InviteCheckResult checkInvitedMember(String projectId, String email){
+        User user = userRepository.findUserByEmail(email).orElseThrow(UserNotFoundException::new);
+        boolean projectUserExists = projectUserRepository.existsByProjectIdAndUserId(projectId, user.getId());
+        if(projectUserExists){
+            return InviteCheckResult.toAlreadyMember();
+        } else {
+            return InviteCheckResult.toAvailable();
+        }
+    }
 }

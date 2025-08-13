@@ -35,7 +35,7 @@ public class PaymentService {
         Optional<User> user = userRepository.findUserByEmail(email);
         if(user.isEmpty())
         {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         log.info("email={}",email);
 

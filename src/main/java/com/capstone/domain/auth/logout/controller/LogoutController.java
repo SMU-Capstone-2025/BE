@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@CrossOrigin(value = "http://localhost:63342")
 public class LogoutController implements LogoutControllerDocs {
 
     @PostMapping("/logout")
