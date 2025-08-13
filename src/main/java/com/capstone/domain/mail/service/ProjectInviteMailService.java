@@ -51,7 +51,7 @@ public class ProjectInviteMailService {
 
             pendingUserRepository.save(pendingUser);
         } else {
-            throw new UserNotFoundException(UserMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
 
 
