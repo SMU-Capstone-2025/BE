@@ -64,7 +64,7 @@ public class AIService
         Optional<User> user = userRepository.findUserByEmail(email);
         if(user.isEmpty())
         {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new UserNotFoundException();
         }
         if(user.get().getMembership().equals(MembershipType.FREE_USER))
         {

@@ -1,7 +1,10 @@
 package com.capstone.domain.user.exception;
 
-public class UserNotFoundException extends RuntimeException {
-  public UserNotFoundException(String message) {
-    super(message);
+import com.capstone.global.response.exception.GlobalException;
+import com.capstone.global.response.status.ErrorStatus;
+
+public class UserNotFoundException extends GlobalException {
+  public UserNotFoundException() {
+    super(ErrorStatus.USER_NOT_FOUND);
   }
 }
