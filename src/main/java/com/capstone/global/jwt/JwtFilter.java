@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -25,11 +26,25 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
+    private static final List<String> AUTH_WHITELIST = List.of(
+            "/api/project/invite/accept",
+            "/api/auth/login",
+            "/api/auth/register"
+    );
+
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String accessToken = request.getHeader("Authorization");
         String token = accessToken;
+
+        String uri = request.getRequestURI();
+
+        if (AUTH_WHITELIST.stream().anyMatch(uri::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
 
         if (accessToken == null) {
