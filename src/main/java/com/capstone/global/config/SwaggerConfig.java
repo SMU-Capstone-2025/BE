@@ -37,6 +37,14 @@ public class SwaggerConfig {
                 .info(apiInfo());
     }
 
+    @Bean
+    public org.springdoc.core.customizers.OpenApiCustomizer prependApiPrefix() {
+        return openApi -> {
+            var newPaths = new io.swagger.v3.oas.models.Paths();
+            openApi.getPaths().forEach((p, item) -> newPaths.addPathItem("/api" + p, item));
+            openApi.setPaths(newPaths);
+        };
+    }
     private Info apiInfo() {
         return new Info()
                 .title("Doctalk API 명세서")
