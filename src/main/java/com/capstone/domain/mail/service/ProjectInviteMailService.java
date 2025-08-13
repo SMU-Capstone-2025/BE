@@ -77,7 +77,7 @@ public class ProjectInviteMailService {
             </p>
           </div>
         </div>
-        """.formatted(invitor, projectName, "http://3.34.91.202:8080/project/invite/accept?credentialCode=" + userCredentialCode);
+        """.formatted(invitor, projectName, "https://docktalk.co.kr/api/project/invite/accept?credentialCode=" + userCredentialCode);
         message.setText(msg, "utf-8", "html");
         message.setFrom(new InternetAddress(id, "Doctalk"));
 

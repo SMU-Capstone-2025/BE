@@ -1,7 +1,5 @@
 package com.capstone.global.jwt;
 
-import com.capstone.domain.user.entity.User;
-import com.capstone.global.security.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,18 +17,23 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import static org.springframework.integration.IntegrationPatternType.chain;
+
 @RequiredArgsConstructor
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    private static final List<String> AUTH_WHITELIST = List.of(
-            "/api/project/invite/accept",
-            "/api/auth/login",
-            "/api/auth/register"
+    private static final List<String> EXCLUDE_URLS = List.of(
+            "/api/oauth2/",
+            "/api/register/",
+            "/api/login",
+            "/api/swagger-ui/",
+            "/api/v3/api-docs/",
+            "/api/csrf-token",
+            "/api/project/invite/accept"
     );
-
 
 
     @Override
@@ -39,9 +41,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = request.getHeader("Authorization");
         String token = accessToken;
 
-        String uri = request.getRequestURI();
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String path = httpRequest.getRequestURI();
 
-        if (AUTH_WHITELIST.stream().anyMatch(uri::startsWith)) {
+        if (EXCLUDE_URLS.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
