@@ -214,7 +214,7 @@ public interface ProjectControllerDocs {
 
     })
     ResponseEntity<com.capstone.global.response.ApiResponse<InviteCheckResult>> validateInviteMember(
-            @PathVariable String projectId,
+            @PathVariable(required = false) String projectId,
             @Email(message = "이메일 형식이 올바르지 않습니다.") @RequestParam String email);
 
 
