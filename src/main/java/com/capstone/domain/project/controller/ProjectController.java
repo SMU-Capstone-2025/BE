@@ -63,9 +63,9 @@ public class ProjectController implements ProjectControllerDocs {
         return ResponseEntity.ok(ApiResponse.onSuccess(projectUserService.processAuth(customUserDetails, projectId, projectAuthority)));
     }
 
-    @GetMapping("/invite/{projectId}")
+    @GetMapping("/invite")
     public ResponseEntity<ApiResponse<InviteCheckResult>> validateInviteMember(
-            @PathVariable("projectId") String projectId,
+            @RequestParam(required = false) String projectId,
             @Email(message = "이메일 형식이 올바르지 않습니다.") @RequestParam String email){
         InviteCheckResult result = projectUserService.checkInvitedMember(projectId, email);
 
