@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [fix/#121-socket-address-fix]
+    branches: [main]
 
 jobs:
   CI:
