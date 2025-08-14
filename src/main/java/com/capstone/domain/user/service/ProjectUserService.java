@@ -134,11 +134,12 @@ public class ProjectUserService {
 
     public InviteCheckResult checkInvitedMember(String projectId, String email){
         User user = userRepository.findUserByEmail(email).orElseThrow(UserNotFoundException::new);
-        boolean projectUserExists = projectUserRepository.existsByProjectIdAndUserId(projectId, user.getId());
-        if(projectUserExists){
-            return InviteCheckResult.toAlreadyMember();
-        } else {
-            return InviteCheckResult.toAvailable();
+        if(projectId != null){
+            boolean projectUserExists = projectUserRepository.existsByProjectIdAndUserId(projectId, user.getId());
+            if(projectUserExists){
+                return InviteCheckResult.toAlreadyMember();
+            }
         }
+        return InviteCheckResult.toAvailable();
     }
 }
