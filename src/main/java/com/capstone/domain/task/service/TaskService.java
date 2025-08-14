@@ -77,7 +77,7 @@ public class TaskService {
         TaskChangeDetail beforeChange = TaskChangeDetail.from(task);
 
         task.addNewVersion(version);
-        task.updateInfo(taskDto.title(), LocalDate.parse(Objects.requireNonNull(taskDto.deadline())),taskDto.version());
+        task.updateInfo(taskDto.title(), LocalDate.parse(Objects.requireNonNull(taskDto.deadline())),taskDto.version(),taskDto.editors());
 
         TaskChangeDetail afterChange = TaskChangeDetail.from(task);
 
@@ -85,7 +85,7 @@ public class TaskService {
         taskRepository.save(task);
 
         kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED, TaskChangePayload.from(task, beforeChange, afterChange, customUserDetails.getEmail(), taskDto.editors()));
-        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline());
+        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline(),task.getEditors());
 
     }
     private List<AttachmentDto> convertAttachmentsToDto(List<Attachment> attachments) {
@@ -127,7 +127,7 @@ public class TaskService {
         return versionList.stream()
                 .map(version ->
                 {
-                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline());
+                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline(),task.getEditors());
                 })
                 .toList();
 
