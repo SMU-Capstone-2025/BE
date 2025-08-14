@@ -24,7 +24,7 @@ public class TaskChangeDetail extends ChangeDetail<List<String>>{
     public static TaskChangeDetail from(Task task) {
         return TaskChangeDetail.builder()
                 .title(task.getTitle())
-                .coworkers(task.getEditors())
+                .coworkers(task.getCoworkers())
                 .version(task.getCurrentVersion())
                 .status(task.getStatus())
                 .deadline(task.getDeadline())

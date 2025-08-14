@@ -19,7 +19,7 @@ public record TaskResponse(
                 .title(task.getTitle())
                 .currentVersion(task.getCurrentVersion())
                 .status(task.getStatus())
-                .editors(task.getEditors())
+                .editors(task.getCoworkers())
                 .versionHistory(task.getVersionHistory())
                 .build();
     }

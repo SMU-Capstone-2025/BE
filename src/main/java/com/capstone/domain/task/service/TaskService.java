@@ -57,7 +57,7 @@ public class TaskService {
         Task saved = taskRepository.save(taskDto.toTask());
         project.addNewTaskId(saved.getId());
         projectRepository.save(project);
-        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED,TaskChangePayload.from(saved, null, null, userDetails.getEmail(), taskDto.editors()));
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED,TaskChangePayload.from(saved, null, null, userDetails.getEmail(), taskDto.coworkers()));
 
         return saved;
     }
@@ -77,15 +77,15 @@ public class TaskService {
         TaskChangeDetail beforeChange = TaskChangeDetail.from(task);
 
         task.addNewVersion(version);
-        task.updateInfo(taskDto.title(), LocalDate.parse(Objects.requireNonNull(taskDto.deadline())),taskDto.version(),taskDto.editors());
+        task.updateInfo(taskDto.title(), LocalDate.parse(Objects.requireNonNull(taskDto.deadline())),taskDto.version(),taskDto.coworkers());
 
         TaskChangeDetail afterChange = TaskChangeDetail.from(task);
 
 
         taskRepository.save(task);
 
-        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED, TaskChangePayload.from(task, beforeChange, afterChange, customUserDetails.getEmail(), taskDto.editors()));
-        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline(),task.getEditors());
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_CREATED, TaskChangePayload.from(task, beforeChange, afterChange, customUserDetails.getEmail(), taskDto.coworkers()));
+        return TaskVersionResponse.from(version, taskDto.taskId(),task.getTitle(),task.getDeadline(),task.getCoworkers());
 
     }
     private List<AttachmentDto> convertAttachmentsToDto(List<Attachment> attachments) {
@@ -99,7 +99,7 @@ public class TaskService {
         Task task = findTaskByIdOrThrow(id);
         taskRepository.delete(task);
 
-        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_DELETED,TaskChangePayload.from(task, null, null, userDetails.getEmail(), task.getEditors()));
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_DELETED,TaskChangePayload.from(task, null, null, userDetails.getEmail(), task.getCoworkers()));
 
         return task;
     }
@@ -115,7 +115,7 @@ public class TaskService {
         taskRepository.save(task);
         TaskChangeDetail afterChange = TaskChangeDetail.from(task);
 
-        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_UPDATED,TaskChangePayload.from(task, beforeChange, afterChange, userDetails.getEmail(), task.getEditors()));
+        kafkaProducerService.sendEvent(KafkaEventTopic.TASK_UPDATED,TaskChangePayload.from(task, beforeChange, afterChange, userDetails.getEmail(), task.getCoworkers()));
 
         return task;
     }
@@ -127,7 +127,7 @@ public class TaskService {
         return versionList.stream()
                 .map(version ->
                 {
-                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline(),task.getEditors());
+                    return TaskVersionResponse.from(version,task.getId(),task.getTitle(),task.getDeadline(),task.getCoworkers());
                 })
                 .toList();
 

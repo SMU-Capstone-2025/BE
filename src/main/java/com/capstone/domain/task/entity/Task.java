@@ -21,7 +21,7 @@ public class Task extends BaseDocument {
     private String title;
     private String currentVersion;
     private String status;
-    private List<String> editors;
+    private List<String> coworkers;
     private List<Version> versionHistory;
     private LocalDate deadline;
     public void updateStatus(String status){
@@ -41,6 +41,6 @@ public class Task extends BaseDocument {
         this.title = title;
         this.deadline = deadline;
         this.currentVersion = currentVersion;
-        this.editors = editors;
+        this.coworkers = editors;
     }
 }

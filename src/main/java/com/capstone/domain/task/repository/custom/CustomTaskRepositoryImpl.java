@@ -51,7 +51,7 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     @Override
     public List<Task> findByUserEmailAndSortDeadLine(String email) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("editors").in(email));
+        query.addCriteria(Criteria.where("coworkers").in(email));
         query.with(Sort.by(Sort.Direction.ASC,"deadline"));
         return mongoTemplate.find(query, Task.class);
     }
@@ -59,14 +59,14 @@ public class CustomTaskRepositoryImpl implements CustomTaskRepository{
     @Override
     public List<Task> findByUserEmail(String email) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("editors").in(email));
+        query.addCriteria(Criteria.where("coworkers").in(email));
         return mongoTemplate.find(query, Task.class);
     }
 
     @Override
     public List<Task> findByProjectId(String projectId) {
         Query query= new Query();
-        query.addCriteria(Criteria.where("projectId").is(projectId));
+        query.addCriteria(Criteria.where("coworkers").is(projectId));
         return mongoTemplate.find(query, Task.class);
     }
 

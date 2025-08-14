@@ -24,13 +24,13 @@ public record TaskRequest(String taskId,
                           @NotNull
                           String content,
                           @Nullable
-                          List<String> editors,
+                          List<String> coworkers,
                           @Nullable
                           String deadline
                     ){
 
     public Task toTask() {
-        List<String> updatedEditors = editors != null ? new ArrayList<>(editors) : new ArrayList<>();
+        List<String> updatedEditors = coworkers != null ? new ArrayList<>(coworkers) : new ArrayList<>();
         if (!updatedEditors.contains(modifiedBy)) {
             updatedEditors.add(modifiedBy);
         }
@@ -40,7 +40,7 @@ public record TaskRequest(String taskId,
                 .status(status)
                 .currentVersion(this.version)
                 .versionHistory(new ArrayList<>())
-                .editors(editors)
+                .coworkers(coworkers)
                 .deadline(LocalDate.parse(this.deadline))
                 .build();
     }

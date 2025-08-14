@@ -18,7 +18,7 @@ public record TaskVersionResponse(
         List<Attachment> attachmentList,
         String title,
         LocalDate deadline,
-        List<String> editors
+        List<String> coworkers
 
 ) {
     public static TaskVersionResponse from(Version version,String taskId,String title, LocalDate deadline,List<String> editors) {
@@ -31,7 +31,7 @@ public record TaskVersionResponse(
                 .attachmentList(version.getAttachmentList())
                 .title(title)
                 .deadline(deadline)
-                .editors(editors)
+                .coworkers(editors)
                 .build();
     }
 }

@@ -24,7 +24,7 @@ public record  TaskSpecResponse(
                 .title(task.getTitle())
                 .status(task.getStatus())
                 .deadline(task.getDeadline())
-                .coworkers(task.getEditors())
+                .coworkers(task.getCoworkers())
                 .attachmentList(attachments)
                 .content(content)
                 .build();

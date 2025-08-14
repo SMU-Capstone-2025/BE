@@ -133,13 +133,13 @@ public class MypageService {
             if (taskIds != null && !taskIds.isEmpty())
             {
                 for (Task task : taskList) {
-                    List<String> editors = task.getEditors();
+                    List<String> editors = task.getCoworkers();
                     log.info("editors {}",editors.get(0));
                     if (editors != null && editors.contains(email))
                     {
                         editors.remove(email);
                         editors.add(userEmailDto.getNewEmail());
-                        task.setEditors(editors);
+                        task.setCoworkers(editors);
                         taskRepository.save(task);
                     }
                 }
@@ -177,7 +177,7 @@ public class MypageService {
             if (taskIds != null && !taskIds.isEmpty())
             {
                 for (Task task : taskList) {
-                    List<String> editors = task.getEditors();
+                    List<String> editors = task.getCoworkers();
                     if (editors != null && editors.contains(email))
                     {
                         editors.remove(email);
