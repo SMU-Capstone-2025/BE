@@ -83,7 +83,9 @@ public interface DocumentControllerDocs {
                     )
             )
     })
-    ResponseEntity<com.capstone.global.response.ApiResponse<Void>> deleteDocument(@RequestParam("documentId") String documentId);
+    ResponseEntity<com.capstone.global.response.ApiResponse<Void>> deleteDocument(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @RequestParam("documentId") String documentId);
 
     @Operation(description = "문서 생성")
     @ApiResponses(value = {

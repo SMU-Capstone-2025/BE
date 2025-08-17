@@ -7,7 +7,10 @@ import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
 
+import com.capstone.global.kafka.dto.DocumentChangePayload;
+import com.capstone.global.kafka.dto.detail.DocumentChangeDetail;
 import com.capstone.global.kafka.service.KafkaProducerService;
+import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -55,10 +58,12 @@ public class DocumentService {
         redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 10, TimeUnit.SECONDS);
     }
 
-    public void deleteDocumentFromCacheAndDB(String key){
+    public void deleteDocumentFromCacheAndDB(CustomUserDetails customUserDetails, String key){
         Document document = documentRepository.findDocumentByDocumentId(key);
         redisTemplate.delete(key);
         documentRepository.delete(document);
+        kafkaProducerService.sendEvent(KafkaEventTopic.DOCUMENT_DELETED, DocumentChangePayload.from(document
+                , null, null, customUserDetails.getEmail(), document.getEditors()));
     }
 
     public void createDocument(CustomUserDetails customUserDetails, DocumentCreateRequest documentCreateRequest){
@@ -93,7 +98,8 @@ public class DocumentService {
         }
         document.setStatus(status);
         documentRepository.save(document);
-        //kafkaProducerService.sendEvent("document.changed", "UPDATE", DocumentResponse.from(document), userDetails.getEmail());
+//        kafkaProducerService.sendEvent(KafkaEventTopic.DOCUMENT_UPDATED, DocumentChangePayload.from(document
+//                , null, null, userDetails.getEmail(), document.getEditors()));
 
         return document;
     }
@@ -116,19 +122,22 @@ public class DocumentService {
         if (!keys.isEmpty()) {
             for (String key : keys) {
                 Object data = redisTemplate.opsForValue().get(key);
-                System.out.println(data.toString());
 
                 if (data != null) {
                     Document document = mapToDocument(data);
+                    Document oldDocument = documentRepository.findById(document.getId()).orElseThrow();
 
-                    if (document != null) {
-                        documentRepository.save(document);
+                    DocumentChangeDetail oldContent = DocumentChangeDetail.from(oldDocument);
+                    DocumentChangeDetail newContent = DocumentChangeDetail.from(document);
+                    documentRepository.save(document);
 
-                        String loadedKey = "DOC:loaded:" + document.getId();
-                        redisTemplate.opsForValue().set(loadedKey, document);
-                        redisTemplate.delete(key);
+                    String loadedKey = "DOC:loaded:" + document.getId();
+                    redisTemplate.opsForValue().set(loadedKey, document);
+                    redisTemplate.delete(key);
 
-                    }
+                    kafkaProducerService.sendEvent(KafkaEventTopic.DOCUMENT_UPDATED, DocumentChangePayload.from(document
+                            , oldContent, newContent, null, document.getEditors()));
+
                 }
             }
         }
