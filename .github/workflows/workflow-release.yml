@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [refactor/#110-doc-consumer-refactor]
+    branches: [main]
 
 jobs:
   CI:
