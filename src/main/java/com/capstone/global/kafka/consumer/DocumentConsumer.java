@@ -21,18 +21,19 @@ public class DocumentConsumer {
     private final DocumentChangeService logService;
     private final NotificationService notificationService;
 
-    @KafkaListener(topics = "document.changed", groupId = "log-service", containerFactory = "documentChangeKafkaListenerContainerFactory")
+    @KafkaListener(topics = "document.updated", groupId = "log-service", containerFactory = "documentChangeKafkaListenerContainerFactory")
     public void processLogSave(
             @Header("kafka_receivedTopic") String kafkaTopic,
             @Payload DocumentChangePayload payload) {
         try {
+            log.info("called");
             logService.saveLogEntityFromPayload(kafkaTopic, payload);
         } catch (Exception e) {
             System.err.println("메시지 처리 실패: " + e.getMessage());
         }
     }
 
-    @KafkaListener(topics = "document.changed", groupId = "notification-service", containerFactory = "documentChangeKafkaListenerContainerFactory")
+    @KafkaListener(topics = "document.updated", groupId = "notification-service", containerFactory = "documentChangeKafkaListenerContainerFactory")
     public void consumeUpdateMessage(
             @Header("kafka_receivedTopic") String kafkaTopic,
             @Payload DocumentChangePayload payload){
