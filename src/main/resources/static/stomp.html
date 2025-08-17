@@ -40,7 +40,7 @@
   let subscription = null;
 
   // ✅ JWT 토큰
-  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTAzNjgxNjQsImV4cCI6MTc1MDM2OTA2NH0.c8oHG52D0kHc1jIZQ71pKUjqelsGhDVsGSHKPuDHxv4";
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTU0MDk2ODAsImV4cCI6MTc1NTQxMDU4MH0.Ajm8rwEeeXX_yf7jRjQxHS3XVlzbTixtCvF8Yjf-mkU";
 
   function logMessage(message) {
     const logDiv = document.getElementById("messageLog");
@@ -49,7 +49,7 @@
   }
 
   function connect() {
-    const socket = new SockJS("http://localhost:8080/doc/ws");
+    const socket = new SockJS("http://localhost:8080/api/doc/ws");
     stompClient = Stomp.over(socket);
 
     stompClient.connect(
@@ -103,8 +103,8 @@
   message: JSON.stringify({
     documentId: documentId,
     status: "COMPLETED",
-    title: "임시 제목23212",
-    content: "임시 컨텐츠23123",
+    title: "zkvmzk",
+    content: "qewq",
     logs: [],
     attachments: []
   })
