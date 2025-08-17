@@ -102,25 +102,10 @@ public class SecurityConfig {
                         })
                 )
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(
-                                "/api/oauth2/**",
-                                "/api/register/*",
-                                "/api/login",
-                                "/api/swagger-ui/**",
-                                "/api/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/api/csrf-token",
-                                "/api/project/**",
-                                "/api/doc/ws", "/api/doc/ws/**",
-                                "/api/document/**",
-                                "/api/editing",
-                                "/api/notification/**",
-                                "/api/mypage/email/avail",
-                                "/api/mypage/password/new",
-                                "/api/mypage/email/check",
-                                "/api/project/invite/accept"
-                        ).permitAll().anyRequest().authenticated()
+                        .requestMatchers("/oauth2/**","/register/*","/login", "/swagger-ui/**",    // Swagger UI 관련 경로
+                                "/v3/api-docs/**","/csrf-token", "/project/**", "/socket/**","/document/**", "/editing", "/notification/**",
+                                "/mypage/email/avail","/mypage/password/new","/mypage/email/check", "/project/invite/accept").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2Login(configure ->
                         configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
@@ -142,7 +127,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342", "http://docktalk.co.kr", "https://docktalk.co.kr"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:63342", "https://mail.naver.com", "https://docktalk.co.kr"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-CSRF-TOKEN"));
         configuration.addExposedHeader("access");
