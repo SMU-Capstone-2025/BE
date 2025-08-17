@@ -40,7 +40,7 @@
   let subscription = null;
 
   // ✅ JWT 토큰
-  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTU0MDk2ODAsImV4cCI6MTc1NTQxMDU4MH0.Ajm8rwEeeXX_yf7jRjQxHS3XVlzbTixtCvF8Yjf-mkU";
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTUxNjAwMTUsImV4cCI6MTc1NTE2MDkxNX0._U06axD-n57nDzSLUvuvfnwalXYNSZgwcwn_k-hWQOQ";
 
   function logMessage(message) {
     const logDiv = document.getElementById("messageLog");
@@ -49,8 +49,9 @@
   }
 
   function connect() {
-    const socket = new SockJS("http://localhost:8080/api/doc/ws");
+    const socket = new SockJS("https://docktalk.co.kr/api/socket/doc/wss");
     stompClient = Stomp.over(socket);
+    console.log(token);
 
     stompClient.connect(
       { Authorization: token },
@@ -103,8 +104,8 @@
   message: JSON.stringify({
     documentId: documentId,
     status: "COMPLETED",
-    title: "zkvmzk",
-    content: "qewq",
+    title: "임시 제목23212",
+    content: "임시 컨텐츠23123",
     logs: [],
     attachments: []
   })
@@ -116,7 +117,7 @@
   function loadDocument() {
     const documentId = document.getElementById("documentId").value;
 
-    fetch(`http://localhost:8080/document/load?documentId=${documentId}`, {
+    fetch(`https://docktalk.co.kr/api/document/load?documentId=${documentId}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
