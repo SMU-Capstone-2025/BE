@@ -49,8 +49,9 @@ public class Document extends BaseDocument {
         if (this.editors == null) {
             this.editors = new ArrayList<>();
         }
-
-        this.editors.add(email);
+        if (!this.editors.contains(email)) {
+            this.editors.add(email);
+        }
 
         this.updatedAt = LocalDateTime.now();
     }
