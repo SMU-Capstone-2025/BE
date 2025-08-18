@@ -18,7 +18,8 @@ public record DocumentResponse(
         List<String> logs,
         List<String> attachments,
         String projectId,
-        LocalDateTime updateTime
+        LocalDateTime updateTime,
+        List<String> editors
 )
 {
     public static DocumentResponse from(Document document) {
@@ -30,6 +31,7 @@ public record DocumentResponse(
                 .attachments(document.getAttachments())
                 .projectId(document.getProjectId())
                 .updateTime(document.getUpdatedAt())
+                .editors(document.getEditors())
                 .build();
     }
 }
