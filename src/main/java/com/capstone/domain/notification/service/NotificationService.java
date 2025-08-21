@@ -28,7 +28,6 @@ import static com.capstone.domain.notification.entity.Notification.createNotific
 @Slf4j
 public class NotificationService {
     private final NotificationRepository notificationRepository;
-    private final ObjectMapper objectMapper;
     private final List<NotificationHandler> handlers;
     private final SimpMessageSendingOperations messagingTemplate;
     private final JwtUtil jwtUtil;
@@ -60,7 +59,6 @@ public class NotificationService {
     }
 
     public void sendNotificationByOwnersId(List<String> editors, String content){
-        log.info("content: {}", content);
         editors.forEach(ownerEmail -> {
             messagingTemplate.convertAndSend("/sub/notification/" + ownerEmail, content);
         });
@@ -83,7 +81,7 @@ public class NotificationService {
 
             // 핸들러 못 찾은 경우 로그 남기기
             if (matchedHandler.isEmpty()) {
-                log.warn("No matching handler found for method: {}, topic: {}", kafkaTopic);
+                log.warn("No matching handler found for method: {}", kafkaTopic);
             }
         } catch (Exception e) {
             log.error("Failed to parse notification message: {}", payload, e);
