@@ -1,8 +1,6 @@
 package com.capstone.domain.document.service;
 
-import com.capstone.domain.document.dto.DocumentCreateRequest;
-import com.capstone.domain.document.dto.DocumentEditVo;
-import com.capstone.domain.document.dto.DocumentResponse;
+import com.capstone.domain.document.dto.*;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
@@ -57,7 +55,8 @@ public class DocumentService {
         if(!doc.getEditors().contains(email)){
             doc.update(email, key, doc.getProjectId(), changes);
         }
-        redisTemplate.opsForValue().set("DOC:waited:" + key, doc, 10, TimeUnit.SECONDS);
+        DocumentWrapper tempDto = DocumentWrapper.toDto(doc, email);
+        redisTemplate.opsForValue().set("DOC:waited:" + key, tempDto, 10, TimeUnit.SECONDS);
     }
 
     public void deleteDocumentFromCacheAndDB(CustomUserDetails customUserDetails, String key){
@@ -75,14 +74,14 @@ public class DocumentService {
 
 
     // 별도 변환과정 없이 바로 save 하게 되면 자료형이 LinkedHashMap이라 바꿔줘야 함.
-    public Document mapToDocument(Object data) {
+    public DocumentWrapper mapToDocument(Object data) {
         if (data instanceof Map) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 String json = objectMapper.writeValueAsString(data);
-                return objectMapper.readValue(json, Document.class);
+                return objectMapper.readValue(json, DocumentWrapper.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -126,19 +125,20 @@ public class DocumentService {
                 Object data = redisTemplate.opsForValue().get(key);
 
                 if (data != null) {
-                    Document document = mapToDocument(data);
+                    DocumentWrapper documentWrapper = mapToDocument(data);
+                    Document document = documentWrapper.document();
+                    String documentEditor = documentWrapper.editor();
+
                     Document oldDocument = documentRepository.findById(document.getId()).orElseThrow();
 
                     DocumentChangeDetail oldContent = DocumentChangeDetail.from(oldDocument);
                     DocumentChangeDetail newContent = DocumentChangeDetail.from(document);
                     documentRepository.save(document);
 
-                    String loadedKey = "DOC:loaded:" + document.getId();
-                    redisTemplate.opsForValue().set(loadedKey, document);
                     redisTemplate.delete(key);
 
                     kafkaProducerService.sendEvent(KafkaEventTopic.DOCUMENT_UPDATED, DocumentChangePayload.from(document
-                            , oldContent, newContent, null, document.getEditors()));
+                            , oldContent, newContent, documentEditor, document.getEditors()));
 
                 }
             }
