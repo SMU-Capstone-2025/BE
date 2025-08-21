@@ -26,8 +26,6 @@ public class DocumentUpdateHandler implements NotificationHandler<DocumentChange
         merged.put("email", payload.getModifiedBy());
         merged.put("title", payload.getTitle());
 
-        log.info("merged: {}", merged);
-
         return MessageGenerator.generateFromDto(MessageGenerator.DOCUMENT_UPDATED, merged);
     }
 }
