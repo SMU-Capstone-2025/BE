@@ -31,7 +31,7 @@ public class MessageGenerator {
             + "- 대상: {names} <br>"
             + "- 권한: {authorities}";
 
-    public static final String DOCUMENT_UPDATED = "문서에 변동사항이 있습니다. 제목: {title}, 작업자: {email}";
+    public static final String DOCUMENT_UPDATED = "문서에 변동사항이 있습니다. 제목: {title}, 최근 편집자: {email}";
 
 
 
