@@ -67,7 +67,6 @@ public class DocumentController implements DocumentControllerDocs {
                             @Header("simpSessionAttributes") Map<String, Object> sessionAttributes) {
 
         try {
-            // TODO: 기존 편집자는 추가 X
             String email = (String) sessionAttributes.get("email");
 
             DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
