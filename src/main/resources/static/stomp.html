@@ -40,7 +40,7 @@
   let subscription = null;
 
   // ✅ JWT 토큰
-  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTUxNjAwMTUsImV4cCI6MTc1NTE2MDkxNX0._U06axD-n57nDzSLUvuvfnwalXYNSZgwcwn_k-hWQOQ";
+  const token = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NTU3NzY2NTQsImV4cCI6MTc1NTc3NzU1NH0.HfilkYMysVkJn47eCkiS3HjJn4WRAKYPtmJvZYamisE";
 
   function logMessage(message) {
     const logDiv = document.getElementById("messageLog");
@@ -50,10 +50,22 @@
 
   function connect() {
     const socket = new SockJS("https://docktalk.co.kr/api/socket/doc/wss");
+    const socket2 = new SockJS("https://docktalk.co.kr/api/socket/notification/wss");
     stompClient = Stomp.over(socket);
+    stompClient2 = Stomp.over(socket2);
     console.log(token);
 
     stompClient.connect(
+      { Authorization: token },
+      function (frame) {
+        logMessage("✅ STOMP 연결 성공: " + frame);
+      },
+      function (error) {
+        logMessage("❌ 연결 실패: " + error);
+      }
+    );
+
+    stompClient2.connect(
       { Authorization: token },
       function (frame) {
         logMessage("✅ STOMP 연결 성공: " + frame);
@@ -86,7 +98,16 @@
       { Authorization: token }
     );
 
+    subscription2 = stompClient.subscribe(
+      `/sub/notification/qwe123@naver.com`,
+      function (message) {
+        logMessage("📨 받은 메시지: " + message.body);
+      },
+      { Authorization: token }
+    );
+
     logMessage(`👀 /sub/document/${documentId} 구독 시작`);
+    logMessage(`👀 /sub/notification/qwe123@naver.com 구독 시작`);
   }
 
   function unsubscribe() {
