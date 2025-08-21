@@ -10,19 +10,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/notification")
 @RequiredArgsConstructor
 public class NotificationController implements NotificationControllerDocs {
     private final NotificationService notificationService;
 
-    @GetMapping("/get")
-    public ResponseEntity<ApiResponse<List<Notification>>> getNotificationLists(@RequestHeader("Authorization") String token){
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Notification>>> getNotificationLists(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(ApiResponse.onSuccess(notificationService.findAllNotifications(token)));
     }
 
-    @PutMapping("/read")
-    public ResponseEntity<ApiResponse<String>> readNotification(@RequestParam("notificationId") String notificationId){
+    @PutMapping
+    public ResponseEntity<ApiResponse<String>> readNotification(@RequestParam("notificationId") String notificationId) {
         return ResponseEntity.ok(ApiResponse.onSuccess(notificationService.markNotificationAsRead(notificationId)));
     }
+
 }
