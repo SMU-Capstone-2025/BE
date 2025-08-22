@@ -73,10 +73,12 @@ public class NotificationService {
             matchedHandler.ifPresent(handler -> {
                 String notificationContent = handler.generateMessage(payload);
 
+                List<String> notificationTarget = new ArrayList<>(payload.getCoworkers());
+                notificationTarget.remove(payload.getModifiedBy());
 
-                Notification notification = createNotification(notificationContent, payload.getCoworkers());
+                Notification notification = createNotification(notificationContent, notificationTarget);
                 saveNotification(notification);
-                sendNotificationByOwnersId(payload.getCoworkers(), notificationContent);
+                sendNotificationByOwnersId(notificationTarget, notificationContent);
             });
 
             // 핸들러 못 찾은 경우 로그 남기기
