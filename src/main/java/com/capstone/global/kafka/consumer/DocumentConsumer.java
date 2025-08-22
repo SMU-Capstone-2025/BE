@@ -26,7 +26,6 @@ public class DocumentConsumer {
             @Header("kafka_receivedTopic") String kafkaTopic,
             @Payload DocumentChangePayload payload) {
         try {
-            log.info("called");
             logService.saveLogEntityFromPayload(kafkaTopic, payload);
         } catch (Exception e) {
             System.err.println("메시지 처리 실패: " + e.getMessage());

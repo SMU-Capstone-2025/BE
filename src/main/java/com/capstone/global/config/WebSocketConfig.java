@@ -20,12 +20,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        // TODO: 1번째 주소에서 연결된 거 확인 후 와읻드카드는 제거.
         registry.addEndpoint("/socket/doc/wss", "/socket/notification/wss")
-                .setAllowedOriginPatterns("https://docktalk.co.kr", "*").withSockJS();
-        registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*").withSockJS();
-        registry.addEndpoint("/chat-websocket").setAllowedOriginPatterns("*");
-
+                .setAllowedOriginPatterns("https://docktalk.co.kr").withSockJS();
     }
 
 
