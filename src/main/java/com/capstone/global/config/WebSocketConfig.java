@@ -21,7 +21,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 
         registry.addEndpoint("/socket/doc/wss", "/socket/notification/wss")
-                .setAllowedOriginPatterns("https://docktalk.co.kr").withSockJS();
+                .setAllowedOriginPatterns("https://docktalk.co.kr", "http://localhost:3000").withSockJS();
     }
 
 
