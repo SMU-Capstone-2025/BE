@@ -52,9 +52,7 @@ public class DocumentService {
 
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
         Document doc = documentRepository.findDocumentByDocumentId(key);
-        if(!doc.getEditors().contains(email)){
-            doc.update(email, key, doc.getProjectId(), changes);
-        }
+        doc.update(email, key, doc.getProjectId(), changes);
         DocumentWrapper tempDto = DocumentWrapper.toDto(doc, email);
         redisTemplate.opsForValue().set("DOC:waited:" + key, tempDto, 10, TimeUnit.SECONDS);
     }
