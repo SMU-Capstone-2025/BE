@@ -16,7 +16,6 @@ import java.util.List;
 public class DocumentChangeDetail extends ChangeDetail<List<String>>{
     private String status;
     private String content;
-    private List<String> logs;
     private List<String> attachments;
 
     public static DocumentChangeDetail from(Document document){
@@ -25,7 +24,6 @@ public class DocumentChangeDetail extends ChangeDetail<List<String>>{
                 .content(document.getContent())
                 .coworkers(document.getEditors())
                 .status(document.getStatus())
-                .logs(document.getLogs())
                 .attachments(document.getAttachments())
                 .build();
 
