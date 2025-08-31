@@ -56,7 +56,8 @@ public class DocumentService {
             doc.update(email, key, doc.getProjectId(), changes);
         }
         DocumentWrapper tempDto = DocumentWrapper.toDto(doc, email);
-        log.info("tempDto: {}", tempDto.document());
+        log.info("tempDto: {}", tempDto.document().getTitle());
+        log.info("tempDto: {}", tempDto.document().getContent());
         redisTemplate.opsForValue().set("DOC:waited:" + key, tempDto, 10, TimeUnit.SECONDS);
     }
 
