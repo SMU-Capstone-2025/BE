@@ -1,5 +1,6 @@
 package com.capstone.domain.notification.service;
 
+import com.capstone.domain.notification.dto.NotificationDto;
 import com.capstone.domain.notification.entity.Notification;
 import com.capstone.domain.notification.exception.NotificationNotFoundException;
 import com.capstone.domain.notification.handler.NotificationHandler;
@@ -58,7 +59,7 @@ public class NotificationService {
         notificationRepository.deleteAll(notifications);
     }
 
-    public void sendNotificationByOwnersId(List<String> editors, String content){
+    public void sendNotificationByOwnersId(List<String> editors, NotificationDto content){
         editors.forEach(ownerEmail -> {
             messagingTemplate.convertAndSend("/sub/notification/" + ownerEmail, content);
         });
@@ -71,6 +72,7 @@ public class NotificationService {
             Optional<NotificationHandler> matchedHandler = findProperHandler(handlers, kafkaTopic);
 
             matchedHandler.ifPresent(handler -> {
+                String redirectionUrl = handler.generateRedirectUrl(payload);
                 String notificationContent = handler.generateMessage(payload);
 
                 List<String> notificationTarget = new ArrayList<>(payload.getCoworkers());
@@ -78,7 +80,7 @@ public class NotificationService {
 
                 Notification notification = createNotification(notificationContent, notificationTarget);
                 saveNotification(notification);
-                sendNotificationByOwnersId(notificationTarget, notificationContent);
+                sendNotificationByOwnersId(notificationTarget, new NotificationDto(redirectionUrl, notificationContent));
             });
 
             // 핸들러 못 찾은 경우 로그 남기기

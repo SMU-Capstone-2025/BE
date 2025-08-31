@@ -7,6 +7,7 @@ import com.capstone.global.kafka.dto.TaskChangePayload;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.kafka.topic.KafkaTopicProperties;
+import com.capstone.global.util.UrlGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,5 +38,11 @@ public class TaskUpdateHandler implements NotificationHandler<TaskChangePayload>
         log.info("merged: {}", merged);
 
         return MessageGenerator.generateFromDto(MessageGenerator.TASK_UPDATED, merged);
+    }
+
+
+    @Override
+    public String generateRedirectUrl(TaskChangePayload payload) {
+        return UrlGenerator.createTaskUrl(payload.getId());
     }
 }

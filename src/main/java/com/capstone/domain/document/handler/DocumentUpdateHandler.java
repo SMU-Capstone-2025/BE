@@ -2,10 +2,9 @@ package com.capstone.domain.document.handler;
 
 import com.capstone.domain.notification.handler.NotificationHandler;
 import com.capstone.global.kafka.dto.DocumentChangePayload;
-import com.capstone.global.kafka.dto.TaskChangePayload;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.capstone.global.kafka.topic.KafkaEventTopic;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.capstone.global.util.UrlGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.xml.sax.DocumentHandler;
@@ -27,5 +26,10 @@ public class DocumentUpdateHandler implements NotificationHandler<DocumentChange
         merged.put("title", payload.getTitle());
 
         return MessageGenerator.generateFromDto(MessageGenerator.DOCUMENT_UPDATED, merged);
+    }
+
+    @Override
+    public String generateRedirectUrl(DocumentChangePayload payload){
+        return UrlGenerator.createDocumentUrl(payload.getId());
     }
 }
