@@ -60,6 +60,8 @@ public class NotificationService {
     }
 
     public void sendNotificationByOwnersId(List<String> editors, NotificationDto content){
+        log.info("{} {}", content.getMessage(), content.getRedirectionUrl());
+
         editors.forEach(ownerEmail -> {
             messagingTemplate.convertAndSend("/sub/notification/" + ownerEmail, content);
         });
