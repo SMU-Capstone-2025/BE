@@ -15,12 +15,14 @@ import java.util.List;
 @AllArgsConstructor
 public class DocumentChangeDetail extends ChangeDetail<List<String>>{
     private String status;
+    private String content;
     private List<String> logs;
     private List<String> attachments;
 
     public static DocumentChangeDetail from(Document document){
         return DocumentChangeDetail.builder()
                 .title(document.getTitle())
+                .content(document.getContent())
                 .coworkers(document.getEditors())
                 .status(document.getStatus())
                 .logs(document.getLogs())
