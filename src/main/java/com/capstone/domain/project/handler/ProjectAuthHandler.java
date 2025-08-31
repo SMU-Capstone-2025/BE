@@ -5,6 +5,7 @@ import com.capstone.global.kafka.dto.ProjectChangePayload;
 import com.capstone.global.kafka.message.MessageGenerator;
 import com.capstone.global.kafka.topic.KafkaEventTopic;
 import com.capstone.global.kafka.topic.KafkaTopicProperties;
+import com.capstone.global.util.UrlGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,5 +32,10 @@ public class ProjectAuthHandler implements NotificationHandler<ProjectChangePayl
         );
 
         return MessageGenerator.generateFromDto(MessageGenerator.PROJECT_AUTHENTICATED, merged);
+    }
+
+    @Override
+    public String generateRedirectUrl(ProjectChangePayload payload) {
+        return UrlGenerator.createProjectUrl(payload.getId());
     }
 }

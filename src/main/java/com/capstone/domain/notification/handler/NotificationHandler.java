@@ -8,4 +8,5 @@ import java.util.List;
 public interface NotificationHandler<T extends CommonChangePayload> {
     boolean canHandle(String kafkaTopic);
     String generateMessage(T payload);
+    String generateRedirectUrl(T payload);
 }

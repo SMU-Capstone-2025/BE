@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [fix/#138-document-save-fix]
+    branches: [main]
 
 jobs:
   CI:
