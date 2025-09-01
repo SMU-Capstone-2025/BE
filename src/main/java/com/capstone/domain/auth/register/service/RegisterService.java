@@ -23,15 +23,14 @@ public class RegisterService {
     }
 
     public boolean checkEmail(String email){
-        if (userRepository.findUserByEmail(email) != null){
-            System.out.println(email);
+        if (userRepository.findUserByEmail(email).isPresent()){
             throw new GlobalException(ErrorStatus.USER_ALREADY_EXISTS);
         }
         return true;
     }
 
     public String validateAndSendMail(String email) throws Exception {
-        if (userRepository.findUserByEmail(email) != null){
+        if (userRepository.findUserByEmail(email).isPresent()){
             throw new GlobalException(ErrorStatus.USER_ALREADY_EXISTS);
         }
         return mailService.sendSimpleMessage(email);
