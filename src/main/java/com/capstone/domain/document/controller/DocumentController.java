@@ -70,8 +70,12 @@ public class DocumentController implements DocumentControllerDocs {
             String email = (String) sessionAttributes.get("email");
 
             DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
+            documentService.updateDocumentEditStatus(documentEditVo);
 
-            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
+            List<DocumentCursorDto> otherCursors = documentService.findOtherUsersCursor(documentEditVo.getDocumentId()
+                    , documentEditVo.getUserDto().getUserId());
+
+            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params, otherCursors);
             messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
             documentService.updateDocumentToCache(email, params.documentId(), documentEditVo);
 
