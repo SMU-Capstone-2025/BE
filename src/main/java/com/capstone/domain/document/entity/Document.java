@@ -42,7 +42,6 @@ public class Document extends BaseDocument {
         this.projectId = projectId;
         if (vo.getTitle() != null) this.title = vo.getTitle();
         if (vo.getStatus() != null) this.status = vo.getStatus();
-        if (vo.getLogs() != null) this.logs = vo.getLogs();
         if (vo.getAttachments() != null) this.attachments = vo.getAttachments();
         if (vo.getContent() != null) this.content = vo.getContent();
 
