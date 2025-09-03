@@ -1,14 +1,14 @@
 package com.capstone.domain.document.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
 public record DocumentEditResponse(
         String email,
-        String message
+        String message,
+        List<DocumentCursorDto> cursors
 ) {
 
-    public static DocumentEditResponse from(DocumentEditRequest request){
-        return new DocumentEditResponse(request.documentId(), request.message());
+    public static DocumentEditResponse from(DocumentEditRequest request, List<DocumentCursorDto> cursors){
+        return new DocumentEditResponse(request.documentId(), request.message(), cursors);
     }
 }
