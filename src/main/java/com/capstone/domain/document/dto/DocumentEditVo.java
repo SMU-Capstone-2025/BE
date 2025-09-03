@@ -17,7 +17,7 @@ public class DocumentEditVo {
 
     private String documentId;
 
-    private DocumentUserDto userDto;
+    private DocumentUserDto user;
 
     private String status;
 
