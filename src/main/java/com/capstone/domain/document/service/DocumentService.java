@@ -50,6 +50,22 @@ public class DocumentService {
 
     }
 
+    public void updateDocumentEditStatus(DocumentEditVo documentEditVo){
+        String key = "DOC:editing:" + documentEditVo.getDocumentId();
+        DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUserDto().getUserName(), documentEditVo.getCursor());
+
+        redisTemplate.opsForHash().put(key, documentEditVo.getUserDto().getUserId(), dto);
+    }
+
+    public List<DocumentCursorDto> findOtherUsersCursor(String documentId, Long myUserId) {
+        String key = "DOC:editing:" + documentId;
+        Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
+        return all.entrySet().stream()
+                .filter(e -> !Objects.equals(e.getKey(), myUserId))
+                .map(e -> (DocumentCursorDto) e.getValue())
+                .toList();
+    }
+
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
         Document doc = documentRepository.findDocumentByDocumentId(key);
         doc.update(email, key, doc.getProjectId(), changes);
@@ -80,6 +96,20 @@ public class DocumentService {
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 String json = objectMapper.writeValueAsString(data);
                 return objectMapper.readValue(json, DocumentWrapper.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+    public DocumentCursorDto mapToDocumentCursor(Object data) {
+        if (data instanceof Map) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new JavaTimeModule());
+                objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+                String json = objectMapper.writeValueAsString(data);
+                return objectMapper.readValue(json, DocumentCursorDto.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }
