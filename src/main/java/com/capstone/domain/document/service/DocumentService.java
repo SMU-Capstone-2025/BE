@@ -52,9 +52,9 @@ public class DocumentService {
 
     public void updateDocumentEditStatus(DocumentEditVo documentEditVo){
         String key = "DOC:editing:" + documentEditVo.getDocumentId();
-        DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUserDto().getUserName(), documentEditVo.getCursor());
+        DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUser().getUserName(), documentEditVo.getCursor());
 
-        redisTemplate.opsForHash().put(key, documentEditVo.getUserDto().getUserId(), dto);
+        redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserId(), dto);
     }
 
     public List<DocumentCursorDto> findOtherUsersCursor(String documentId, Long myUserId) {
