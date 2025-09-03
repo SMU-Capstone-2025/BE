@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -16,13 +17,15 @@ public class DocumentEditVo {
 
     private String documentId;
 
+    private DocumentUserDto userDto;
+
     private String status;
 
     private String title;
 
     private String content;
 
-    private List<String> logs;
+    private Map<String, Long> cursor;
 
     private List<String> attachments;
 
