@@ -11,5 +11,5 @@ public record DocumentEditRequest(
         String documentId,
 
         @NotBlank(message = "message는 필수입니다.")
-        String message
+        DocumentEditVo message
 ) {}
