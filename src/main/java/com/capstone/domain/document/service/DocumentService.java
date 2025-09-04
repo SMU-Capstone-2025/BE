@@ -60,9 +60,17 @@ public class DocumentService {
 
     public List<DocumentCursorDto> findOtherUsersCursor(String documentId) {
         String key = "DOC:editing:" + documentId;
-        Object all = redisTemplate.opsForHash().entries(key);
+        Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
 
-        return mapToDocumentCursor(all, objectMapper);
+        return all.values().stream()
+                .map(v -> {
+                    try {
+                        return objectMapper.readValue(v.toString(), DocumentCursorDto.class);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
     }
 
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
