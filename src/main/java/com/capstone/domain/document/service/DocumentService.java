@@ -52,8 +52,16 @@ public class DocumentService {
     }
 
     public void updateDocumentEditStatus(DocumentEditVo documentEditVo){
+        log.info("Before Key");
         String key = "DOC:editing:" + documentEditVo.getDocumentId();
+        log.info("after Key");
+        log.info("before Dto creation");
+        log.info("user: {}", documentEditVo.getUser().getUserName());
         DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUser().getUserName(), documentEditVo.getCursor());
+        log.info("after Dto creation: {}", dto.getUserName());
+        log.info("after Dto creation: {}", dto.getCursor().get(0));
+        log.info("after Dto creation: {}", dto.getCursor().get(1));
+
 
         redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserEmail(), dto);
     }
