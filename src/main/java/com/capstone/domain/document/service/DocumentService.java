@@ -57,12 +57,11 @@ public class DocumentService {
         redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserEmail(), dto);
     }
 
-    public List<DocumentCursorDto> findOtherUsersCursor(String documentId, String myEmail) {
+    public List<DocumentCursorDto> findOtherUsersCursor(String documentId) {
         String key = "DOC:editing:" + documentId;
-        Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
-        return all.values().stream()
-                .map(o -> (DocumentCursorDto) o)
-                .toList();
+        Object all = redisTemplate.opsForHash().entries(key);
+
+        return mapToDocumentCursor(all);
     }
 
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
@@ -101,14 +100,14 @@ public class DocumentService {
         }
         return null;
     }
-    public DocumentCursorDto mapToDocumentCursor(Object data) {
+    public List<DocumentCursorDto> mapToDocumentCursor(Object data) {
         if (data instanceof Map) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
                 String json = objectMapper.writeValueAsString(data);
-                return objectMapper.readValue(json, DocumentCursorDto.class);
+                return objectMapper.readValue(json, List.class);
             } catch (Exception e) {
                 e.printStackTrace();
             }

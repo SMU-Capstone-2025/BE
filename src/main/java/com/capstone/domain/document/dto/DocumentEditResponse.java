@@ -3,7 +3,7 @@ package com.capstone.domain.document.dto;
 import java.util.List;
 
 public record DocumentEditResponse(
-        String email,
+        String documentId,
         String message,
         List<DocumentCursorDto> cursors
 ) {
