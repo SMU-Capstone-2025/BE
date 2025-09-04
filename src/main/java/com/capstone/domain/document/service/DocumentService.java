@@ -58,27 +58,39 @@ public class DocumentService {
         log.info("before Dto creation");
         log.info("user: {}", documentEditVo.getUser().getUserName());
         log.info("editVoCursor: {}", documentEditVo.getCursor().get("from"));
-        log.info("editVoCursor: {}", documentEditVo.getCursor().get("end"));
+        log.info("editVoCursor: {}", documentEditVo.getCursor().get("to"));
         DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUser().getUserName(), documentEditVo.getCursor());
         log.info("after Dto creation: {}", dto.getUserName());
         log.info("after Dto creation: {}", dto.getCursor().get("from"));
-        log.info("after Dto creation: {}", dto.getCursor().get("end"));
+        log.info("after Dto creation: {}", dto.getCursor().get("to"));
 
-        log.info("before put");
         redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserEmail(), dto);
-        log.info("after put");
     }
 
     public List<DocumentCursorDto> findOtherUsersCursor(String documentId) {
         String key = "DOC:editing:" + documentId;
+        log.info("before all: {}");
         Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
+        log.info("after all");
 
         return all.values().stream()
                 .map(v -> {
                     try {
-                        return objectMapper.readValue(v.toString(), DocumentCursorDto.class);
+                        if (v instanceof DocumentCursorDto dto) {
+                            return dto;
+                        } else if (v instanceof String s) {
+                            // hashValueSerializer가 String일 때: JSON 문자열
+                            return objectMapper.readValue(s, DocumentCursorDto.class);
+                        } else if (v instanceof byte[] bytes) {
+                            // 어떤 설정에선 byte[]일 수 있음
+                            return objectMapper.readValue(bytes, DocumentCursorDto.class);
+                        } else {
+                            // 보통 GenericJackson2JsonRedisSerializer 사용 시 LinkedHashMap
+                            return objectMapper.convertValue(v, DocumentCursorDto.class);
+                        }
                     } catch (Exception e) {
-                        throw new RuntimeException(e);
+                        throw new RuntimeException("Failed to deserialize cursor value. type="
+                                + (v == null ? "null" : v.getClass().getName()) + ", value=" + String.valueOf(v), e);
                     }
                 })
                 .toList();
