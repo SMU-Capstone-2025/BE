@@ -57,13 +57,16 @@ public class DocumentService {
         log.info("after Key");
         log.info("before Dto creation");
         log.info("user: {}", documentEditVo.getUser().getUserName());
+        log.info("editVoCursor: {}", documentEditVo.getCursor().get("from"));
+        log.info("editVoCursor: {}", documentEditVo.getCursor().get("end"));
         DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUser().getUserName(), documentEditVo.getCursor());
         log.info("after Dto creation: {}", dto.getUserName());
-        log.info("after Dto creation: {}", dto.getCursor().get(0));
-        log.info("after Dto creation: {}", dto.getCursor().get(1));
+        log.info("after Dto creation: {}", dto.getCursor().get("from"));
+        log.info("after Dto creation: {}", dto.getCursor().get("end"));
 
-
+        log.info("before put");
         redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserEmail(), dto);
+        log.info("after put");
     }
 
     public List<DocumentCursorDto> findOtherUsersCursor(String documentId) {
