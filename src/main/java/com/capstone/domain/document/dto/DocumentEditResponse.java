@@ -4,7 +4,7 @@ import java.util.List;
 
 public record DocumentEditResponse(
         String documentId,
-        String message,
+        DocumentEditVo message,
         List<DocumentCursorDto> cursors
 ) {
 
