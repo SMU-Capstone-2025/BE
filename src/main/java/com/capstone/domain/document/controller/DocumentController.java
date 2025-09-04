@@ -72,6 +72,7 @@ public class DocumentController implements DocumentControllerDocs {
             log.info("params:{}", params.message().getContent());
             DocumentEditVo documentEditVo = params.message();
             log.info("documentEditVo:{}", documentEditVo.getContent());
+            log.info("user:{}", documentEditVo.getUser());
 
             documentService.updateDocumentEditStatus(documentEditVo);
 
