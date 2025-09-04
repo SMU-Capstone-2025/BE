@@ -37,6 +37,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final KafkaProducerService kafkaProducerService;
+    private final ObjectMapper objectMapper;
 
 
     public DocumentResponse findDocumentCacheFirst(String key){
@@ -61,7 +62,7 @@ public class DocumentService {
         String key = "DOC:editing:" + documentId;
         Object all = redisTemplate.opsForHash().entries(key);
 
-        return mapToDocumentCursor(all);
+        return mapToDocumentCursor(all, objectMapper);
     }
 
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
@@ -100,19 +101,12 @@ public class DocumentService {
         }
         return null;
     }
-    public List<DocumentCursorDto> mapToDocumentCursor(Object data) {
-        if (data instanceof Map) {
-            try {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                String json = objectMapper.writeValueAsString(data);
-                return objectMapper.readValue(json, List.class);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
+
+    public List<DocumentCursorDto> mapToDocumentCursor(Object data, ObjectMapper mapper) {
+        if (!(data instanceof Map<?, ?> m) || m.isEmpty()) return List.of();
+        return m.values().stream()
+                .map(v -> mapper.convertValue(v, DocumentCursorDto.class))
+                .toList();
     }
 
     @Transactional
