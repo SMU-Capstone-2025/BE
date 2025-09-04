@@ -60,9 +60,8 @@ public class DocumentService {
     public List<DocumentCursorDto> findOtherUsersCursor(String documentId, String myEmail) {
         String key = "DOC:editing:" + documentId;
         Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
-        return all.entrySet().stream()
-                .filter(e -> !Objects.equals(e.getKey(), myEmail))
-                .map(e -> (DocumentCursorDto) e.getValue())
+        return all.values().stream()
+                .map(o -> (DocumentCursorDto) o)
                 .toList();
     }
 
