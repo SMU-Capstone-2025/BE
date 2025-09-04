@@ -69,7 +69,10 @@ public class DocumentController implements DocumentControllerDocs {
         try {
             String email = (String) sessionAttributes.get("email");
 
+            log.info("params:{}", params.message().getContent());
             DocumentEditVo documentEditVo = params.message();
+            log.info("documentEditVo:{}", documentEditVo.getContent());
+
             documentService.updateDocumentEditStatus(documentEditVo);
 
             List<DocumentCursorDto> otherCursors = documentService.findOtherUsersCursor(documentEditVo.getDocumentId());
