@@ -73,6 +73,10 @@ public class DocumentController implements DocumentControllerDocs {
             documentService.updateDocumentEditStatus(documentEditVo);
 
             List<DocumentCursorDto> otherCursors = documentService.findOtherUsersCursor(documentEditVo.getDocumentId());
+            for (DocumentCursorDto otherCursor : otherCursors) {
+                log.info("cursorUser:{}", otherCursor.getUserName());
+            }
+
 
             DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params, otherCursors);
             messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
