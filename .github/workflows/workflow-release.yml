@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [main]
+    branches: [feat/#144-ai-gpt]
 
 jobs:
   CI:
@@ -74,6 +74,7 @@ jobs:
           NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}
           OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          GPT_API_KEY=${{ secrets.GPT_API_KEY }}
           REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
           REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
           SPRING_PROFILES_ACTIVE=prod
