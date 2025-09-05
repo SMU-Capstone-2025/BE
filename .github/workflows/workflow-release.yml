@@ -2,7 +2,7 @@ name: CI / CD
 
 on:
   push:
-    branches: [feat/#147-ai-gpt]
+    branches: [main]
 
 jobs:
   CI:
