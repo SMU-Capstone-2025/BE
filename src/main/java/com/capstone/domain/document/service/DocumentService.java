@@ -37,6 +37,7 @@ public class DocumentService {
     private final DocumentRepository documentRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final KafkaProducerService kafkaProducerService;
+    private final ObjectMapper objectMapper;
 
 
     public DocumentResponse findDocumentCacheFirst(String key){
@@ -48,6 +49,51 @@ public class DocumentService {
     public List<Document> findDocumentList(String projectId){
         return documentRepository.findDocumentsByProjectId(projectId);
 
+    }
+
+    public void updateDocumentEditStatus(DocumentEditVo documentEditVo){
+        log.info("Before Key");
+        String key = "DOC:editing:" + documentEditVo.getDocumentId();
+        log.info("after Key");
+        log.info("before Dto creation");
+        log.info("user: {}", documentEditVo.getUser().getUserName());
+        log.info("editVoCursor: {}", documentEditVo.getCursor().get("from"));
+        log.info("editVoCursor: {}", documentEditVo.getCursor().get("to"));
+        DocumentCursorDto dto = new DocumentCursorDto(documentEditVo.getUser().getUserName(), documentEditVo.getCursor());
+        log.info("after Dto creation: {}", dto.getUserName());
+        log.info("after Dto creation: {}", dto.getCursor().get("from"));
+        log.info("after Dto creation: {}", dto.getCursor().get("to"));
+
+        redisTemplate.opsForHash().put(key, documentEditVo.getUser().getUserEmail(), dto);
+    }
+
+    public List<DocumentCursorDto> findOtherUsersCursor(String documentId) {
+        String key = "DOC:editing:" + documentId;
+        log.info("before all: {}");
+        Map<Object, Object> all = redisTemplate.opsForHash().entries(key);
+        log.info("after all");
+
+        return all.values().stream()
+                .map(v -> {
+                    try {
+                        if (v instanceof DocumentCursorDto dto) {
+                            return dto;
+                        } else if (v instanceof String s) {
+                            // hashValueSerializer가 String일 때: JSON 문자열
+                            return objectMapper.readValue(s, DocumentCursorDto.class);
+                        } else if (v instanceof byte[] bytes) {
+                            // 어떤 설정에선 byte[]일 수 있음
+                            return objectMapper.readValue(bytes, DocumentCursorDto.class);
+                        } else {
+                            // 보통 GenericJackson2JsonRedisSerializer 사용 시 LinkedHashMap
+                            return objectMapper.convertValue(v, DocumentCursorDto.class);
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to deserialize cursor value. type="
+                                + (v == null ? "null" : v.getClass().getName()) + ", value=" + String.valueOf(v), e);
+                    }
+                })
+                .toList();
     }
 
     public void updateDocumentToCache(String email, String key, DocumentEditVo changes){
@@ -85,6 +131,13 @@ public class DocumentService {
             }
         }
         return null;
+    }
+
+    public List<DocumentCursorDto> mapToDocumentCursor(Object data, ObjectMapper mapper) {
+        if (!(data instanceof Map<?, ?> m) || m.isEmpty()) return List.of();
+        return m.values().stream()
+                .map(v -> mapper.convertValue(v, DocumentCursorDto.class))
+                .toList();
     }
 
     @Transactional

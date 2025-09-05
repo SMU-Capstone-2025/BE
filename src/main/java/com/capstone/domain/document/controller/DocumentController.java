@@ -69,9 +69,17 @@ public class DocumentController implements DocumentControllerDocs {
         try {
             String email = (String) sessionAttributes.get("email");
 
-            DocumentEditVo documentEditVo = objectMapper.readValue(params.message(), DocumentEditVo.class);
+            DocumentEditVo documentEditVo = params.message();
 
-            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params);
+            documentService.updateDocumentEditStatus(documentEditVo);
+
+            List<DocumentCursorDto> otherCursors = documentService.findOtherUsersCursor(documentEditVo.getDocumentId());
+            for (DocumentCursorDto otherCursor : otherCursors) {
+                log.info("cursorUser:{}", otherCursor.getUserName());
+            }
+
+
+            DocumentEditResponse documentEditResponse = DocumentEditResponse.from(params, otherCursors);
             messagingTemplate.convertAndSend("/sub/document/" + params.documentId(), documentEditResponse);
             documentService.updateDocumentToCache(email, params.documentId(), documentEditVo);
 

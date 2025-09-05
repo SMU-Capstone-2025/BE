@@ -1,66 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>Task API 테스트</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>이미지 보기</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { margin: 4px; padding: 6px; }
-    button { cursor: pointer; }
-    pre { background: #f1f1f1; padding: 10px; white-space: pre-wrap; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f6f7f9;
+      padding: 16px;
+    }
+    img {
+      max-width: 100%;
+      max-height: 100vh;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      box-shadow: 0 6px 24px rgba(0,0,0,.12);
+    }
   </style>
 </head>
 <body>
-<h2>📝 Task API 테스트 페이지</h2>
-
-<div>
-  <input id="taskId" placeholder="taskId 입력" />
-  <input id="status" placeholder="status (예: DONE)" />
-  <input id="version" placeholder="version (예: 1)" />
-</div>
-
-<div style="margin-top: 10px;">
-  <button onclick="callApi('/get', 'GET', { taskId: get('taskId') })">📄 Get Task</button>
-  <button onclick="callApi('/list/get')">📚 Get All Tasks</button>
-  <button onclick="callApi('/list/deadline')">⏰ Deadline Tasks</button>
-  <button onclick="callApi('/log', 'GET', { taskId: get('taskId') })">📜 Task Logs</button>
-  <button onclick="callApi('/status', 'PUT', { id: get('taskId'), status: get('status') })">✅ Update Status</button>
-  <button onclick="callApi('/delete', 'DELETE', { id: get('taskId') })">❌ Delete Task</button>
-  <button onclick="callApi('/version/list', 'GET', { projectId: '67f917f2faed8a4ff3f02bc3', taskId: get('taskId') })">📁 Version List</button>
-  <button onclick="callApi('/version/back', 'GET', { taskId: get('taskId'), version: get('version') })">↩️ Rollback Version</button>
-</div>
-
-<h3>📦 응답 결과</h3>
-<pre id="result">여기에 응답이 표시됩니다</pre>
-
-<script>
-  const BASE_URL = "http://localhost:8080/task"; // ← 여기에 실제 서버 주소 입력
-
-  const get = (id) => document.getElementById(id).value;
-
-  async function callApi(path, method = "GET", params = {}) {
-    const url = new URL(BASE_URL + path);
-
-    if (method === "GET") {
-      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    }
-
-    try {
-      const res = await fetch(url.toString(), {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJjYXRlZ29yeSI6ImFjY2VzcyIsImVtYWlsIjoicXdlMTIzQG5hdmVyLmNvbSIsInJvbGUiOiJST0xFX01BTkFHRVIiLCJpYXQiOjE3NDQzOTUzOTcsImV4cCI6MTc0NDM5NzE5N30.Ur-khgHSfv7ZE31p5-06QFAibNVoUoWuDb1aWXuwkzc", // ← 필요하면 여기에 토큰 입력
-        },
-        body: method !== "GET" ? JSON.stringify(params) : undefined,
-      });
-
-      const data = await res.json();
-      document.getElementById("result").textContent = JSON.stringify(data, null, 2);
-    } catch (err) {
-      document.getElementById("result").textContent = "에러 발생: " + err;
-    }
-  }
-</script>
+<img
+        src="https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=e29600a3-7ec7-4e1e-b11d-030396ff1305"
+        alt="대한민국 구석구석 이미지"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+/>
 </body>
 </html>
