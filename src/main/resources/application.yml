@@ -138,7 +138,9 @@ logging:
 openai:
   api:
     url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
-    key: ${OPENAI_API_KEY}
+    geminikey: ${OPENAI_API_KEY}
+    gptkey: ${GPT_API_KEY}
+
 
 IMP_API_KEY: ${IMP_API_KEY}
 IMP_API_SECRET: ${IMP_API_SECRET}

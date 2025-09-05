@@ -2,6 +2,7 @@ package com.capstone.domain.AI.service;
 
 import com.capstone.domain.AI.dto.AIRequest;
 import com.capstone.domain.AI.dto.AIReviseRequest;
+import com.capstone.domain.AI.dto.ChatGptResponse;
 import com.capstone.domain.AI.exception.AIException;
 import com.capstone.domain.AI.prompt.AiPromptBuilder;
 import com.capstone.domain.user.entity.MembershipType;
@@ -13,8 +14,11 @@ import com.capstone.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -27,10 +31,15 @@ import static com.capstone.domain.user.message.UserMessages.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AIService
 {
-    @Value("${openai.api.key}")
-    private String apiKey;
+    @Value("${openai.api.geminikey}")
+    private String geminiApiKey;
+
+    @Value("${openai.api.gptkey}")
+    private String gptApiKey;
+
 
     private static final int AI_LIMIT =5;
 
@@ -108,7 +117,7 @@ public class AIService
         String feedback =aiReviseRequest.getReviseRequest();
 
         String prompt=AiPromptBuilder.revisePrompt(originalSummary,feedback);
-        String response= askGemini(prompt).block();
+        String response= askChatGPT(prompt).block();
         return response;
     }
 
@@ -118,7 +127,7 @@ public class AIService
 
         return webClient.post()
                 .header("Content-Type", "application/json")
-                .header("x-goog-api-key", apiKey)
+                .header("x-goog-api-key", geminiApiKey)
                 .bodyValue(Map.of(
                         "contents", new Object[]{
                                 Map.of("parts", new Object[]{
@@ -156,6 +165,30 @@ public class AIService
 
 
 
+    }
+    public Mono<String> askChatGPT(String prompt) {
+        Map<String, Object> requestBody = Map.of(
+            "model", "gpt-4o-mini",
+            "temperature", 0.0,
+            "messages", List.of(
+                Map.of("role", "user", "content", prompt)
+            )
+        );
+
+        return webClient.post()
+            .uri("/v1/chat/completions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer " + gptApiKey)
+            .bodyValue(requestBody)
+            .retrieve()
+            .bodyToMono(ChatGptResponse.class)
+            .map(response -> Optional.ofNullable(response)
+                .map(ChatGptResponse::choices)
+                .filter(choices -> !choices.isEmpty())
+                .map(choices -> choices.get(0).message().content())
+                .orElse("no result"))
+            .doOnError(e -> log.error("ChatGPT API 호출 실패", e))
+            .onErrorResume(e -> Mono.error(new AIException("AI 응답 처리 중 오류가 발생했습니다.")));
     }
 
 
