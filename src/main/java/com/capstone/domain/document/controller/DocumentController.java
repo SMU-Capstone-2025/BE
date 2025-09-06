@@ -5,17 +5,22 @@ import com.capstone.domain.document.dto.*;
 import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.service.DocumentService;
 import com.capstone.global.response.ApiResponse;
+import com.capstone.global.response.PageResponse;
 import com.capstone.global.security.CustomUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +30,7 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/document")
-public class DocumentController implements DocumentControllerDocs {
+public class DocumentController implements DocumentControllerDocs{
     private final SimpMessageSendingOperations messagingTemplate;
     private final DocumentService documentService;
     private final ObjectMapper objectMapper;
@@ -34,6 +39,15 @@ public class DocumentController implements DocumentControllerDocs {
     @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
     public ResponseEntity<ApiResponse<DocumentResponse>> getDocument(@RequestParam("documentId") String documentId){
         return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentCacheFirst(documentId)));
+    }
+
+    @GetMapping("/logs/{documentId}")
+    @PreAuthorize("@projectAuthorityEvaluator.hasDocumentPermission(#documentId, {'ROLE_MANAGER','ROLE_MEMBER'}, authentication)")
+    public ResponseEntity<ApiResponse<PageResponse<List<DocumentLogDto>>>> getDocumentLogs(@PathVariable String documentId,
+                                                                                           @RequestParam(defaultValue = "1") @Valid @Min(value = 1) int page,
+                                                                                           @RequestParam(defaultValue = "5") @Valid @Min(value = 1) int size){
+        Pageable pageable = PageRequest.of(page - 1, size);
+        return ResponseEntity.ok(ApiResponse.onSuccess(documentService.findDocumentLogs(documentId, pageable)));
     }
 
     @DeleteMapping("/delete")
