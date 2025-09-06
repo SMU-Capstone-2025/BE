@@ -5,10 +5,12 @@ import com.capstone.domain.document.entity.Document;
 import com.capstone.domain.document.message.DocumentStatus;
 import com.capstone.domain.document.repository.DocumentRepository;
 
+import com.capstone.domain.log.repository.LogRepository;
 import com.capstone.global.kafka.dto.DocumentChangePayload;
 import com.capstone.global.kafka.dto.detail.DocumentChangeDetail;
 import com.capstone.global.kafka.service.KafkaProducerService;
 import com.capstone.global.kafka.topic.KafkaEventTopic;
+import com.capstone.global.response.PageResponse;
 import com.capstone.global.response.exception.GlobalException;
 import com.capstone.global.response.status.ErrorStatus;
 import com.capstone.global.security.CustomUserDetails;
@@ -21,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,6 +39,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class DocumentService {
     private final DocumentRepository documentRepository;
+    private final LogRepository logRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final KafkaProducerService kafkaProducerService;
     private final ObjectMapper objectMapper;
@@ -45,6 +50,13 @@ public class DocumentService {
                 .orElseThrow(() -> new GlobalException(ErrorStatus.DOCUMENT_NOT_FOUND));
         return DocumentResponse.from(doc);
     }
+
+    public PageResponse<List<DocumentLogDto>> findDocumentLogs(String documentId, Pageable pageable){
+        Page<DocumentLogDto> logs = logRepository.findAllByDocumentId(documentId, pageable);
+
+        return PageResponse.of(logs, pageable);
+    }
+
 
     public List<Document> findDocumentList(String projectId){
         return documentRepository.findDocumentsByProjectId(projectId);
