@@ -22,7 +22,7 @@ public class FileController implements FileControllerDocs {
     private final FileService fileService;
 
 
-    @PostMapping(value = "/upload/{taskId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileResponse>> uploadFile(
             @RequestParam("file") MultipartFile file) throws Exception {
         return ResponseEntity.ok(ApiResponse.onSuccess(fileService.upload(file)));
